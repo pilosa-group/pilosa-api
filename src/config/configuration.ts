@@ -20,17 +20,17 @@ export type DatabaseConfig = {
 };
 
 export type Config = {
-  aws: AwsConfig;
+  // aws: AwsConfig;
   database: DatabaseConfig;
   influxdb: InfluxdbConfig;
 };
 
 export default (): Config => ({
-  aws: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION,
-  },
+  // aws: {
+  //   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  //   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  //   region: process.env.AWS_REGION,
+  // },
   database: {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),

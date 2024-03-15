@@ -7,3 +7,9 @@ export interface BrowserMetric extends BaseMetric {
   cachedBytes: number;
   accuracy: number;
 }
+
+export interface ServerMetric extends BaseMetric {
+  cpu?: number;
+  networkIn?: number;
+  networkOut?: number;
+}

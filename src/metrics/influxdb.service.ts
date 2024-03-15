@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
 import { InfluxDB, Point } from '@influxdata/influxdb-client';
-import { BrowserMetric } from './metrics/metric.browser';
+import { BrowserMetric, ServerMetric } from './metrics/metric.browser';
 import { ConfigService } from '@nestjs/config';
 import { InfluxdbConfig } from '../config/configuration';
+import { Instance } from '../cloud/cloud-provider-instance-list.interface';
 
 @Injectable()
 export class InfluxdbService {
@@ -27,7 +28,7 @@ export class InfluxdbService {
     await this.writeApi.flush();
   }
 
-  storeBrowserMetric(metric: BrowserMetric) {
+  storeBrowserMetric(metric: BrowserMetric, timestamp: Date = new Date()) {
     const p = new Point('browser')
       .tag('client', metric.clientId)
       .tag('domain', metric.domain)
@@ -35,7 +36,33 @@ export class InfluxdbService {
       .intField('bytes', metric.bytes)
       .intField('cachedBytes', metric.cachedBytes)
       .floatField('accuracy', metric.accuracy)
-      .timestamp(new Date());
+      .timestamp(timestamp);
+
+    this.writeApi.writePoint(p);
+  }
+
+  storeServerMetric(instance: Instance, metric: ServerMetric, timestamp: Date) {
+    const p = new Point('server')
+      .tag('client', metric.clientId)
+      .tag('provider', instance.provider)
+      .tag('class', instance.class)
+      .tag('state', instance.state)
+      .tag('id', instance.id)
+      .timestamp(timestamp);
+
+    if (metric.cpu !== undefined) {
+      p.floatField('cpu', metric.cpu);
+    }
+
+    if (metric.networkIn !== undefined) {
+      p.floatField('networkIn', metric.networkIn);
+    }
+
+    if (metric.networkOut !== undefined) {
+      p.floatField('networkOut', metric.networkOut);
+    }
+
+    console.log(p);
 
     this.writeApi.writePoint(p);
   }

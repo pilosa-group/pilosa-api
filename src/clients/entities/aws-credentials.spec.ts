@@ -8,12 +8,12 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import { Client } from './client.entity';
 
 @Entity()
 @Exclude()
-export class SnippetConfig {
+export class AWSCredentials {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -27,10 +27,18 @@ export class SnippetConfig {
   deletedAt: Date;
 
   @Column()
-  @Expose()
-  batchWaitTime: number;
+  @Exclude()
+  accessKeyId: string;
 
-  @OneToOne(() => Client)
+  @Column()
+  @Exclude()
+  secretAccessKey: string;
+
+  @Column()
+  @Exclude()
+  region: string;
+
+  @OneToOne(() => Client, (client: Client) => client.snippetConfig)
   @JoinColumn()
   client: Client;
 }
