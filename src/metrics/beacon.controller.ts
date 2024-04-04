@@ -12,13 +12,13 @@ import { Request, Response } from 'express';
 import { ClientsService } from '../clients/clients.service';
 
 import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
-import { InfluxdbService } from './influxdb.service';
+// import { InfluxdbService } from './influxdb.service';
 
 @Controller('beacon')
 export class BeaconController {
   constructor(
     private clientsService: ClientsService,
-    private influxDb: InfluxdbService,
+    // private influxDb: InfluxdbService,
   ) {}
 
   @Options()
@@ -57,16 +57,16 @@ export class BeaconController {
 
     // TODO: store user agent for embodied carbon calculations
 
-    this.influxDb.storeBrowserMetric({
-      clientId: client.id,
-      domain: createBrowserMetricDto.d,
-      path: createBrowserMetricDto.p,
-      bytes: createBrowserMetricDto.b,
-      cachedBytes: createBrowserMetricDto.cb,
-      accuracy: createBrowserMetricDto.a,
-    });
-
-    await this.influxDb.flush();
+    // this.influxDb.storeBrowserMetric({
+    //   clientId: client.id,
+    //   domain: createBrowserMetricDto.d,
+    //   path: createBrowserMetricDto.p,
+    //   bytes: createBrowserMetricDto.b,
+    //   cachedBytes: createBrowserMetricDto.cb,
+    //   accuracy: createBrowserMetricDto.a,
+    // });
+    //
+    // await this.influxDb.flush();
 
     return res.status(HttpStatus.ACCEPTED).send();
   }

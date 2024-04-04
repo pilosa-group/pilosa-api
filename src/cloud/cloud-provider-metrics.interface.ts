@@ -9,6 +9,8 @@ export type MetricResult = {
   cpu?: number;
   networkIn?: number;
   networkOut?: number;
+  diskReadOps?: number;
+  diskWriteOps?: number;
 };
 
 interface GetMetricsOptions {
