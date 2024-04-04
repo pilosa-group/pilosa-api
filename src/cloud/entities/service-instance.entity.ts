@@ -33,17 +33,18 @@ export class ServerInstance {
 
   @Column()
   @Expose()
-  instanceClass: string;
+  class: string;
 
   @Column()
   @Expose()
-  instanceState: string;
+  state: string;
 
   @Column()
   @Expose()
   instanceId: string;
 
   @Column('simple-json')
+  @Expose()
   tags: InstanceTag[] = [];
 
   @ManyToOne(

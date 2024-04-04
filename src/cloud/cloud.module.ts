@@ -7,8 +7,10 @@ import { MetricsModule } from '../metrics/metrics.module';
 import { CloudProviderAccount } from './entities/cloud-provider-account';
 import { ServerInstance } from './entities/service-instance.entity';
 import { CloudProviderAccountService } from './cloud-provider-account.service';
+import { ServersController } from './servers.controller';
 
 @Module({
+  controllers: [ServersController],
   providers: [
     MonitoringService,
     ServerInstanceService,

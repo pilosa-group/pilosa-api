@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule } from './clients/clients.module';
 import { CloudModule } from './cloud/cloud.module';
@@ -13,6 +13,7 @@ import { HealthController } from './health/health.controller';
 import { CloudProviderAccount } from './cloud/entities/cloud-provider-account';
 import { ServerInstance } from './cloud/entities/service-instance.entity';
 import { ServerMetric } from './metrics/entities/server-metric.entity';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -56,5 +57,11 @@ import { ServerMetric } from './metrics/entities/server-metric.entity';
     AwsModule,
   ],
   controllers: [HealthController],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
+  ],
 })
 export class AppModule {}
