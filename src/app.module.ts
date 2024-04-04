@@ -7,13 +7,20 @@ import { validationSchema } from './config/validation.schema';
 import configuration, { DatabaseConfig } from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Client } from './clients/entities/client.entity';
-import { SnippetConfig } from './clients/entities/snippet-config.entity';
 import { AwsModule } from './aws/aws.module';
 import { HealthController } from './health/health.controller';
 import { CloudProviderAccount } from './cloud/entities/cloud-provider-account';
 import { ServerInstance } from './cloud/entities/service-instance.entity';
 import { ServerMetric } from './metrics/entities/server-metric.entity';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { FrontendApp } from './metrics/entities/frontend-app.entity';
+import { BrowserMetric } from './metrics/entities/browser-metric.entity';
+import { SnippetConfig } from './metrics/entities/snippet-config.entity';
+
+export const serializeInterceptorProvider = {
+  provide: APP_INTERCEPTOR,
+  useClass: ClassSerializerInterceptor,
+};
 
 @Module({
   imports: [
@@ -40,6 +47,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
             CloudProviderAccount,
             ServerInstance,
             ServerMetric,
+            FrontendApp,
+            BrowserMetric,
           ],
           migrations: ['dist/db/*-migrations.js'],
           cli: {
@@ -57,11 +66,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     AwsModule,
   ],
   controllers: [HealthController],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ClassSerializerInterceptor,
-    },
-  ],
+  providers: [serializeInterceptorProvider],
 })
 export class AppModule {}

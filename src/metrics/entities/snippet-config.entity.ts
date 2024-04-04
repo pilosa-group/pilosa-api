@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
-import { Client } from './client.entity';
+import { Client } from '../../clients/entities/client.entity';
 
 @Entity()
 @Exclude()
