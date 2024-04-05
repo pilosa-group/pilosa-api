@@ -50,7 +50,6 @@ export class BeaconController {
     @Body() createBrowserMetricDto: CreateBrowserMetricDto,
     @Req() req: Request,
   ) {
-    console.log({ createBrowserMetricDto });
     const frontendAppId = req.headers[FRONTEND_APP_ID] as Client['id'];
     const frontendApp =
       await this.frontendAppService.findOneById(frontendAppId);
