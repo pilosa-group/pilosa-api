@@ -1,11 +1,4 @@
 export class CreateBrowserMetricDto {
-  clientId: string;
-
-  /**
-   * domain
-   */
-  d: string;
-
   /**
    * path
    */

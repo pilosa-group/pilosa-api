@@ -13,6 +13,9 @@ export class CloudProviderAccountService {
   async findOneLatestImported(): Promise<CloudProviderAccount | null> {
     return this.cloudProviderAccountRepository
       .createQueryBuilder('cpa')
+      .where('cpa.lastImportedAt < :lastImportedAt', {
+        lastImportedAt: new Date(new Date().getTime() - 5 * 60 * 1000),
+      })
       .orderBy('cpa.lastImportedAt', 'ASC')
       .getOne();
   }

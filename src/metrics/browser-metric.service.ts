@@ -15,6 +15,7 @@ export class BrowserMetricService {
   async create(
     browserMetricDto: CreateBrowserMetricDto & {
       u: string;
+      d: string;
     },
     frontendApp: FrontendApp,
   ): Promise<BrowserMetric> {

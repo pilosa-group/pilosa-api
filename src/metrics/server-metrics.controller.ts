@@ -1,5 +1,5 @@
 import { Controller, Get, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { ServerMetricService } from './server-metric.service';
 
 @Controller('metrics/server')
@@ -19,7 +19,6 @@ export class ServerMetricsController {
       startDate,
       endDate,
     );
-    console.log(metrics);
 
     return res.send(metrics);
   }
