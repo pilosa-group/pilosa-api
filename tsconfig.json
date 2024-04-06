@@ -16,6 +16,50 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/client": [
+        "libs/client/src"
+      ],
+      "@app/client/*": [
+        "libs/client/src/*"
+      ],
+      "@app/cloud-aws": [
+        "libs/cloud-aws/src"
+      ],
+      "@app/cloud-aws/*": [
+        "libs/cloud-aws/src/*"
+      ],
+      "@app/cloud-core": [
+        "libs/cloud-core/src"
+      ],
+      "@app/cloud-core/*": [
+        "libs/cloud-core/src/*"
+      ],
+      "@app/cloud": [
+        "libs/cloud/src"
+      ],
+      "@app/cloud/*": [
+        "libs/cloud/src/*"
+      ],
+      "@app/web-metrics": [
+        "libs/web-metrics/src"
+      ],
+      "@app/web-metrics/*": [
+        "libs/web-metrics/src/*"
+      ],
+      "@app/cloud-metrics": [
+        "libs/cloud-metrics/src"
+      ],
+      "@app/cloud-metrics/*": [
+        "libs/cloud-metrics/src/*"
+      ],
+      "@app/health": [
+        "libs/health/src"
+      ],
+      "@app/health/*": [
+        "libs/health/src/*"
+      ]
+    }
   }
 }
