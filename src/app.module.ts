@@ -36,6 +36,7 @@ import { WebSnippetModule } from './web-snippet/web-snippet.module';
           username,
           password,
           database,
+          ssl: true,
           entities: [
             Client,
             SnippetConfig,
