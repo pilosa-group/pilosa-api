@@ -1,0 +1,6 @@
+.env
+node_modules
+dist
+docker
+infra
+k8s
