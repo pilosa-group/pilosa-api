@@ -10,9 +10,20 @@ export type DatabaseConfig = {
   database: string;
 };
 
+export type EncryptionConfig = {
+  password: string;
+  salt: string;
+};
+
+export type JWTConfig = {
+  secret: string;
+};
+
 export type Config = {
   database: DatabaseConfig;
   webSnippet: WebSnippetConfig;
+  encryption: EncryptionConfig;
+  jwt: JWTConfig;
 };
 
 export default (): Config => ({
@@ -25,5 +36,12 @@ export default (): Config => ({
   },
   webSnippet: {
     beaconApiUrl: process.env.SNIPPET_BEACON_API_URL,
+  },
+  encryption: {
+    password: process.env.ENCRYPTION_PASSWORD,
+    salt: process.env.ENCRYPTION_SALT,
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET,
   },
 });

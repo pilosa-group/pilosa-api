@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/project-green-nest/test/jest-e2e.json",
     "typeorm": "typeorm -d dist/apps/project-green-nest/apps/project-green-nest/src/config/typeorm.datasource.js",
-    "migration:generate": "npm run build && npm run typeorm -- migration:generate src/db/migrations",
+    "migration:generate": "npm run build && npm run typeorm -- migration:generate apps/project-green-nest/src/db/migrations",
     "migration:run": "npm run build && npm run typeorm -- migration:run",
     "migration:show": "npm run build && npm run typeorm -- migration:show"
   },
@@ -31,12 +31,18 @@
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.0",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/jwt": "^10.2.0",
     "@nestjs/mapped-types": "*",
+    "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/typeorm": "^10.0.2",
+    "bcrypt": "^5.1.1",
     "cache-manager": "^5.5.0",
     "class-transformer": "^0.5.1",
     "joi": "^17.12.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
@@ -46,9 +52,11 @@
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
+    "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -93,7 +101,9 @@
       "^@app/cloud(|/.*)$": "<rootDir>/libs/cloud/src/$1",
       "^@app/web-metrics(|/.*)$": "<rootDir>/libs/web-metrics/src/$1",
       "^@app/cloud-metrics(|/.*)$": "<rootDir>/libs/cloud-metrics/src/$1",
-      "^@app/health(|/.*)$": "<rootDir>/libs/health/src/$1"
+      "^@app/health(|/.*)$": "<rootDir>/libs/health/src/$1",
+      "^@app/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
+      "^@app/user(|/.*)$": "<rootDir>/libs/user/src/$1"
     }
   }
 }

@@ -15,6 +15,9 @@ import { ServerMetric } from '@app/cloud-metrics/entities/server-metric.entity';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
 import { HealthModule } from '@app/health';
+import { AuthModule } from '@app/auth';
+import { UserModule } from '@app/user';
+import { User } from '@app/user/entities/user.entity';
 
 @Module({
   imports: [
@@ -43,8 +46,11 @@ import { HealthModule } from '@app/health';
             ServerMetric,
             FrontendApp,
             BrowserMetric,
+            User,
           ],
-          migrations: ['dist/db/*-migrations.js'],
+          migrations: [
+            'dist/apps/project-green-nest/apps/project-green-nest/src/db/*-migrations.js',
+          ],
           cli: {
             migrationsDir: 'src/db/migrations',
           },
@@ -53,6 +59,7 @@ import { HealthModule } from '@app/health';
       },
       inject: [ConfigService],
     }),
+    AuthModule,
     ClientModule,
     WebMetricsModule,
     CloudMetricsModule,
@@ -61,6 +68,5 @@ import { HealthModule } from '@app/health';
     WebSnippetModule,
     HealthModule,
   ],
-  controllers: [],
 })
 export class AppModule {}
