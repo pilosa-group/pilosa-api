@@ -5,20 +5,26 @@ import { CloudProviderAccountService } from './cloud-provider-account.service';
 import { AwsGetMetrics } from '@app/cloud-aws/aws-get-metrics';
 import { AwsInstanceList } from '@app/cloud-aws/aws-instance-list';
 import { ServerMetricService } from '@app/cloud-metrics/server-metric.service';
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class MonitoringService {
+  private isRunning = false;
+
   constructor(
     private readonly serverInstanceService: ServerInstanceService,
     private readonly cloudProviderAccountService: CloudProviderAccountService,
     private readonly serverMetricService: ServerMetricService,
-  ) {
-    void this.run();
-  }
+  ) {}
 
+  @Cron(CronExpression.EVERY_5_SECONDS)
   async run() {
+    if (this.isRunning) {
+      return;
+    }
+
+    this.isRunning = true;
+
     const cloudProviderAccount =
       await this.cloudProviderAccountService.findOneLatestImported();
 
@@ -76,7 +82,6 @@ export class MonitoringService {
       await this.cloudProviderAccountService.save(cloudProviderAccount);
     }
 
-    await sleep(5000);
-    await this.run();
+    this.isRunning = false;
   }
 }

@@ -9,6 +9,7 @@ import { ClientModule } from '@app/client';
 import { CloudMetricsModule } from '@app/cloud-metrics';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   controllers: [ServersController],
@@ -21,6 +22,7 @@ import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
     ClientModule,
     CloudMetricsModule,
     TypeOrmModule.forFeature([CloudProviderAccount, ServerInstance]),
+    ScheduleModule.forRoot(),
   ],
 })
 export class CloudModule {}
