@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EncryptionConfig } from '../../../apps/project-green-nest/src/config/configuration';
 
+// TODO: make sure to store this in a secure location
 const iv = randomBytes(16);
 const algorithm = 'aes-256-ctr';
 
@@ -31,8 +32,6 @@ export class EncryptionService {
   private async getKey() {
     const { password, salt } =
       this.configService.get<EncryptionConfig>('encryption');
-
-    console.log({ password, salt });
 
     return (await promisify(scrypt)(password, salt, 32)) as Buffer;
   }

@@ -1,5 +1,4 @@
-import { Controller, Get, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Get } from '@nestjs/common';
 import { ServerMetricService } from './server-metric.service';
 
 @Controller('metrics/server')
@@ -7,19 +6,17 @@ export class ServerMetricsController {
   constructor(private serverMetricService: ServerMetricService) {}
 
   @Get()
-  async options(@Res() res: Response) {
+  async getMetrics() {
     const endDate = new Date();
 
     const startDate = new Date(endDate);
     startDate.setHours(startDate.getHours() - 1);
 
-    const metrics = await this.serverMetricService.getMetricsByPeriod(
+    return this.serverMetricService.getMetricsByPeriod(
       '3c122f81-f090-4275-9670-ebf326bd9dea',
-      '1 minute',
+      '15 minutes',
       startDate,
       endDate,
     );
-
-    return res.send(metrics);
   }
 }
