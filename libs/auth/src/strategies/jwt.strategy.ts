@@ -1,26 +1,29 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { passportJwtSecret } from 'jwks-rsa';
 import { ConfigService } from '@nestjs/config';
-import { JWTConfig } from '../../../../apps/project-green-nest/src/config/configuration';
-import { JwtPayload } from '@app/auth/types';
-import { UserService } from '@app/user';
+import { ClerkConfig } from '../../../../apps/project-green-nest/src/config/configuration';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    @Inject(forwardRef(() => UserService))
-    private userService: UserService,
-    configService: ConfigService,
-  ) {
+  constructor(configService: ConfigService) {
     super({
+      secretOrKeyProvider: passportJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: `${configService.get<ClerkConfig>('clerk').issuerUrl}/.well-known/jwks.json`,
+      }),
+
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: configService.get<JWTConfig>('jwt').secret,
+      issuer: configService.get<ClerkConfig>('clerk').issuerUrl,
+      algorithms: ['RS256'],
     });
   }
 
-  async validate(payload: JwtPayload) {
-    return this.userService.findOneById(payload.sub);
+  validate(payload: unknown): unknown {
+    console.log('JWT Payload', payload);
+    return payload;
   }
 }

@@ -11,6 +11,10 @@ async function bootstrap() {
     defaultVersion: '1',
   });
 
+  app.enableCors({
+    origin: '*',
+  });
+
   await app.listen(4000);
 }
 

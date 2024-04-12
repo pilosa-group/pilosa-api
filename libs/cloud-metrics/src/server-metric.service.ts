@@ -75,17 +75,18 @@ export class ServerMetricService {
     //
 
     return this.serverMetricRepository.manager
-      .query(`SELECT time_bucket('1 minutes', time) AS bucket,
+      .query(`SELECT time_bucket('15 minutes', time) AS bucket,
     
      COUNT(*),
-     AVG(cpu) AS cpu,
+        AVG(cpu) AS cpu,
        AVG("networkIn") AS networkIn,
        AVG("networkOut") AS networkOut
     
      FROM server_metric
      
      GROUP BY bucket
-     ORDER BY bucket DESC`);
+     ORDER BY bucket DESC
+     LIMIT 100`);
 
     //   .createQueryBuilder('sm')
     //

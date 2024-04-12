@@ -21,4 +21,7 @@ export const validationSchema = Joi.object({
 
   // JWT
   JWT_SECRET: Joi.string().required(),
+
+  // Clerk
+  CLERK_ISSUER_URL: Joi.string().required(),
 });

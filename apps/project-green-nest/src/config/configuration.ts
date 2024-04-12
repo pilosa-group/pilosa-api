@@ -19,11 +19,16 @@ export type JWTConfig = {
   secret: string;
 };
 
+export type ClerkConfig = {
+  issuerUrl: string;
+};
+
 export type Config = {
   database: DatabaseConfig;
   webSnippet: WebSnippetConfig;
   encryption: EncryptionConfig;
   jwt: JWTConfig;
+  clerk: ClerkConfig;
 };
 
 export default (): Config => ({
@@ -43,5 +48,8 @@ export default (): Config => ({
   },
   jwt: {
     secret: process.env.JWT_SECRET,
+  },
+  clerk: {
+    issuerUrl: process.env.CLERK_ISSUER_URL,
   },
 });

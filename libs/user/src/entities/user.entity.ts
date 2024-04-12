@@ -24,15 +24,6 @@ export class User {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @Column()
-  @Expose()
-  name: string;
-
-  @Column('text', { unique: true })
-  @Expose()
-  email: string;
-
-  @Column()
-  @Exclude()
-  password: string;
+  @Column('varchar', { unique: true })
+  clerkId: string;
 }
