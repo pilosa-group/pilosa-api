@@ -10,15 +10,19 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async findOneById(id: string): Promise<User | undefined> {
-    return this.userRepository.findOneBy({
-      id,
+  async findOrCreateOneByClerkId(clerkId: string): Promise<User | undefined> {
+    const existingUser = await this.userRepository.findOneBy({
+      clerkId,
     });
-  }
 
-  async findOneByEmailAddress(email: string): Promise<User | undefined> {
-    return this.userRepository.findOneBy({
-      email,
-    });
+    if (!existingUser) {
+      const newUser = this.userRepository.create({
+        clerkId,
+      });
+
+      return this.userRepository.save(newUser);
+    }
+
+    return existingUser;
   }
 }
