@@ -7,7 +7,7 @@ import {
   DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Project } from '@app/project';
+import { Project } from '@app/project/entities/project.entity';
 import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 

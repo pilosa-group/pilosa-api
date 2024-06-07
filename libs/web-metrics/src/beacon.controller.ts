@@ -15,7 +15,7 @@ import { Request } from 'express';
 import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
 import { FrontendAppService } from './frontend-app.service';
 import { BrowserMetricService } from './browser-metric.service';
-import { Project } from '@app/project';
+import { Project } from '@app/project/entities/project.entity';
 import { Public } from '@app/auth/decorators/public.decorator';
 import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
 

@@ -1,7 +1,8 @@
 import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Project } from '@app/project';
+import { Project } from '@app/project/entities/project.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { User } from '@app/user/entities/user.entity';
+import { GraphQLString } from 'graphql/type';
 
 @Entity({ name: 'project_to_user' })
 @ObjectType()
@@ -16,9 +17,9 @@ export class UserProjectRole {
   @Column()
   public userId: string;
 
-  @Column()
-  @Field()
-  public role: string;
+  @Column('simple-array')
+  @Field((type) => [GraphQLString])
+  public roles: string;
 
   @ManyToOne(() => Project, (project) => project.userRoles)
   @Field((type) => Project)

@@ -52,7 +52,8 @@ type Project {
 
 type Query {
   me: User!
-  project(id: ID!): Project
+  organization(id: ID!): Organization!
+  project(id: ID!): Project!
 }
 
 type ServerInstance {
@@ -76,19 +77,20 @@ type ServerMetric {
 type User {
   id: ID!
   organizationRoles: [UserOrganizationRole]!
+  project(id: ID!): Project!
   projectRoles: [UserProjectRole]!
 }
 
 type UserOrganizationRole {
   id: ID!
   organization: Organization!
-  role: String!
+  roles: [String!]!
   user: User!
 }
 
 type UserProjectRole {
   id: ID!
   project: Project!
-  role: String!
+  roles: [String!]!
   user: User!
 }

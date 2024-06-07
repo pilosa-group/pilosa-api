@@ -1,18 +1,11 @@
-import { forwardRef, Inject, NotFoundException } from '@nestjs/common';
-import {
-  Args,
-  ID,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql';
+import { forwardRef, Inject } from '@nestjs/common';
+import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import {
   Project,
   Project as ProjectEntity,
 } from '@app/project/entities/project.entity';
-import { ProjectService } from '@app/project/project.service';
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
+import { ProjectService } from '@app/project/project.service';
 
 @Resolver((of) => UserProjectRole)
 export class ProjectRoleResolver {
@@ -25,12 +18,6 @@ export class ProjectRoleResolver {
   async project(
     @Parent() projectRole: UserProjectRole,
   ): Promise<ProjectEntity> {
-    const project = await this.projectService.findOne(projectRole.projectId);
-
-    if (!project) {
-      throw new NotFoundException(projectRole.projectId);
-    }
-
-    return project;
+    return this.projectService.findByUserRole(projectRole);
   }
 }

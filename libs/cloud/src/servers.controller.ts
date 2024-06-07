@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ServerInstanceService } from './server-instance.service';
-import { Project } from '@app/project';
+import { Project } from '@app/project/entities/project.entity';
 
 type GetAllParams = {
   projectId: Project['id'];

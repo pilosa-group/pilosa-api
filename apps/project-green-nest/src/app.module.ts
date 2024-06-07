@@ -1,6 +1,6 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ProjectModule, Project } from '@app/project';
+import { ProjectModule } from '@app/project';
 import { validationSchema } from './config/validation.schema';
 import configuration, { DatabaseConfig } from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,6 +26,7 @@ import * as path from 'path';
 import { Organization } from '@app/project/entities/organization.entity';
 import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
+import { Project } from '@app/project/entities/project.entity';
 
 @Module({
   providers: [

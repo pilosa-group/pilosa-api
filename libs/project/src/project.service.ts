@@ -1,32 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { Project } from './entities/project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '@app/user/entities/user.entity';
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
+import { Project } from '@app/project/entities/project.entity';
+import { User } from '@app/user/entities/user.entity';
+import { Organization } from '@app/project/entities/organization.entity';
 
 @Injectable()
 export class ProjectService {
   constructor(
-    @InjectRepository(UserProjectRole)
-    private projectRoleRepository: Repository<UserProjectRole>,
-
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
   ) {}
 
-  async findAllForUser(user: User): Promise<UserProjectRole[]> {
-    return this.projectRoleRepository
-      .createQueryBuilder('pr')
-      .leftJoin('pr.project', 'p')
-      .where('pr.userId = :userId', { userId: user.id })
-      .getMany();
-  }
-
-  async findOne(id: string): Promise<Project | undefined> {
+  async findByUserRole(userProjectRole: UserProjectRole): Promise<Project> {
     return this.projectRepository
       .createQueryBuilder('p')
-      .where('id = :id', { id })
+      .innerJoin('p.userRoles', 'upr')
+      .where('upr.id = :id', { id: userProjectRole.id })
       .getOne();
+  }
+
+  async findById(id: string, user: User): Promise<Project | undefined> {
+    return this.projectRepository
+      .createQueryBuilder('p')
+      .innerJoin('p.userRoles', 'upr')
+      .where('p.id = :id', { id })
+      .andWhere('upr.userId = :userId', { userId: user.id })
+      .getOne();
+  }
+
+  async findAllByOrganization(organization: Organization): Promise<Project[]> {
+    return this.projectRepository
+      .createQueryBuilder('p')
+      .where('p.organizationId = :organizationId', {
+        organizationId: organization.id,
+      })
+      .getMany();
   }
 }

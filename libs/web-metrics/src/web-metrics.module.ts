@@ -13,10 +13,9 @@ import { BrowserMetricsController } from '@app/web-metrics/browser-metrics.contr
   controllers: [BeaconController, BrowserMetricsController],
   providers: [FrontendAppService, BrowserMetricService],
   imports: [
-    ProjectModule,
     ConfigModule,
     TypeOrmModule.forFeature([BrowserMetric, FrontendApp]),
   ],
-  exports: [],
+  exports: [FrontendAppService],
 })
 export class WebMetricsModule {}

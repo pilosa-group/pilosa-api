@@ -12,7 +12,6 @@ import {
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { Organization } from '@app/project/entities/organization.entity';
-import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 

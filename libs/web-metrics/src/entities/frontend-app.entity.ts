@@ -10,7 +10,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { BrowserMetric } from './browser-metric.entity';
-import { Project } from '@app/project';
+import { Project } from '@app/project/entities/project.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
 

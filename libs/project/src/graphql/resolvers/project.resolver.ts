@@ -1,19 +1,44 @@
 import { forwardRef, Inject, NotFoundException } from '@nestjs/common';
-import { Args, ID, Parent, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  ID,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
+import { Project } from '@app/project/entities/project.entity';
 import { ProjectService } from '@app/project/project.service';
-import { Project } from '@app/project';
+import { CurrentUser } from '@app/user/decorators/current-user.decorator';
+import { User } from '@app/user/entities/user.entity';
+import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
+import { FrontendAppService } from '@app/web-metrics/frontend-app.service';
 
 @Resolver((of) => Project)
 export class ProjectResolver {
-  constructor(private readonly projectService: ProjectService) {}
-  @Query((returns) => Project, { nullable: true })
-  async project(@Args('id', { type: () => ID }) id: string): Promise<Project> {
-    const project = await this.projectService.findOne(id);
+  constructor(
+    @Inject(forwardRef(() => ProjectService))
+    private readonly projectService: ProjectService,
+    @Inject(forwardRef(() => FrontendAppService))
+    private readonly frontendAppService: FrontendAppService,
+  ) {}
+
+  @Query((returns) => Project)
+  async project(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() currentUser: User,
+  ): Promise<Project> {
+    const project = await this.projectService.findById(id, currentUser);
 
     if (!project) {
-      throw new NotFoundException(id);
+      throw new NotFoundException();
     }
 
     return project;
+  }
+
+  @ResolveField((returns) => [FrontendApp])
+  async frontendApps(@Parent() project: Project): Promise<FrontendApp[]> {
+    return this.frontendAppService.findAllByProject(project);
   }
 }
