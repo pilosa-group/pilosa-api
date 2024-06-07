@@ -77,6 +77,12 @@
       ],
       "@app/metrics/*": [
         "libs/metrics/src/*"
+      ],
+      "@app/synthetic-scan": [
+        "libs/synthetic-scan/src"
+      ],
+      "@app/synthetic-scan/*": [
+        "libs/synthetic-scan/src/*"
       ]
     }
   }

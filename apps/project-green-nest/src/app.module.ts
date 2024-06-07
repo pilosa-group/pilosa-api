@@ -29,6 +29,7 @@ import { UserProjectRole } from '@app/project/entities/user-project-role.entity'
 import { Project } from '@app/project/entities/project.entity';
 import { MetricsModule } from '@app/metrics';
 import { BrowserMetricCrossOrigin } from '@app/web-metrics/entities/browser-metric-cross-origin.entity';
+import { SyntheticScanModule } from '@app/synthetic-scan';
 
 @Module({
   providers: [
@@ -100,6 +101,7 @@ import { BrowserMetricCrossOrigin } from '@app/web-metrics/entities/browser-metr
     UserModule,
     WebSnippetModule,
     HealthModule,
+    SyntheticScanModule,
   ],
 })
 export class AppModule {}

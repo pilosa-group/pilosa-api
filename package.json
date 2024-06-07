@@ -42,6 +42,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/schedule": "^4.0.1",
     "@nestjs/typeorm": "^10.0.2",
+    "@tgwf/co2": "^0.15.0",
     "bcrypt": "^5.1.1",
     "cache-manager": "^5.5.0",
     "graphql": "^16.8.1",
@@ -51,6 +52,7 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
+    "playwright": "^1.44.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20"
@@ -111,7 +113,8 @@
       "^@app/health(|/.*)$": "<rootDir>/libs/health/src/$1",
       "^@app/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
       "^@app/user(|/.*)$": "<rootDir>/libs/user/src/$1",
-      "^@app/metrics(|/.*)$": "<rootDir>/libs/metrics/src/$1"
+      "^@app/metrics(|/.*)$": "<rootDir>/libs/metrics/src/$1",
+      "^@app/synthetic-scan(|/.*)$": "<rootDir>/libs/synthetic-scan/src/$1"
     }
   }
 }

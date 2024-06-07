@@ -99,6 +99,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/metrics/tsconfig.lib.json"
       }
+    },
+    "synthetic-scan": {
+      "type": "library",
+      "root": "libs/synthetic-scan",
+      "entryFile": "index",
+      "sourceRoot": "libs/synthetic-scan/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/synthetic-scan/tsconfig.lib.json"
+      }
     }
   }
 }
