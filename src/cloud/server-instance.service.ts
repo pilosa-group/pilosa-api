@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { ServerInstance } from './entities/service-instance.entity';
 import { CloudProviderAccount } from './entities/cloud-provider-account';
 import { Instance } from './cloud-provider-instance-list.interface';
+import { Client } from '../clients/entities/client.entity';
 
 @Injectable()
 export class ServerInstanceService {
@@ -29,7 +30,7 @@ export class ServerInstanceService {
       .getOne();
 
     if (serverInstance) {
-      serverInstance.instanceState = instance.state;
+      serverInstance.state = instance.state;
       serverInstance.tags = instance.tags;
 
       return this.save(serverInstance);
@@ -37,12 +38,20 @@ export class ServerInstanceService {
 
     const newInstance = new ServerInstance();
     newInstance.instanceId = instance.id;
-    newInstance.instanceClass = instance.class;
-    newInstance.instanceState = instance.state;
+    newInstance.class = instance.class;
+    newInstance.state = instance.state;
     newInstance.cloudProviderAccount = cloudProviderAccount;
     newInstance.tags = instance.tags;
 
     return this.save(newInstance);
+  }
+
+  findAllByClient(clientId: Client['id']): Promise<ServerInstance[]> {
+    return this.serverInstanceRepository
+      .createQueryBuilder('ci')
+      .innerJoin('ci.cloudProviderAccount', 'cpa')
+      .innerJoin('cpa.client', 'client', 'client.id = :clientId', { clientId })
+      .getMany();
   }
 
   /**
