@@ -9,15 +9,16 @@ import {
   OneToMany,
   ManyToOne,
 } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
 import { BrowserMetric } from './browser-metric.entity';
 import { Project } from '@app/project';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { GraphQLString } from 'graphql/type';
 
 @Entity()
-@Exclude()
+@ObjectType()
 export class FrontendApp {
   @PrimaryGeneratedColumn('uuid')
-  @Expose()
+  @Field((type) => ID)
   id: string;
 
   @CreateDateColumn()
@@ -30,17 +31,19 @@ export class FrontendApp {
   deletedAt: Date;
 
   @Column()
-  @Expose()
+  @Field()
   name: string;
 
   @Column('simple-array')
-  @Expose()
+  @Field((type) => [GraphQLString])
   urls: string[];
 
   @ManyToOne(() => Project, (project: Project) => project.frontendApps)
   @JoinColumn()
+  @Field((type) => Project)
   project: Project;
 
   @OneToMany(() => BrowserMetric, (metric: BrowserMetric) => metric.frontendApp)
+  @Field((type) => [BrowserMetric], { nullable: 'items' })
   metrics: BrowserMetric[];
 }

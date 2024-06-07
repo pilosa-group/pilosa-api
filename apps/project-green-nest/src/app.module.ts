@@ -23,6 +23,9 @@ import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as path from 'path';
+import { Organization } from '@app/project/entities/organization.entity';
+import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
+import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 
 @Module({
   providers: [
@@ -43,6 +46,7 @@ import * as path from 'path';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
+      allowBatchedHttpRequests: true,
       sortSchema: true,
     }),
     TypeOrmModule.forRootAsync({
@@ -67,6 +71,9 @@ import * as path from 'path';
             FrontendApp,
             BrowserMetric,
             User,
+            Organization,
+            UserOrganizationRole,
+            UserProjectRole,
           ],
           migrations: [
             'dist/apps/project-green-nest/apps/project-green-nest/src/db/*-migrations.js',

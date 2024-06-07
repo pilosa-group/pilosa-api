@@ -1,19 +1,19 @@
 import {
   Column,
   CreateDateColumn,
+  UpdateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
+import { Project } from '@app/project';
 import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
-import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 @Entity()
 @ObjectType()
-export class User {
+export class Organization {
   @PrimaryGeneratedColumn('uuid')
   @Field((type) => ID)
   id: string;
@@ -27,17 +27,18 @@ export class User {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @Column('varchar', { unique: true })
-  clerkId: string;
+  @Column()
+  @Field()
+  name: string;
+
+  @OneToMany(() => Project, (project: Project) => project.organization)
+  @Field((type) => [Project], { nullable: 'items' })
+  projects: Project[];
 
   @OneToMany(
     () => UserOrganizationRole,
-    (organizationToUser) => organizationToUser.user,
+    (organizationToUser) => organizationToUser.organization,
   )
   @Field((type) => [UserOrganizationRole], { nullable: 'items' })
-  public organizationRoles: UserOrganizationRole[];
-
-  @OneToMany(() => UserProjectRole, (projectToUser) => projectToUser.user)
-  @Field((type) => [UserProjectRole], { nullable: 'items' })
-  public projectRoles: UserProjectRole[];
+  public userRoles: UserOrganizationRole[];
 }

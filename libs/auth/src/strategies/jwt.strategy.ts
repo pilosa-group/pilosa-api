@@ -4,9 +4,9 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ConfigService } from '@nestjs/config';
 import { ClerkConfig } from '../../../../apps/project-green-nest/src/config/configuration';
-import { UserService } from '@app/user';
-import { UserDTO } from '../../../user/dto/user';
+import { UserDTO } from '@app/user/dto/user';
 import { JWTPayload } from '@app/auth/types';
+import { UserService } from '@app/user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -30,7 +30,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JWTPayload): Promise<UserDTO> {
-    console.log(payload);
     const user = await this.userService.findOrCreateOneByClerkId(payload.sub);
 
     return {

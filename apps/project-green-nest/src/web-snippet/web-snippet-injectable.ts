@@ -72,8 +72,6 @@ const observer = new PerformanceObserver((list) => {
     }
   });
 
-  console.log(currentBytes);
-
   if (currentBytes > 0) {
     sendReport();
   }

@@ -1,34 +1,33 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @Entity()
-@Exclude()
+@ObjectType()
 export class ServerMetric {
   @PrimaryColumn('timestamptz', {
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Expose()
   time: Date;
 
   @Column('float')
-  @Expose()
+  @Field()
   cpu: number;
 
   @Column('float', { nullable: true })
-  @Expose()
+  @Field()
   networkIn: number;
 
   @Column('float', { nullable: true })
-  @Expose()
+  @Field()
   networkOut: number;
 
   @Column('float', { nullable: true })
-  @Expose()
+  @Field()
   diskReadOps: number;
 
   @Column('float', { nullable: true })
-  @Expose()
+  @Field()
   diskWriteOps: number;
 
   @ManyToOne(
@@ -36,5 +35,6 @@ export class ServerMetric {
     (serverInstance: ServerInstance) => serverInstance.metrics,
   )
   @JoinColumn()
+  @Field((type) => [ServerInstance], { nullable: 'items' })
   serverInstance: ServerInstance;
 }

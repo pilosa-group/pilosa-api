@@ -2,12 +2,93 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Project {
+type BrowserMetric {
+  accuracy: Float!
+  bytes: Float!
+  bytesCached: Float!
+  domain: String!
+  frontendApp: FrontendApp!
+  path: String!
+  time: DateTime!
+  userAgent: String!
+}
+
+type CloudProviderAccount {
   id: ID!
-  name: String
+  lastImportedAt: DateTime!
+  project: Project!
+  provider: String!
+  region: String!
+  serverInstances: [ServerInstance]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type FrontendApp {
+  id: ID!
+  metrics: [BrowserMetric]!
+  name: String!
+  project: Project!
+  urls: [String!]!
+}
+
+type Organization {
+  id: ID!
+  name: String!
+  projects: [Project]!
+  userRoles: [UserOrganizationRole]!
+}
+
+type Project {
+  cloudProviderAccounts: [CloudProviderAccount]!
+  frontendApps: [FrontendApp]!
+  id: ID!
+  name: String!
+  userRoles: [UserProjectRole]!
 }
 
 type Query {
-  project(id: String!): Project!
-  projects: [Project!]!
+  me: User!
+  project(id: ID!): Project
+}
+
+type ServerInstance {
+  class: String!
+  cloudProviderAccount: [CloudProviderAccount]!
+  id: ID!
+  instanceId: String!
+  metrics: [ServerMetric]!
+  state: String!
+}
+
+type ServerMetric {
+  cpu: Float!
+  diskReadOps: Float!
+  diskWriteOps: Float!
+  networkIn: Float!
+  networkOut: Float!
+  serverInstance: [ServerInstance]!
+}
+
+type User {
+  id: ID!
+  organizationRoles: [UserOrganizationRole]!
+  projectRoles: [UserProjectRole]!
+}
+
+type UserOrganizationRole {
+  id: ID!
+  organization: Organization!
+  role: String!
+  user: User!
+}
+
+type UserProjectRole {
+  id: ID!
+  project: Project!
+  role: String!
+  user: User!
 }

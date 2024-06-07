@@ -9,16 +9,16 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
 import { CloudProviderAccount } from './cloud-provider-account.entity';
 import { InstanceTag } from '../cloud-provider-instance-list.interface';
 import { ServerMetric } from '@app/cloud-metrics/entities/server-metric.entity';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 @Entity()
-@Exclude()
+@ObjectType()
 export class ServerInstance {
   @PrimaryGeneratedColumn('uuid')
-  @Expose()
+  @Field((type) => ID)
   id: string;
 
   @CreateDateColumn()
@@ -31,19 +31,18 @@ export class ServerInstance {
   deletedAt: Date;
 
   @Column()
-  @Expose()
+  @Field()
   class: string;
 
   @Column()
-  @Expose()
+  @Field()
   state: string;
 
   @Column()
-  @Expose()
+  @Field()
   instanceId: string;
 
   @Column('simple-json')
-  @Expose()
   tags: InstanceTag[] = [];
 
   @ManyToOne(
@@ -52,11 +51,13 @@ export class ServerInstance {
       cloudProviderAccount.serverInstances,
   )
   @JoinColumn()
+  @Field((type) => [CloudProviderAccount], { nullable: 'items' })
   cloudProviderAccount: CloudProviderAccount;
 
   @OneToMany(
     () => ServerMetric,
     (metric: ServerMetric) => metric.serverInstance,
   )
+  @Field((type) => [ServerMetric], { nullable: 'items' })
   metrics: ServerMetric[];
 }

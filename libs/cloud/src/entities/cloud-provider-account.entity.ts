@@ -9,15 +9,17 @@ import {
   OneToMany,
   ManyToOne,
 } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
 import { availableCloudProviders } from '../available-cloud-providers';
 import { ServerInstance } from './service-instance.entity';
 import { Project } from '@app/project';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 
 @Entity()
+@ObjectType()
 export class CloudProviderAccount {
   @PrimaryGeneratedColumn('uuid')
-  @Expose()
+  @Field((type) => ID)
   id: string;
 
   @CreateDateColumn()
@@ -32,26 +34,27 @@ export class CloudProviderAccount {
   @Column('simple-enum', {
     enum: availableCloudProviders,
   })
+  @Field()
   provider: 'aws';
 
   @Column('timestamp', {
     nullable: true,
   })
+  @Field()
   lastImportedAt: Date;
 
   @Column()
-  @Exclude()
   accessKeyId: string;
 
   @Column()
-  @Exclude()
   secretAccessKey: string;
 
   @Column()
-  @Exclude()
+  @Field()
   region: string;
 
   @ManyToOne(() => Project, (project: Project) => project.cloudProviderAccounts)
+  @Field((type) => Project)
   @JoinColumn()
   project: Project;
 
@@ -59,5 +62,6 @@ export class CloudProviderAccount {
     () => ServerInstance,
     (serverInstance: ServerInstance) => serverInstance.cloudProviderAccount,
   )
+  @Field((type) => [ServerInstance], { nullable: 'items' })
   serverInstances: ServerInstance[];
 }

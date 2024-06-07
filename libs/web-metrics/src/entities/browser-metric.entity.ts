@@ -1,40 +1,42 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
 import { FrontendApp } from './frontend-app.entity';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { GraphQLFloat } from 'graphql/type';
 
 @Entity()
-@Exclude()
+@ObjectType()
 export class BrowserMetric {
   @PrimaryColumn('timestamptz', {
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Expose()
+  @Field()
   time: Date;
 
   @Column()
-  @Expose()
+  @Field()
   domain: string;
 
   @Column()
-  @Expose()
+  @Field()
   path: string;
 
   @Column()
+  @Field()
   userAgent: string;
 
   @Column({ nullable: true })
   ip: string;
 
   @Column('float')
-  @Expose()
+  @Field((type) => GraphQLFloat)
   bytes: number;
 
   @Column('float')
-  @Expose()
+  @Field((type) => GraphQLFloat)
   bytesCached: number;
 
   @Column('float')
-  @Expose()
+  @Field((type) => GraphQLFloat)
   accuracy: number;
 
   @ManyToOne(
@@ -42,5 +44,6 @@ export class BrowserMetric {
     (frontendApp: FrontendApp) => frontendApp.metrics,
   )
   @JoinColumn()
+  @Field((type) => FrontendApp)
   frontendApp: FrontendApp;
 }
