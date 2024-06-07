@@ -13,7 +13,6 @@ export class FrontendAppResolver {
 
   @ResolveField((returns) => [BrowserMetric])
   async metrics(@Parent() frontendApp: FrontendApp): Promise<BrowserMetric[]> {
-    console.log({ frontendApp });
     return this.browserMetricService.findAllByFrontendApp(frontendApp);
   }
 }

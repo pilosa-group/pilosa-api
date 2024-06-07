@@ -39,6 +39,24 @@ type FrontendApp {
   urls: [String!]!
 }
 
+interface Metric {
+  name: String!
+  period: DateTime!
+}
+
+enum MetricPeriod {
+  DAY
+  FIFTEEN_MINUTES
+  FIVE_MINUTES
+  HOUR
+  MINUTE
+  MONTH
+  THIRTY_MINUTES
+  THREE_MONTHS
+  WEEK
+  YEAR
+}
+
 type Organization {
   id: ID!
   name: String!
@@ -58,6 +76,7 @@ type Query {
   me: User!
   organization(id: ID!): Organization!
   project(id: ID!): Project!
+  serverInstance(id: ID!): ServerInstance!
 }
 
 type ServerInstance {
@@ -65,7 +84,7 @@ type ServerInstance {
   cloudProviderAccount: [CloudProviderAccount]!
   id: ID!
   instanceId: String!
-  metrics: [ServerMetric]!
+  metrics(endDate: DateTime!, models: [String!]!, period: MetricPeriod!, startDate: DateTime!): [Metric]!
   state: String!
   tags: [ServerInstanceTag]!
 }
@@ -75,13 +94,11 @@ type ServerInstanceTag {
   value: String!
 }
 
-type ServerMetric {
-  cpu: Float!
-  diskReadOps: Float!
-  diskWriteOps: Float!
-  networkIn: Float!
-  networkOut: Float!
-  serverInstance: [ServerInstance]!
+type TeadsAWSMetric implements Metric {
+  embodiedCarbon: Float
+  energy: Float
+  name: String!
+  period: DateTime!
 }
 
 type User {
@@ -103,4 +120,14 @@ type UserProjectRole {
   project: Project!
   roles: [String!]!
   user: User!
+}
+
+type UtilizationMetric implements Metric {
+  cpu: Float!
+  diskReadOps: Float
+  diskWriteOps: Float
+  name: String!
+  networkIn: Float
+  networkOut: Float
+  period: DateTime!
 }

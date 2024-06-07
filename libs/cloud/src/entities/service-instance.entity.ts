@@ -13,6 +13,7 @@ import { CloudProviderAccount } from './cloud-provider-account.entity';
 import { InstanceTag } from '../cloud-provider-instance-list.interface';
 import { ServerMetric } from '@app/cloud-metrics/entities/server-metric.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Metric } from '@app/metrics/models/metric.model';
 
 @ObjectType()
 class ServerInstanceTag {
@@ -67,6 +68,6 @@ export class ServerInstance {
     () => ServerMetric,
     (metric: ServerMetric) => metric.serverInstance,
   )
-  @Field((type) => [ServerMetric], { nullable: 'items' })
+  @Field((type) => [Metric], { nullable: 'items' })
   metrics: ServerMetric[];
 }

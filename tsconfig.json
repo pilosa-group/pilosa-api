@@ -71,6 +71,12 @@
       ],
       "@app/user/*": [
         "libs/user/src/*"
+      ],
+      "@app/metrics": [
+        "libs/metrics/src"
+      ],
+      "@app/metrics/*": [
+        "libs/metrics/src/*"
       ]
     }
   }

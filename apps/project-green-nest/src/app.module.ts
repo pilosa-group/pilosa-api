@@ -27,6 +27,7 @@ import { Organization } from '@app/project/entities/organization.entity';
 import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 import { Project } from '@app/project/entities/project.entity';
+import { MetricsModule } from '@app/metrics';
 
 @Module({
   providers: [
@@ -90,6 +91,7 @@ import { Project } from '@app/project/entities/project.entity';
     AuthModule,
     ProjectModule,
     WebMetricsModule,
+    MetricsModule,
     CloudMetricsModule,
     CloudModule,
     CloudAwsModule,

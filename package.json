@@ -27,6 +27,8 @@
     "@apollo/server": "^4.10.4",
     "@aws-sdk/client-cloudwatch": "^3.529.1",
     "@aws-sdk/client-ec2": "^3.532.0",
+    "@grnsft/if-plugins": "^0.3.2",
+    "@grnsft/if-unofficial-plugins": "^0.3.1",
     "@influxdata/influxdb-client": "^1.33.2",
     "@nestjs/apollo": "^12.1.0",
     "@nestjs/cache-manager": "^2.2.2",
@@ -108,7 +110,8 @@
       "^@app/cloud-metrics(|/.*)$": "<rootDir>/libs/cloud-metrics/src/$1",
       "^@app/health(|/.*)$": "<rootDir>/libs/health/src/$1",
       "^@app/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
-      "^@app/user(|/.*)$": "<rootDir>/libs/user/src/$1"
+      "^@app/user(|/.*)$": "<rootDir>/libs/user/src/$1",
+      "^@app/metrics(|/.*)$": "<rootDir>/libs/metrics/src/$1"
     }
   }
 }

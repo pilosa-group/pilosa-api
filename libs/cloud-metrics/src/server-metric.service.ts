@@ -4,14 +4,7 @@ import { Repository } from 'typeorm';
 import { ServerMetric } from './entities/server-metric.entity';
 import { MetricResult } from '@app/cloud/cloud-provider-metrics.interface';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
-
-type TimeBucket =
-  | '1 hour'
-  | '45 minutes'
-  | '30 minutes'
-  | '15 minutes'
-  | '5 minutes'
-  | '1 minute';
+import { MetricPeriodValue } from '@app/cloud/enum/metric-period.enum';
 
 @Injectable()
 export class ServerMetricService {
@@ -67,47 +60,29 @@ export class ServerMetricService {
   }
 
   async getMetricsByPeriod(
-    serverInstanceId: ServerInstance['id'],
-    timeBucket: TimeBucket,
+    serverInstance: ServerInstance,
+    timeBucket: MetricPeriodValue,
     start: Date,
     end: Date,
   ): Promise<ServerMetric[]> {
-    // SELECT time_bucket('10 minutes', time) AS bucket,
-    //
-    // COUNT(*),
-    // AVG(cpu) AS cpu,
-    //   AVG("networkIn") AS networkIn,
-    //   AVG("networkOut") AS networkOut
-    //
-    // FROM server_metric
-    // WHERE time > NOW() - INTERVAL '3 hours'
-    // GROUP BY bucket
-    // ORDER BY bucket DESC
-    //
+    return this.serverMetricRepository.manager.query(
+      `SELECT time_bucket($1, sm.time) AS period,
+              COUNT(*),
+              AVG(sm.cpu) AS cpu,
+              AVG(sm."networkIn") AS networkIn,
+              AVG(sm."networkOut") AS networkOut,
+              AVG(sm."diskReadOps") AS diskReadOps,
+              AVG(sm."diskWriteOps") AS diskWriteOps
 
-    return this.serverMetricRepository.manager
-      .query(`SELECT time_bucket('15 minutes', time) AS bucket,
-    
-     COUNT(*),
-        AVG(cpu) AS cpu,
-       AVG("networkIn") AS networkIn,
-       AVG("networkOut") AS networkOut
-    
-     FROM server_metric
-     
-     GROUP BY bucket
-     ORDER BY bucket DESC
-     LIMIT 100`);
+       FROM server_metric sm
 
-    //   .createQueryBuilder('sm')
-    //
-    //   .select(`time_bucket("${timeBucket}", sm.time) AS bucket`)
-    //   .where('sm.serverInstance = :instanceId', {
-    //     instanceId: serverInstanceId,
-    //   })
-    //   .andWhere('sm.time > :start', { start })
-    //   .andWhere('sm.time < :end', { end })
-    //   .orderBy('bucket', 'DESC')
-    //   .getMany();
+       WHERE sm."serverInstanceId" = $2
+       AND sm.time > $3
+        AND sm.time < $4
+
+       GROUP BY period
+       ORDER BY period DESC`,
+      [timeBucket, serverInstance.id, start, end],
+    );
   }
 }

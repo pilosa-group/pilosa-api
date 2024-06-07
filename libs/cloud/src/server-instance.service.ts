@@ -13,6 +13,13 @@ export class ServerInstanceService {
     private serverInstanceRepository: Repository<ServerInstance>,
   ) {}
 
+  async findOneById(id: string): Promise<ServerInstance> {
+    return this.serverInstanceRepository
+      .createQueryBuilder('si')
+      .where('si.id = :id', { id })
+      .getOne();
+  }
+
   /**
    * Find the last imported server instance for a provider,
    * and that was imported more than 5 minutes ago.
