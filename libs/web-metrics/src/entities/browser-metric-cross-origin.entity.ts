@@ -12,7 +12,7 @@ import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 @ObjectType()
 export class BrowserMetricCrossOrigin {
   @PrimaryGeneratedColumn('uuid')
-  @Field((type) => ID)
+  @Field(() => ID)
   id: string;
 
   @Column()
@@ -24,6 +24,6 @@ export class BrowserMetricCrossOrigin {
     (frontendApp: FrontendApp) => frontendApp.crossOrigins,
   )
   @JoinColumn()
-  @Field((type) => FrontendApp)
+  @Field(() => FrontendApp)
   frontendApp: FrontendApp;
 }

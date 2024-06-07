@@ -19,7 +19,7 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class Project {
   @PrimaryGeneratedColumn('uuid')
-  @Field((type) => ID)
+  @Field(() => ID)
   id: string;
 
   @CreateDateColumn()
@@ -43,7 +43,7 @@ export class Project {
   organization: Project;
 
   @OneToMany(() => UserProjectRole, (projectToUser) => projectToUser.project)
-  @Field((type) => [UserProjectRole], { nullable: 'items' })
+  @Field(() => [UserProjectRole], { nullable: 'items' })
   public userRoles: UserProjectRole[];
 
   @OneToMany(
@@ -51,13 +51,13 @@ export class Project {
     (cloudProviderAccount: CloudProviderAccount) =>
       cloudProviderAccount.project,
   )
-  @Field((type) => [CloudProviderAccount], { nullable: 'items' })
+  @Field(() => [CloudProviderAccount], { nullable: 'items' })
   cloudProviderAccounts: CloudProviderAccount[];
 
   @OneToMany(
     () => FrontendApp,
     (frontendApp: FrontendApp) => frontendApp.project,
   )
-  @Field((type) => [FrontendApp], { nullable: 'items' })
+  @Field(() => [FrontendApp], { nullable: 'items' })
   frontendApps: FrontendApp[];
 }

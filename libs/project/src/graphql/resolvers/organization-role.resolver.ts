@@ -4,14 +4,14 @@ import { UserOrganizationRole } from '@app/project/entities/user-organization-ro
 import { OrganizationService } from '@app/project/organization.service';
 import { Organization } from '@app/project/entities/organization.entity';
 
-@Resolver((of) => UserOrganizationRole)
+@Resolver(() => UserOrganizationRole)
 export class OrganizationRoleResolver {
   constructor(
     @Inject(forwardRef(() => OrganizationService))
     private readonly organizationService: OrganizationService,
   ) {}
 
-  @ResolveField((returns) => Organization)
+  @ResolveField(() => Organization)
   async organization(
     @Parent() organizationRole: UserOrganizationRole,
   ): Promise<Organization> {

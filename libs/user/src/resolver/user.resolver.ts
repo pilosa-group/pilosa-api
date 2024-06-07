@@ -1,4 +1,4 @@
-import { Args, ID, Int, Parent, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, ID, Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { UserProjectRoleService } from '@app/project/user-project-role.service';
 import { User } from '../entities/user.entity';
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
@@ -9,7 +9,7 @@ import { NotFoundException } from '@nestjs/common';
 import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
 import { UserOrganizationRoleService } from '@app/project/user-organization-role.service';
 
-@Resolver((of) => User)
+@Resolver(() => User)
 export class UserResolver {
   constructor(
     private readonly projectService: ProjectService,
@@ -17,12 +17,12 @@ export class UserResolver {
     private readonly userOrganizationRoleService: UserOrganizationRoleService,
   ) {}
 
-  @ResolveField((returns) => [UserProjectRole], { nullable: 'items' })
+  @ResolveField(() => [UserProjectRole], { nullable: 'items' })
   async projectRoles(@Parent() user: User): Promise<UserProjectRole[]> {
     return this.userProjectRoleService.findAllForUser(user);
   }
 
-  @ResolveField((returns) => Project)
+  @ResolveField(() => Project)
   async project(
     @Args('id', { type: () => ID }) id: string,
     @CurrentUser() currentUser: User,
@@ -36,7 +36,7 @@ export class UserResolver {
     return project;
   }
 
-  @ResolveField((returns) => [UserOrganizationRole], { nullable: 'items' })
+  @ResolveField(() => [UserOrganizationRole], { nullable: 'items' })
   async organizationRoles(
     @Parent() user: User,
   ): Promise<UserOrganizationRole[]> {

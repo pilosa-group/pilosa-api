@@ -31,6 +31,6 @@ export class ServerMetric {
     (serverInstance: ServerInstance) => serverInstance.metrics,
   )
   @JoinColumn()
-  @Field((type) => [ServerInstance], { nullable: 'items' })
+  @Field(() => [ServerInstance], { nullable: 'items' })
   serverInstance: ServerInstance;
 }

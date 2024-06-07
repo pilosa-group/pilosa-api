@@ -12,11 +12,6 @@ export class BrowserMetricsController {
     const startDate = new Date(endDate);
     startDate.setHours(startDate.getHours() - 1);
 
-    return this.browserMetricsService.getMetricsByPeriod(
-      '3c122f81-f090-4275-9670-ebf326bd9dea',
-      '1 hour',
-      startDate,
-      endDate,
-    );
+    return this.browserMetricsService.getMetricsByPeriod();
   }
 }

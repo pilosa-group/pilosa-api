@@ -30,11 +30,11 @@ export class BrowserMetric {
   extension: string;
 
   @Column('float')
-  @Field((type) => GraphQLFloat)
+  @Field(() => GraphQLFloat)
   bytesCompressed: number;
 
   @Column('float')
-  @Field((type) => GraphQLFloat)
+  @Field(() => GraphQLFloat)
   bytesUncompressed: number;
 
   @Column()
@@ -49,6 +49,6 @@ export class BrowserMetric {
     (frontendApp: FrontendApp) => frontendApp.metrics,
   )
   @JoinColumn()
-  @Field((type) => FrontendApp)
+  @Field(() => FrontendApp)
   frontendApp: FrontendApp;
 }

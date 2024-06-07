@@ -16,7 +16,7 @@ import { FrontendAppService } from '@app/web-metrics/frontend-app.service';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { CloudProviderAccountService } from '@app/cloud/cloud-provider-account.service';
 
-@Resolver((of) => Project)
+@Resolver(() => Project)
 export class ProjectResolver {
   constructor(
     @Inject(forwardRef(() => ProjectService))
@@ -27,7 +27,7 @@ export class ProjectResolver {
     private readonly cloudProviderAccountService: CloudProviderAccountService,
   ) {}
 
-  @Query((returns) => Project)
+  @Query(() => Project)
   async project(
     @Args('id', { type: () => ID }) id: string,
     @CurrentUser() currentUser: User,
@@ -41,12 +41,12 @@ export class ProjectResolver {
     return project;
   }
 
-  @ResolveField((returns) => [FrontendApp])
+  @ResolveField(() => [FrontendApp])
   async frontendApps(@Parent() project: Project): Promise<FrontendApp[]> {
     return this.frontendAppService.findAllByProject(project);
   }
 
-  @ResolveField((returns) => [CloudProviderAccount])
+  @ResolveField(() => [CloudProviderAccount])
   async cloudProviderAccounts(
     @Parent() project: Project,
   ): Promise<CloudProviderAccount[]> {

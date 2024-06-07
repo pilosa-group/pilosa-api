@@ -8,7 +8,7 @@ import { GraphQLString } from 'graphql/type';
 @ObjectType()
 export class UserProjectRole {
   @PrimaryGeneratedColumn('uuid')
-  @Field((type) => ID)
+  @Field(() => ID)
   public id: number;
 
   @Column()
@@ -18,14 +18,14 @@ export class UserProjectRole {
   public userId: string;
 
   @Column('simple-array')
-  @Field((type) => [GraphQLString])
+  @Field(() => [GraphQLString])
   public roles: string[];
 
   @ManyToOne(() => Project, (project) => project.userRoles)
-  @Field((type) => Project)
+  @Field(() => Project)
   public project: Project;
 
   @ManyToOne(() => User, (user) => user.projectRoles)
-  @Field((type) => User)
+  @Field(() => User)
   public user: User;
 }

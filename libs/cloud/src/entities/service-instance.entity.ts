@@ -27,7 +27,7 @@ class ServerInstanceTag {
 @ObjectType()
 export class ServerInstance {
   @PrimaryGeneratedColumn('uuid')
-  @Field((type) => ID)
+  @Field(() => ID)
   id: string;
 
   @CreateDateColumn()
@@ -52,7 +52,7 @@ export class ServerInstance {
   instanceId: string;
 
   @Column('simple-json')
-  @Field((type) => [ServerInstanceTag], { nullable: 'items' })
+  @Field(() => [ServerInstanceTag], { nullable: 'items' })
   tags: InstanceTag[] = [];
 
   @ManyToOne(
@@ -61,13 +61,13 @@ export class ServerInstance {
       cloudProviderAccount.serverInstances,
   )
   @JoinColumn()
-  @Field((type) => [CloudProviderAccount], { nullable: 'items' })
+  @Field(() => [CloudProviderAccount], { nullable: 'items' })
   cloudProviderAccount: CloudProviderAccount;
 
   @OneToMany(
     () => ServerMetric,
     (metric: ServerMetric) => metric.serverInstance,
   )
-  @Field((type) => [Metric], { nullable: 'items' })
+  @Field(() => [Metric], { nullable: 'items' })
   metrics: ServerMetric[];
 }

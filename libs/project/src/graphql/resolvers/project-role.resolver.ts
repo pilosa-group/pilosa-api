@@ -7,14 +7,14 @@ import {
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 import { ProjectService } from '@app/project/project.service';
 
-@Resolver((of) => UserProjectRole)
+@Resolver(() => UserProjectRole)
 export class ProjectRoleResolver {
   constructor(
     @Inject(forwardRef(() => ProjectService))
     private readonly projectService: ProjectService,
   ) {}
 
-  @ResolveField((returns) => Project)
+  @ResolveField(() => Project)
   async project(
     @Parent() projectRole: UserProjectRole,
   ): Promise<ProjectEntity> {

@@ -19,7 +19,7 @@ import { BrowserMetricCrossOrigin } from '@app/web-metrics/entities/browser-metr
 @ObjectType()
 export class FrontendApp {
   @PrimaryGeneratedColumn('uuid')
-  @Field((type) => ID)
+  @Field(() => ID)
   id: string;
 
   @CreateDateColumn()
@@ -36,22 +36,22 @@ export class FrontendApp {
   name: string;
 
   @Column('simple-array')
-  @Field((type) => [GraphQLString])
+  @Field(() => [GraphQLString])
   urls: string[];
 
   @ManyToOne(() => Project, (project: Project) => project.frontendApps)
   @JoinColumn()
-  @Field((type) => Project)
+  @Field(() => Project)
   project: Project;
 
   @OneToMany(() => BrowserMetric, (metric: BrowserMetric) => metric.frontendApp)
-  @Field((type) => [BrowserMetric], { nullable: 'items' })
+  @Field(() => [BrowserMetric], { nullable: 'items' })
   metrics: BrowserMetric[];
 
   @OneToMany(
     () => BrowserMetricCrossOrigin,
     (crossOrigin: BrowserMetricCrossOrigin) => crossOrigin.frontendApp,
   )
-  @Field((type) => [BrowserMetric], { nullable: 'items' })
+  @Field(() => [BrowserMetric], { nullable: 'items' })
   crossOrigins: BrowserMetricCrossOrigin[];
 }

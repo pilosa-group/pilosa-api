@@ -15,7 +15,7 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class Organization {
   @PrimaryGeneratedColumn('uuid')
-  @Field((type) => ID)
+  @Field(() => ID)
   id: string;
 
   @CreateDateColumn()
@@ -32,13 +32,13 @@ export class Organization {
   name: string;
 
   @OneToMany(() => Project, (project: Project) => project.organization)
-  @Field((type) => [Project], { nullable: 'items' })
+  @Field(() => [Project], { nullable: 'items' })
   projects: Project[];
 
   @OneToMany(
     () => UserOrganizationRole,
     (organizationToUser) => organizationToUser.organization,
   )
-  @Field((type) => [UserOrganizationRole], { nullable: 'items' })
+  @Field(() => [UserOrganizationRole], { nullable: 'items' })
   public userRoles: UserOrganizationRole[];
 }

@@ -14,7 +14,7 @@ import { OrganizationService } from '@app/project/organization.service';
 import { Project } from '@app/project/entities/project.entity';
 import { ProjectService } from '@app/project/project.service';
 
-@Resolver((of) => Organization)
+@Resolver(() => Organization)
 export class OrganizationResolver {
   constructor(
     @Inject(forwardRef(() => OrganizationService))
@@ -23,7 +23,7 @@ export class OrganizationResolver {
     private readonly projectService: ProjectService,
   ) {}
 
-  @Query((returns) => Organization)
+  @Query(() => Organization)
   async organization(
     @Args('id', { type: () => ID }) id: string,
     @CurrentUser() currentUser: User,
@@ -37,7 +37,7 @@ export class OrganizationResolver {
     return project;
   }
 
-  @ResolveField((returns) => [Project])
+  @ResolveField(() => [Project])
   async projects(@Parent() organization: Organization): Promise<Project[]> {
     const project =
       await this.projectService.findAllByOrganization(organization);

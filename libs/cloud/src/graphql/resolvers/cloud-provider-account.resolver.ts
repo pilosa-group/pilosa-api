@@ -3,11 +3,11 @@ import { ServerInstanceService } from '@app/cloud/server-instance.service';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 
-@Resolver((of) => CloudProviderAccount)
+@Resolver(() => CloudProviderAccount)
 export class CloudProviderAccountResolver {
   constructor(private readonly serverInstanceService: ServerInstanceService) {}
 
-  @ResolveField((returns) => [ServerInstance])
+  @ResolveField(() => [ServerInstance])
   async serverInstances(
     @Parent() cloudProviderAccount: CloudProviderAccount,
   ): Promise<ServerInstance[]> {

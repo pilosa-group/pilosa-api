@@ -19,7 +19,7 @@ import { CloudProvider } from '@app/cloud/enum/cloud-provider.enum';
 @ObjectType()
 export class CloudProviderAccount {
   @PrimaryGeneratedColumn('uuid')
-  @Field((type) => ID)
+  @Field(() => ID)
   id: string;
 
   @CreateDateColumn()
@@ -34,7 +34,7 @@ export class CloudProviderAccount {
   @Column('simple-enum', {
     enum: availableCloudProviders,
   })
-  @Field((type) => CloudProvider)
+  @Field(() => CloudProvider)
   provider: CloudProvider = CloudProvider.AWS;
 
   @Column('timestamp', {
@@ -54,7 +54,7 @@ export class CloudProviderAccount {
   region: string;
 
   @ManyToOne(() => Project, (project: Project) => project.cloudProviderAccounts)
-  @Field((type) => Project)
+  @Field(() => Project)
   @JoinColumn()
   project: Project;
 
@@ -62,6 +62,6 @@ export class CloudProviderAccount {
     () => ServerInstance,
     (serverInstance: ServerInstance) => serverInstance.cloudProviderAccount,
   )
-  @Field((type) => [ServerInstance], { nullable: 'items' })
+  @Field(() => [ServerInstance], { nullable: 'items' })
   serverInstances: ServerInstance[];
 }

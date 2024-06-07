@@ -23,7 +23,7 @@ import { Metric } from '@app/metrics/models/metric.model';
 
 @ArgsType()
 class GetMetricsArgs {
-  @Field((type) => MetricPeriod)
+  @Field(() => MetricPeriod)
   period?: string;
 
   @Field()
@@ -32,18 +32,18 @@ class GetMetricsArgs {
   @Field()
   endDate?: Date;
 
-  @Field((type) => [GraphQLString])
+  @Field(() => [GraphQLString])
   models: string[];
 }
 
-@Resolver((of) => ServerInstance)
+@Resolver(() => ServerInstance)
 export class ServerInstanceResolver {
   constructor(
     private readonly serverInstanceService: ServerInstanceService,
     private readonly serverMetricService: ServerMetricService,
   ) {}
 
-  @Query((returns) => ServerInstance)
+  @Query(() => ServerInstance)
   async serverInstance(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<ServerInstance> {
@@ -56,7 +56,7 @@ export class ServerInstanceResolver {
     return serverInstance;
   }
 
-  @ResolveField((returns) => [Metric])
+  @ResolveField(() => [Metric])
   async metrics(
     @Parent() serverInstance: ServerInstance,
     @Args() args: GetMetricsArgs,
