@@ -10,15 +10,6 @@ export type DatabaseConfig = {
   database: string;
 };
 
-export type EncryptionConfig = {
-  password: string;
-  salt: string;
-};
-
-export type JWTConfig = {
-  secret: string;
-};
-
 export type ClerkConfig = {
   issuerUrl: string;
 };
@@ -26,8 +17,6 @@ export type ClerkConfig = {
 export type Config = {
   database: DatabaseConfig;
   webSnippet: WebSnippetConfig;
-  encryption: EncryptionConfig;
-  jwt: JWTConfig;
   clerk: ClerkConfig;
 };
 
@@ -41,13 +30,6 @@ export default (): Config => ({
   },
   webSnippet: {
     beaconApiUrl: process.env.SNIPPET_BEACON_API_URL,
-  },
-  encryption: {
-    password: process.env.ENCRYPTION_PASSWORD,
-    salt: process.env.ENCRYPTION_SALT,
-  },
-  jwt: {
-    secret: process.env.JWT_SECRET,
   },
   clerk: {
     issuerUrl: process.env.CLERK_ISSUER_URL,

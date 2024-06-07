@@ -15,13 +15,6 @@ export const validationSchema = Joi.object({
   // WebSnippet
   SNIPPET_BEACON_API_URL: Joi.string().required(),
 
-  // Encryption
-  ENCRYPTION_PASSWORD: Joi.string().required(),
-  ENCRYPTION_SALT: Joi.string().required(),
-
-  // JWT
-  JWT_SECRET: Joi.string().required(),
-
   // Clerk
   CLERK_ISSUER_URL: Joi.string().required(),
 });
