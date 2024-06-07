@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProjectModule } from '@app/project';
 import { validationSchema } from './config/validation.schema';
@@ -18,7 +18,7 @@ import { HealthModule } from '@app/health';
 import { AuthModule } from '@app/auth';
 import { UserModule } from '@app/user';
 import { User } from '@app/user/entities/user.entity';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -34,10 +34,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ClassSerializerInterceptor,
-    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

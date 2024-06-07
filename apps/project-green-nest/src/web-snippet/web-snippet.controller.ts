@@ -1,20 +1,19 @@
-import { Controller, Get, Header, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Header, HttpStatus, Res } from '@nestjs/common';
 import esbuild from 'esbuild';
 import * as util from 'util';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Public } from '@app/auth/decorators/public.decorator';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { Response } from 'express';
 
 const readFile = util.promisify(fs.readFile);
 
 @Controller('sloth.js')
-@UseInterceptors(CacheInterceptor)
 export class WebSnippetController {
   @Get()
   @Public()
   @Header('Content-Type', 'text/javascript')
-  async snippet() {
+  async snippet(@Res() res: Response) {
     const currentDir = path.resolve(__dirname);
     const snippetPath = path.resolve(currentDir, 'web-snippet-injectable.js');
     const snippetOut = path.resolve(
@@ -34,6 +33,12 @@ export class WebSnippetController {
       },
     });
 
-    return readFile(snippetOut, 'utf8');
+    const snippetContents = await readFile(snippetOut, 'utf8');
+
+    return res
+      .setHeader('Content-Type', 'text/javascript')
+      .setHeader('Cache-Control', `public, max-age=60`)
+      .status(HttpStatus.OK)
+      .send(snippetContents);
   }
 }

@@ -177,7 +177,6 @@ export class SyntheticScanService {
         networkRequests.map((request) => [request.url, request]),
       ).values(),
     );
-    // console.log('B',networkRequests.length);
 
     const domainRequests = Array.from(
       new Set(
