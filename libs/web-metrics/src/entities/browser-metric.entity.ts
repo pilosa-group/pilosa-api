@@ -12,8 +12,14 @@ export class BrowserMetric {
   @Field()
   time: Date;
 
-  @Column()
+  @Column({ default: false })
   firstLoad: boolean;
+
+  @Column('simple-enum', {
+    enum: ['dark', 'light'],
+    default: 'light',
+  })
+  colorScheme: string = 'light';
 
   @Column()
   @Field()

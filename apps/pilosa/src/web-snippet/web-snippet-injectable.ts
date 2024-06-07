@@ -6,6 +6,9 @@ type Path = string;
 type Origin = string;
 type NumberOfBytes = number;
 type FileExtension = string;
+type Dark = 'd';
+type Light = 'l';
+type Colorscheme = Dark | Light;
 type CompressedBytes = NumberOfBytes;
 type UncompressedBytes = NumberOfBytes;
 
@@ -30,6 +33,7 @@ type CombinedPayload = {
   f: FirstPageLoad;
   t: Timestamp;
   b: [CompressedBytes, UncompressedBytes];
+  m: Colorscheme;
   d: {
     [key: Domain]: {
       [key: Path]: {
@@ -75,9 +79,14 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
   // whether this was the first page load
   let firstPageLoad = true;
 
+  const colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'd'
+    : 'l';
+
   const sendBeacon = (): void => {
     const groupedPayloads: CombinedPayload = {
       f: firstPageLoad,
+      m: colorScheme,
       t: Date.now(),
       b: [0, 0],
       d: {},

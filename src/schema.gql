@@ -5,6 +5,7 @@
 type BrowserMetric {
   bytesCompressed: Float!
   bytesUncompressed: Float!
+  colorScheme: CloudProvider!
   domain: String!
   frontendApp: FrontendApp!
   path: String!
@@ -20,7 +21,6 @@ type CloudProviderAccount {
   id: ID!
   lastImportedAt: DateTime!
   project: Project!
-  provider: CloudProvider!
   region: String!
   serverInstances: [ServerInstance]!
 }

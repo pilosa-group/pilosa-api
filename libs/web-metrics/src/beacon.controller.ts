@@ -43,6 +43,7 @@ type UncompressedBytes = NumberOfBytes;
 type CombinedPayload = {
   f: FirstPageLoad;
   t: Timestamp;
+  m: 'd' | 'l';
   b: [CompressedBytes, UncompressedBytes];
   d: {
     [key: Domain]: {
@@ -160,6 +161,8 @@ export class BeaconController {
                 if (bytesCompressed > 0 || bytesUncompressed > 0) {
                   const metric: CreateBrowserMetricDto = {
                     firstLoad: createBrowserMetricDto.f,
+                    colorScheme:
+                      createBrowserMetricDto.m === 'd' ? 'dark' : 'light',
                     domain,
                     path,
                     initiatorType,
