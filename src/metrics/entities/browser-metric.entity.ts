@@ -1,22 +1,13 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
 import { FrontendApp } from './frontend-app.entity';
 
 @Entity()
 @Exclude()
 export class BrowserMetric {
-  @PrimaryGeneratedColumn('uuid')
-  @Expose()
-  id: string;
-
-  @CreateDateColumn()
+  @PrimaryColumn('timestamptz', {
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   @Expose()
   time: Date;
 

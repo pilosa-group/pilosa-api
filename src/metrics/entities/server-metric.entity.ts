@@ -6,6 +6,7 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
   ManyToOne,
+  PrimaryColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
 import { ServerInstance } from '../../cloud/entities/service-instance.entity';
@@ -13,11 +14,9 @@ import { ServerInstance } from '../../cloud/entities/service-instance.entity';
 @Entity()
 @Exclude()
 export class ServerMetric {
-  @PrimaryGeneratedColumn('uuid')
-  @Expose()
-  id: string;
-
-  @CreateDateColumn()
+  @PrimaryColumn('timestamptz', {
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   @Expose()
   time: Date;
 
