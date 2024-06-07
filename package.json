@@ -18,7 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/project-green-nest/test/jest-e2e.json",
-    "typeorm": "typeorm -d dist/config/typeorm.datasource.js",
+    "typeorm": "typeorm -d dist/apps/project-green-nest/apps/project-green-nest/src/config/typeorm.datasource.js",
     "migration:generate": "npm run build && npm run typeorm -- migration:generate src/db/migrations",
     "migration:run": "npm run build && npm run typeorm -- migration:run",
     "migration:show": "npm run build && npm run typeorm -- migration:show"
