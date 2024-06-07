@@ -7,5 +7,5 @@ export class CreateBrowserMetricDto {
   domain: string;
   path: string;
   userAgent: string;
-  ip: string;
+  visitor: string;
 }

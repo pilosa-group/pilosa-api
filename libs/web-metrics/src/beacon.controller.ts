@@ -18,6 +18,13 @@ import { BrowserMetricService } from './browser-metric.service';
 import { Project } from '@app/project/entities/project.entity';
 import { Public } from '@app/auth/decorators/public.decorator';
 import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
+import * as crypto from 'crypto';
+
+function hashValue(value: string) {
+  const hash = crypto.createHash('sha256');
+  hash.update(value);
+  return hash.digest('hex');
+}
 
 const FRONTEND_APP_ID = 'x-id';
 
@@ -107,6 +114,9 @@ export class BeaconController {
       throw new ForbiddenException('Invalid domain');
     }
 
+    const userAgent = req.headers['user-agent'] as string;
+    const visitor = hashValue(`${clientIp}${userAgent}`);
+
     Object.keys(createBrowserMetricDto.d).forEach((domain) => {
       Object.keys(createBrowserMetricDto.d[domain]).forEach((path) => {
         Object.keys(createBrowserMetricDto.d[domain][path]).forEach(
@@ -130,8 +140,8 @@ export class BeaconController {
                   extension: extension === '__none__' ? null : extension,
                   bytesCompressed,
                   bytesUncompressed,
-                  userAgent: req.headers['user-agent'] as string,
-                  ip: clientIp,
+                  userAgent,
+                  visitor,
                 };
 
                 const browserMetric = await this.browserMetricService.create(

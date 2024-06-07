@@ -30,6 +30,7 @@ import { Project } from '@app/project/entities/project.entity';
 import { MetricsModule } from '@app/metrics';
 import { BrowserMetricCrossOrigin } from '@app/web-metrics/entities/browser-metric-cross-origin.entity';
 import { SyntheticScanModule } from '@app/synthetic-scan';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   providers: [
@@ -43,6 +44,9 @@ import { SyntheticScanModule } from '@app/synthetic-scan';
     },
   ],
   imports: [
+    CacheModule.register({
+      isGlobal: true,
+    }),
     ConfigModule.forRoot({
       load: [configuration],
       validationSchema,

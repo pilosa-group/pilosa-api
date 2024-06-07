@@ -16,6 +16,11 @@ export class SyntheticScanController {
   @Post()
   @Public()
   scan(@Body() { url }: ScanPayload): Promise<VisitResult> {
-    return this.syntheticScanService.run(url);
+    try {
+      return this.syntheticScanService.run(url);
+    } catch (error) {
+      console.error(error);
+      throw new Error('Unable to scan URL');
+    }
   }
 }

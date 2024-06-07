@@ -42,7 +42,7 @@ export class BrowserMetric {
   userAgent: string;
 
   @Column({ nullable: true })
-  ip: string;
+  visitor: string;
 
   @ManyToOne(
     () => FrontendApp,

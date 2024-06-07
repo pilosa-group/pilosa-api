@@ -1,4 +1,3 @@
-import * as util from 'util';
 import { Inject, Injectable } from '@nestjs/common';
 import type { Request, Response } from 'playwright';
 import { chromium } from 'playwright';
@@ -96,11 +95,34 @@ const scrollPageToEnd = async (page) => {
   }
 };
 
+const co2Emission = new co2({});
+
+async function toFileTypeResult(
+  networkRequests: NetworkRequest[],
+  greenHost: boolean,
+): Promise<FileTypeResult> {
+  const totalBytes = await calculateTotalSize(networkRequests);
+
+  return {
+    count: networkRequests.length,
+    totalBytes,
+    totalBytesFormatted: formatBytes(totalBytes),
+    estimatedCo2: co2Emission.perByte(totalBytes, greenHost),
+  };
+}
+
 @Injectable()
 export class SyntheticScanService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   async run(url: string): Promise<VisitResult> {
+    const cachedResult = await this.cacheManager.get<VisitResult>(url);
+
+    if (cachedResult) {
+      console.log('from cache', url);
+      return cachedResult;
+    }
+
     const browser = await chromium.launch({
       // headless: false,
     });
@@ -165,6 +187,8 @@ export class SyntheticScanService {
       ),
     );
 
+    const pageTitle = await page.title();
+
     // const domainsWithGreenCheck = await Promise.all(domainRequests.map(async (domain) => {
     //   const cacheKey = `green-hosting-${domain}`;
     //   let green = await this.cacheManager.get<boolean>(cacheKey);
@@ -188,35 +212,22 @@ export class SyntheticScanService {
 
     // const greenHostingResult = await hosting.check(domainRequests);
 
-    const co2Emission = new co2({});
-
     const totalBytes = await calculateTotalSize(networkRequests);
     const mainTopDomain = getTopDomain(url);
     //
     // const mainDomainWithGreenCheck = domainsWithGreenCheck.find(({ domain }: any) => domain === mainTopDomain);
     // const green = mainDomainWithGreenCheck.green;
 
+    console.log(mainTopDomain);
+
     const green = (await hosting.check(mainTopDomain)) as boolean;
-
-    async function toFileTypeResult(
-      networkRequests: NetworkRequest[],
-      greenHost: boolean,
-    ): Promise<FileTypeResult> {
-      const totalBytes = await calculateTotalSize(networkRequests);
-
-      return {
-        count: networkRequests.length,
-        totalBytes,
-        totalBytesFormatted: formatBytes(totalBytes),
-        estimatedCo2: co2Emission.perByte(totalBytes, greenHost),
-      };
-    }
 
     logger(`Calculating total results`);
 
     const result: any = {
       total: {
         domain: null,
+        pageTitle,
         hosting: [
           {
             domain: mainTopDomain,
@@ -233,7 +244,7 @@ export class SyntheticScanService {
         },
         totalBytes: totalBytes,
         totalBytesFormatted: formatBytes(totalBytes),
-        estimatedCo2: co2Emission.perByte(totalBytes, green),
+        estimatedCo2: co2Emission.perVisit(totalBytes, green),
         cdnPercentage:
           (networkRequests.filter(isCdn).length / networkRequests.length) * 100,
         compressedPercentage:
@@ -275,10 +286,12 @@ export class SyntheticScanService {
           ),
         },
       },
-      domains: [],
+      domains: domainRequests,
     };
 
     void browser.close();
+
+    await this.cacheManager.set(url, result, 60 * 60 * 10);
 
     return result;
   }
