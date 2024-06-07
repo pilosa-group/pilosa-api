@@ -1,14 +1,5 @@
-export type AwsConfig = {
-  accessKeyId: string;
-  secretAccessKey: string;
-  region: string;
-};
-
-export type InfluxdbConfig = {
-  org: string;
-  url: string;
-  token: string;
-  bucket: string;
+export type WebSnippetConfig = {
+  beaconApiUrl: string;
 };
 
 export type DatabaseConfig = {
@@ -20,17 +11,11 @@ export type DatabaseConfig = {
 };
 
 export type Config = {
-  // aws: AwsConfig;
   database: DatabaseConfig;
-  influxdb: InfluxdbConfig;
+  webSnippet: WebSnippetConfig;
 };
 
 export default (): Config => ({
-  // aws: {
-  //   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  //   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  //   region: process.env.AWS_REGION,
-  // },
   database: {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
@@ -38,10 +23,7 @@ export default (): Config => ({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
   },
-  influxdb: {
-    org: process.env.INFLUXDB_ORG,
-    url: process.env.INFLUXDB_URL,
-    token: process.env.INFLUXDB_TOKEN,
-    bucket: process.env.INFLUXDB_BUCKET,
+  webSnippet: {
+    beaconApiUrl: process.env.SNIPPET_BEACON_API_URL,
   },
 });

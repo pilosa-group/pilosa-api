@@ -23,7 +23,7 @@ export class AwsGetMetrics implements CloudProviderMetrics {
   ): Promise<MetricResult[]> {
     const cloudWatchClient = new CloudWatch({
       apiVersion: '2010-08-01',
-      region: process.env.AWS_REGION,
+      region: credentials.region,
       credentials: {
         accessKeyId: credentials.accessKeyId,
         secretAccessKey: credentials.secretAccessKey,

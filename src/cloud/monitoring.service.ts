@@ -22,56 +22,59 @@ export class MonitoringService {
     const cloudProviderAccount =
       await this.cloudProviderAccountService.findOneLatestImported();
 
-    const awsCredentials: AwsCredentials = {
-      accessKeyId: cloudProviderAccount.accessKeyId,
-      secretAccessKey: cloudProviderAccount.secretAccessKey,
-      region: cloudProviderAccount.region,
-    };
+    if (cloudProviderAccount) {
+      console.log('importing metrics for account', cloudProviderAccount.id);
 
-    if (awsCredentials) {
-      const instanceList = new AwsInstanceList();
-      const instances = await instanceList.listInstances(awsCredentials);
+      const awsCredentials: AwsCredentials = {
+        accessKeyId: cloudProviderAccount.accessKeyId,
+        secretAccessKey: cloudProviderAccount.secretAccessKey,
+        region: cloudProviderAccount.region,
+      };
 
-      for (const instance of instances) {
-        const endTime = new Date();
-        const startTime = new Date(endTime);
-        startTime.setHours(startTime.getHours() - 2);
+      if (awsCredentials) {
+        const instanceList = new AwsInstanceList();
+        const instances = await instanceList.listInstances(awsCredentials);
 
-        const serverInstance =
-          await this.serverInstanceService.findOrCreateOneByInstanceId(
-            instance,
-            cloudProviderAccount,
-          );
+        for (const instance of instances) {
+          const endTime = new Date();
+          const startTime = new Date(endTime);
+          startTime.setHours(startTime.getHours() - 2);
 
-        const lastImportedAt =
-          await this.serverMetricService.getLastImportedDate(serverInstance);
-
-        const metrics = new AwsGetMetrics();
-        const instanceMetrics = await metrics.getMetrics(
-          awsCredentials,
-          instance,
-          {
-            startTime,
-            endTime,
-          },
-        );
-
-        for (const metric of instanceMetrics) {
-          // console.log({ metric });
-          if (metric.datetime > lastImportedAt) {
-            const serverMetric = await this.serverMetricService.create(
-              metric,
-              serverInstance,
+          const serverInstance =
+            await this.serverInstanceService.findOrCreateOneByInstanceId(
+              instance,
+              cloudProviderAccount,
             );
 
-            await this.serverMetricService.save(serverMetric);
+          const lastImportedAt =
+            await this.serverMetricService.getLastImportedDate(serverInstance);
+
+          const metrics = new AwsGetMetrics();
+          const instanceMetrics = await metrics.getMetrics(
+            awsCredentials,
+            instance,
+            {
+              startTime,
+              endTime,
+            },
+          );
+
+          for (const metric of instanceMetrics) {
+            if (metric.datetime > lastImportedAt) {
+              const serverMetric = await this.serverMetricService.create(
+                metric,
+                serverInstance,
+              );
+
+              await this.serverMetricService.save(serverMetric);
+            }
           }
         }
       }
-    }
 
-    cloudProviderAccount.lastImportedAt = new Date();
-    await this.cloudProviderAccountService.save(cloudProviderAccount);
+      cloudProviderAccount.lastImportedAt = new Date();
+      await this.cloudProviderAccountService.save(cloudProviderAccount);
+    }
 
     await sleep(5000);
     await this.run();

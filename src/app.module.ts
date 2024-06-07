@@ -12,15 +12,10 @@ import { HealthController } from './health/health.controller';
 import { CloudProviderAccount } from './cloud/entities/cloud-provider-account';
 import { ServerInstance } from './cloud/entities/service-instance.entity';
 import { ServerMetric } from './metrics/entities/server-metric.entity';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { FrontendApp } from './metrics/entities/frontend-app.entity';
 import { BrowserMetric } from './metrics/entities/browser-metric.entity';
 import { SnippetConfig } from './metrics/entities/snippet-config.entity';
-
-export const serializeInterceptorProvider = {
-  provide: APP_INTERCEPTOR,
-  useClass: ClassSerializerInterceptor,
-};
+import { WebSnippetModule } from './web-snippet/web-snippet.module';
 
 @Module({
   imports: [
@@ -64,8 +59,8 @@ export const serializeInterceptorProvider = {
     CloudModule,
     MetricsModule,
     AwsModule,
+    WebSnippetModule,
   ],
   controllers: [HealthController],
-  providers: [serializeInterceptorProvider],
 })
 export class AppModule {}

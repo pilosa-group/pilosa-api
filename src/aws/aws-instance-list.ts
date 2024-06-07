@@ -9,7 +9,7 @@ export class AwsInstanceList implements CloudProviderInstanceList {
   async listInstances(credentials: AwsCredentials): Promise<Instance[]> {
     const ec2Client = new EC2({
       apiVersion: '2010-08-01',
-      region: process.env.AWS_REGION,
+      region: credentials.region,
       credentials: {
         accessKeyId: credentials.accessKeyId,
         secretAccessKey: credentials.secretAccessKey,

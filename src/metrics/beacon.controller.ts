@@ -7,7 +7,6 @@ import {
   Options,
   Post,
   Req,
-  Res,
   Header,
   ForbiddenException,
 } from '@nestjs/common';
@@ -31,35 +30,52 @@ export class BeaconController {
   @HttpCode(HttpStatus.ACCEPTED)
   @Header('Access-Control-Allow-Origin', '*')
   @Header('Access-Control-Allow-Methods', 'POST')
-  @Header('Access-Control-Allow-Headers', FRONTEND_APP_ID)
+  @Header(
+    'Access-Control-Allow-Headers',
+    [FRONTEND_APP_ID, 'Content-Type'].join(','),
+  )
   async options() {
     return null;
   }
 
   @Post()
   @HttpCode(HttpStatus.ACCEPTED)
+  @Header('Access-Control-Allow-Origin', '*')
+  @Header('Access-Control-Allow-Methods', 'POST')
+  @Header(
+    'Access-Control-Allow-Headers',
+    [FRONTEND_APP_ID, 'Content-Type'].join(','),
+  )
   async create(
     @Body() createBrowserMetricDto: CreateBrowserMetricDto,
     @Req() req: Request,
   ) {
+    console.log({ createBrowserMetricDto });
     const frontendAppId = req.headers[FRONTEND_APP_ID] as Client['id'];
     const frontendApp =
       await this.frontendAppService.findOneById(frontendAppId);
 
     if (!frontendApp) {
-      throw new NotFoundException(`App ${frontendAppId} not found`);
+      throw new ForbiddenException(`App ${frontendAppId} not found`);
     }
 
-    const origin = req.headers['origin'] as string;
+    const url = new URL(req.headers['referer'] as string);
+
     const isAllowed =
-      frontendApp.urls?.includes(origin) || frontendApp.urls?.includes('*');
+      frontendApp.urls?.includes(url.hostname) ||
+      frontendApp.urls?.includes('*');
 
     if (!isAllowed) {
       throw new ForbiddenException('Invalid domain');
     }
 
     const browserMetric = await this.browserMetricService.create(
-      { ...createBrowserMetricDto, u: req.headers['user-agent'] as string },
+      {
+        ...createBrowserMetricDto,
+        p: url.pathname,
+        u: req.headers['user-agent'] as string,
+        d: url.hostname,
+      },
       frontendApp,
     );
 

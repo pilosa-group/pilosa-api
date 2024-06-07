@@ -12,14 +12,6 @@ export const validationSchema = Joi.object({
   DB_PASSWORD: Joi.string().required(),
   DB_DATABASE: Joi.string().required(),
 
-  // AWS
-  AWS_ACCESS_KEY_ID: Joi.string().required(),
-  AWS_SECRET_ACCESS_KEY: Joi.string().required(),
-  AWS_REGION: Joi.string().required(),
-
-  // Influx DB
-  INFLUXDB_ORG: Joi.string().required(),
-  INFLUXDB_URL: Joi.string().required(),
-  INFLUXDB_TOKEN: Joi.string().required(),
-  INFLUXDB_BUCKET: Joi.string().required(),
+  // WebSnippet
+  SNIPPET_BEACON_API_URL: Joi.string().required(),
 });
