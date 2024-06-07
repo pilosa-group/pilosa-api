@@ -7,7 +7,7 @@ import { Public } from '@app/auth/decorators/public.decorator';
 
 const readFile = util.promisify(fs.readFile);
 
-@Controller('snippet.js')
+@Controller('sloth.js')
 export class WebSnippetController {
   @Get()
   @Public()
