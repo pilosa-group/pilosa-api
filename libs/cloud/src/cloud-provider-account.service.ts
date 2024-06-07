@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
+import { Project } from '@app/project/entities/project.entity';
 
 @Injectable()
 export class CloudProviderAccountService {
@@ -24,5 +25,12 @@ export class CloudProviderAccountService {
     cloudProviderAccount: CloudProviderAccount,
   ): Promise<CloudProviderAccount> {
     return this.cloudProviderAccountRepository.save(cloudProviderAccount);
+  }
+
+  async findAllByProject(project: Project): Promise<CloudProviderAccount[]> {
+    return this.cloudProviderAccountRepository
+      .createQueryBuilder('cpa')
+      .where('cpa.projectId = :projectId', { projectId: project.id })
+      .getMany();
   }
 }

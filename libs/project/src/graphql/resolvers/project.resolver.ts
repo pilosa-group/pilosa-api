@@ -13,6 +13,8 @@ import { CurrentUser } from '@app/user/decorators/current-user.decorator';
 import { User } from '@app/user/entities/user.entity';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { FrontendAppService } from '@app/web-metrics/frontend-app.service';
+import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
+import { CloudProviderAccountService } from '@app/cloud/cloud-provider-account.service';
 
 @Resolver((of) => Project)
 export class ProjectResolver {
@@ -21,6 +23,8 @@ export class ProjectResolver {
     private readonly projectService: ProjectService,
     @Inject(forwardRef(() => FrontendAppService))
     private readonly frontendAppService: FrontendAppService,
+    @Inject(forwardRef(() => CloudProviderAccountService))
+    private readonly cloudProviderAccountService: CloudProviderAccountService,
   ) {}
 
   @Query((returns) => Project)
@@ -40,5 +44,12 @@ export class ProjectResolver {
   @ResolveField((returns) => [FrontendApp])
   async frontendApps(@Parent() project: Project): Promise<FrontendApp[]> {
     return this.frontendAppService.findAllByProject(project);
+  }
+
+  @ResolveField((returns) => [CloudProviderAccount])
+  async cloudProviderAccounts(
+    @Parent() project: Project,
+  ): Promise<CloudProviderAccount[]> {
+    return this.cloudProviderAccountService.findAllByProject(project);
   }
 }

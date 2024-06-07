@@ -13,6 +13,7 @@ import { OrganizationResolver } from '@app/project/graphql/resolvers/organizatio
 import { OrganizationService } from '@app/project/organization.service';
 import { Organization } from '@app/project/entities/organization.entity';
 import { WebMetricsModule } from '@app/web-metrics';
+import { CloudModule } from '@app/cloud';
 
 @Module({
   providers: [
@@ -32,6 +33,7 @@ import { WebMetricsModule } from '@app/web-metrics';
   ],
   imports: [
     WebMetricsModule,
+    CloudModule,
     TypeOrmModule.forFeature([
       Project,
       Organization,

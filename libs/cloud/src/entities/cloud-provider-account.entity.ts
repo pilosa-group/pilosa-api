@@ -13,7 +13,6 @@ import { availableCloudProviders } from '../available-cloud-providers';
 import { ServerInstance } from './service-instance.entity';
 import { Project } from '@app/project/entities/project.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 
 @Entity()
 @ObjectType()
