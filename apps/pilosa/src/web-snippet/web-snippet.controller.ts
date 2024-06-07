@@ -38,6 +38,7 @@ export class WebSnippetController {
     return res
       .setHeader('Content-Type', 'text/javascript')
       .setHeader('Cache-Control', `public, max-age=60`)
+      .setHeader('Timing-Allow-Origin', '*')
       .status(HttpStatus.OK)
       .send(snippetContents);
   }
