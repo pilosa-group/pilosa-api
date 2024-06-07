@@ -1,2 +1,2 @@
 npm run typeorm -- migration:run
-npm run start
+npm run start:prod

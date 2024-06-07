@@ -9,7 +9,6 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
  CMD curl -f http://localhost:4000/v1/health || exit 1
 

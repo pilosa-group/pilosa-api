@@ -3,7 +3,11 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ConfigService } from '@nestjs/config';
-import { ClerkConfig } from '../../../../apps/project-green-nest/src/config/configuration';
+import {
+  AppConfig,
+  ClerkConfig,
+  ENV_DEVELOPMENT,
+} from '../../../../apps/project-green-nest/src/config/configuration';
 import { JWTPayload } from '@app/auth/types';
 import { UserService } from '@app/user/user.service';
 import { User } from '@app/user/entities/user.entity';
@@ -15,6 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     configService: ConfigService,
   ) {
     const clerkConfig = configService.get<ClerkConfig>('clerk');
+    const appConfig = configService.get<AppConfig>('app');
 
     super({
       secretOrKeyProvider: passportJwtSecret({
@@ -25,6 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       }),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       issuer: clerkConfig.issuerUrl,
+      ignoreExpiration: appConfig.env === ENV_DEVELOPMENT,
       algorithms: ['RS256'],
     });
   }

@@ -1,3 +1,7 @@
+export type AppConfig = {
+  env: string;
+};
+
 export type WebSnippetConfig = {
   beaconApiUrl: string;
 };
@@ -16,12 +20,18 @@ export type ClerkConfig = {
 };
 
 export type Config = {
+  app: AppConfig;
   database: DatabaseConfig;
   webSnippet: WebSnippetConfig;
   clerk: ClerkConfig;
 };
 
+export const ENV_DEVELOPMENT = 'development';
+
 export default (): Config => ({
+  app: {
+    env: process.env.NODE_ENV,
+  },
   database: {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
