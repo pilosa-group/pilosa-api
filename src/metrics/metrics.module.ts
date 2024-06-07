@@ -8,5 +8,6 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [BeaconController],
   providers: [InfluxdbService],
   imports: [ClientsModule, ConfigModule],
+  exports: [InfluxdbService],
 })
 export class MetricsModule {}

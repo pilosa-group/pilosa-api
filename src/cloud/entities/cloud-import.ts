@@ -8,13 +8,13 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
-import { Client } from './client.entity';
+import { Expose } from 'class-transformer';
+import { Client } from '../../clients/entities/client.entity';
 
 @Entity()
-@Exclude()
-export class SnippetConfig {
+export class CloudImport {
   @PrimaryGeneratedColumn('uuid')
+  @Expose()
   id: string;
 
   @CreateDateColumn()
@@ -26,11 +26,17 @@ export class SnippetConfig {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @Column()
-  @Expose()
-  batchWaitTime: number;
+  @Column('timestamp', {
+    nullable: true,
+  })
+  lastImportedAt: Date;
 
-  @OneToOne(() => Client)
+  @Column('simple-enum', {
+    enum: ['aws'],
+  })
+  provider: 'aws';
+
+  @OneToOne(() => Client, (client: Client) => client.cloudImports)
   @JoinColumn()
   client: Client;
 }

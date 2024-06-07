@@ -1,7 +1,15 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ClientsService } from './clients.service';
 
 @Controller('clients')
+@UseInterceptors(ClassSerializerInterceptor)
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
@@ -11,8 +19,8 @@ export class ClientsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    const client = this.clientsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const client = await this.clientsService.findOne(id);
 
     if (!client) {
       throw new NotFoundException(`Client ${id} not found`);
