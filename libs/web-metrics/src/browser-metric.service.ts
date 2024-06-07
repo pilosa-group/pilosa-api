@@ -47,6 +47,17 @@ export class BrowserMetricService {
     return this.browserMetricRepository.save(browserMetric);
   }
 
+  async findAllByFrontendApp(
+    frontendApp: FrontendApp,
+  ): Promise<BrowserMetric[]> {
+    return this.browserMetricRepository
+      .createQueryBuilder('bm')
+      .where('bm.frontendAppId = :frontendAppId', {
+        frontendAppId: frontendApp.id,
+      })
+      .getMany();
+  }
+
   async getMetricsByPeriod(
     serverInstanceId: ServerInstance['id'],
     timeBucket: TimeBucket,
