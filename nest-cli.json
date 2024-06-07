@@ -1,8 +1,77 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/project-green-nest/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/project-green-nest/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/project-green-nest",
+  "projects": {
+    "project-green-nest": {
+      "type": "application",
+      "root": "apps/project-green-nest",
+      "entryFile": "main",
+      "sourceRoot": "apps/project-green-nest/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/project-green-nest/tsconfig.app.json"
+      }
+    },
+    "client": {
+      "type": "library",
+      "root": "libs/client",
+      "entryFile": "index",
+      "sourceRoot": "libs/client/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/client/tsconfig.lib.json"
+      }
+    },
+    "cloud-aws": {
+      "type": "library",
+      "root": "libs/cloud-aws",
+      "entryFile": "index",
+      "sourceRoot": "libs/cloud-aws/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/cloud-aws/tsconfig.lib.json"
+      }
+    },
+    "cloud": {
+      "type": "library",
+      "root": "libs/cloud",
+      "entryFile": "index",
+      "sourceRoot": "libs/cloud/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/cloud/tsconfig.lib.json"
+      }
+    },
+    "web-metrics": {
+      "type": "library",
+      "root": "libs/web-metrics",
+      "entryFile": "index",
+      "sourceRoot": "libs/web-metrics/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/web-metrics/tsconfig.lib.json"
+      }
+    },
+    "cloud-metrics": {
+      "type": "library",
+      "root": "libs/cloud-metrics",
+      "entryFile": "index",
+      "sourceRoot": "libs/cloud-metrics/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/cloud-metrics/tsconfig.lib.json"
+      }
+    },
+    "health": {
+      "type": "library",
+      "root": "libs/health",
+      "entryFile": "index",
+      "sourceRoot": "libs/health/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/health/tsconfig.lib.json"
+      }
+    }
   }
 }
