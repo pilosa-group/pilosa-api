@@ -48,6 +48,8 @@ type CombinedPayload = {
 declare let SNIPPET_API_ENDPOINT: string;
 declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
 
+const DEFAULT_NONE_EXTENSION = '_';
+
 (() => {
   const ENTRY_TYPE_RESOURCE = 'resource';
 
@@ -190,7 +192,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
             entry.decodedBodySize &&
             entry.decodedBodySize !== entry.encodedBodySize;
 
-          let extension = '__none__';
+          let extension = DEFAULT_NONE_EXTENSION;
           if (url.pathname.includes('.')) {
             extension = url.pathname.split('.').pop();
           }

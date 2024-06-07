@@ -58,6 +58,31 @@ type CombinedPayload = {
   };
 };
 
+const isValidInitiatorType = (initiatorType: string): boolean =>
+  [
+    'audio',
+    'beacon',
+    'body',
+    'css',
+    'early-hint',
+    'embed',
+    'fetch',
+    'frame',
+    'iframe',
+    'icon',
+    'image',
+    'img',
+    'input',
+    'link',
+    'navigation',
+    'object',
+    'ping',
+    'script',
+    'track',
+    'video',
+    'xmlhttprequest',
+  ].includes(initiatorType);
+
 @Controller('beacon')
 export class BeaconController {
   constructor(
@@ -121,42 +146,44 @@ export class BeaconController {
       Object.keys(createBrowserMetricDto.d[domain]).forEach((path) => {
         Object.keys(createBrowserMetricDto.d[domain][path]).forEach(
           (initiatorType) => {
-            Object.keys(
-              createBrowserMetricDto.d[domain][path][initiatorType],
-            ).forEach(async (extension) => {
-              const { b: bytes, co: crossOrigins } =
-                createBrowserMetricDto.d[domain][path][initiatorType][
-                  extension
-                ];
+            if (isValidInitiatorType(initiatorType)) {
+              Object.keys(
+                createBrowserMetricDto.d[domain][path][initiatorType],
+              ).forEach(async (extension) => {
+                const { b: bytes, co: crossOrigins } =
+                  createBrowserMetricDto.d[domain][path][initiatorType][
+                    extension
+                  ];
 
-              const [bytesCompressed, bytesUncompressed] = bytes;
+                const [bytesCompressed, bytesUncompressed] = bytes;
 
-              if (bytesCompressed > 0 || bytesUncompressed > 0) {
-                const metric: CreateBrowserMetricDto = {
-                  firstLoad: createBrowserMetricDto.f,
-                  domain,
-                  path,
-                  initiatorType,
-                  extension: extension === '__none__' ? null : extension,
-                  bytesCompressed,
-                  bytesUncompressed,
-                  userAgent,
-                  visitor,
-                };
+                if (bytesCompressed > 0 || bytesUncompressed > 0) {
+                  const metric: CreateBrowserMetricDto = {
+                    firstLoad: createBrowserMetricDto.f,
+                    domain,
+                    path,
+                    initiatorType,
+                    extension: extension === '_' ? null : extension,
+                    bytesCompressed,
+                    bytesUncompressed,
+                    userAgent,
+                    visitor,
+                  };
 
-                const browserMetric = await this.browserMetricService.create(
-                  metric,
-                  frontendApp,
-                );
+                  const browserMetric = await this.browserMetricService.create(
+                    metric,
+                    frontendApp,
+                  );
 
-                void this.browserMetricService.save(browserMetric);
-              }
+                  void this.browserMetricService.save(browserMetric);
+                }
 
-              if (crossOrigins.length) {
-                // TODO store this in backend, so we can tell the client to add these to the CORS policy
-                console.log(initiatorType, extension, crossOrigins);
-              }
-            });
+                if (crossOrigins.length) {
+                  // TODO store this in backend, so we can tell the client to add these to the CORS policy
+                  console.log(initiatorType, extension, crossOrigins);
+                }
+              });
+            }
           },
         );
       });
