@@ -26,6 +26,7 @@ export class BrowserMetricService {
     browserMetricDto: CreateBrowserMetricDto & {
       u: string;
       d: string;
+      ip: string;
     },
     frontendApp: FrontendApp,
   ): Promise<BrowserMetric> {
@@ -38,6 +39,7 @@ export class BrowserMetricService {
       path: browserMetricDto.p,
       userAgent: browserMetricDto.u,
       accuracy: browserMetricDto.a,
+      ip: browserMetricDto.ip,
     });
   }
 

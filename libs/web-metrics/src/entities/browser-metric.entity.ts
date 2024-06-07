@@ -20,8 +20,10 @@ export class BrowserMetric {
   path: string;
 
   @Column()
-  @Expose()
   userAgent: string;
+
+  @Column({ nullable: true })
+  ip: string;
 
   @Column('float')
   @Expose()

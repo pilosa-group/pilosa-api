@@ -15,6 +15,7 @@ async function bootstrap() {
     origin: '*',
   });
 
+  app.getHttpAdapter().getInstance().set('trust proxy', true);
   app.getHttpAdapter().getInstance().disable('x-powered-by');
 
   await app.listen(4000);

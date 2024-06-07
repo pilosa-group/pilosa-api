@@ -17,6 +17,7 @@ import { FrontendAppService } from './frontend-app.service';
 import { BrowserMetricService } from './browser-metric.service';
 import { Client } from '@app/client';
 import { Public } from '@app/auth/decorators/public.decorator';
+import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
 
 const FRONTEND_APP_ID = 'x-id';
 
@@ -52,6 +53,7 @@ export class BeaconController {
   async create(
     @Body() createBrowserMetricDto: CreateBrowserMetricDto,
     @Req() req: Request,
+    @ClientIp() clientIp: string,
   ) {
     const frontendAppId = req.headers[FRONTEND_APP_ID] as Client['id'];
     const frontendApp =
@@ -81,6 +83,7 @@ export class BeaconController {
         p: url.pathname,
         u: req.headers['user-agent'] as string,
         d: url.hostname,
+        ip: clientIp,
       },
       frontendApp,
     );
