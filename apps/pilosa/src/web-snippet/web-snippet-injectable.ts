@@ -206,6 +206,11 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
             extension,
           };
 
+          // Cached page when EXACTLY 300 bytes?
+          if (entry.transferSize === 300 && entry.initiatorType === 'fetch') {
+            return;
+          }
+
           // If the transfer size is 0, it's a cross-origin request
           if (entry.transferSize === 0) {
             const origin = url.host;

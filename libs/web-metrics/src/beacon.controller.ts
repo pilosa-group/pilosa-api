@@ -170,6 +170,15 @@ export class BeaconController {
                     visitor,
                   };
 
+                  // Cached page when EXACTLY 300 bytes?
+                  if (
+                    bytesCompressed === 0 &&
+                    bytesUncompressed === 300 &&
+                    initiatorType === 'fetch'
+                  ) {
+                    return;
+                  }
+
                   const browserMetric = await this.browserMetricService.create(
                     metric,
                     frontendApp,

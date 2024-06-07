@@ -84,7 +84,6 @@ import { CacheModule } from '@nestjs/cache-manager';
           cli: {
             migrationsDir: 'src/db/migrations',
           },
-          // synchronize: true,
         };
       },
       inject: [ConfigService],
