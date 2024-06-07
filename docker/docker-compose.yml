@@ -1,0 +1,12 @@
+services:
+  db:
+    container_name: "project-green-db"
+    image: postgres
+    volumes:
+      - ./.data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: projectgreen
+      POSTGRES_PASSWORD: projectgreen
+      POSTGRES_DB: projectgreen
