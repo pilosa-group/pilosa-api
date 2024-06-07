@@ -19,7 +19,7 @@ export class CreateBrowserMetricDto {
   /**
    * cached bytes
    */
-  cb: number;
+  bc: number;
 
   /**
    * accuracy
