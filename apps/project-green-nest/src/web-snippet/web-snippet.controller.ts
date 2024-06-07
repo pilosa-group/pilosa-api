@@ -13,7 +13,6 @@ export class WebSnippetController {
   async snippet() {
     const currentDir = path.resolve(__dirname);
     const snippetPath = path.resolve(currentDir, 'web-snippet-injectable.js');
-    console.log(snippetPath);
     const snippetOut = path.resolve(
       currentDir,
       'web-snippet-injectable-minified.js',

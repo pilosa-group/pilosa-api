@@ -11,4 +11,6 @@ RUN npm run build
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
  CMD curl -f http://localhost:3000/health || exit 1
 
-CMD ["sh", "run-prod.sh"]
+RUN npm run typeorm -- migration:run
+
+CMD ["npm", "run", "start"]
