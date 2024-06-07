@@ -30,7 +30,7 @@ export class WebSnippetController {
       outfile: snippetOut,
       define: {
         SNIPPET_API_ENDPOINT: `'${process.env.SNIPPET_BEACON_API_URL}'`,
-        BATCH_REPORT_WAIT_TIME_IN_MS: '2000',
+        BATCH_REPORT_WAIT_TIME_IN_MS: '500',
       },
     });
 

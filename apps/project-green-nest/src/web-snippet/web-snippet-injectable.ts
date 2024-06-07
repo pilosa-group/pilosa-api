@@ -144,7 +144,6 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
 
     if (hasBytes || hasData) {
       // console.log(groupedPayloads);
-      console.log('Sending beacon', groupedPayloads);
       fetch(SNIPPET_API_ENDPOINT, {
         keepalive: true,
         method: 'POST',
@@ -160,6 +159,10 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
     payloads = [];
     firstPageLoad = false;
   };
+
+  document.addEventListener('visibilitychange', () => {
+    sendBeacon();
+  });
 
   // Send the beacon after a certain amount of time
   const sendBeaconDebounced = debounce(
@@ -233,8 +236,6 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
       sendBeaconDebounced();
     }
   });
-
-  document.addEventListener('visibilitychange', () => sendBeacon());
 
   observer.observe({ type: ENTRY_TYPE_RESOURCE, buffered: true });
 })();

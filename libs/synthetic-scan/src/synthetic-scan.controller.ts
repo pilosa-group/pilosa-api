@@ -1,6 +1,13 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { Public } from '@app/auth/decorators/public.decorator';
-import { SyntheticScanService, VisitResult } from '@app/synthetic-scan/synthetic-scan.service';
+import {
+  SyntheticScanService,
+  VisitResult,
+} from '@app/synthetic-scan/synthetic-scan.service';
+
+type ScanPayload = {
+  url: string;
+};
 
 @Controller('synthetic-scan')
 export class SyntheticScanController {
@@ -8,7 +15,7 @@ export class SyntheticScanController {
 
   @Post()
   @Public()
-  scan(): Promise<VisitResult> {
-    return this.syntheticScanService.run('https://www.hetscheepvaartmuseum.nl/');
+  scan(@Body() { url }: ScanPayload): Promise<VisitResult> {
+    return this.syntheticScanService.run(url);
   }
 }

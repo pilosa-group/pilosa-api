@@ -107,8 +107,6 @@ export class BeaconController {
       throw new ForbiddenException('Invalid domain');
     }
 
-    console.log(JSON.stringify(createBrowserMetricDto, null, 2));
-
     Object.keys(createBrowserMetricDto.d).forEach((domain) => {
       Object.keys(createBrowserMetricDto.d[domain]).forEach((path) => {
         Object.keys(createBrowserMetricDto.d[domain][path]).forEach(
@@ -144,9 +142,9 @@ export class BeaconController {
                 void this.browserMetricService.save(browserMetric);
               }
 
-              if(crossOrigins.length) {
+              if (crossOrigins.length) {
                 // TODO store this in backend, so we can tell the client to add these to the CORS policy
-                console.log(initiatorType, extension, crossOrigins)
+                console.log(initiatorType, extension, crossOrigins);
               }
             });
           },
