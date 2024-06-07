@@ -1,12 +1,12 @@
 services:
-  db:
-    container_name: "project-green-db"
-    image: postgres:16.1
+  timescale:
+    container_name: "pilosa-timescale-db"
+    image: timescale/timescaledb-ha:pg16
     volumes:
-      - ./.data/db:/var/lib/postgresql/data
+      - ./.data/timescale:/var/lib/postgresql
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: projectgreen
-      POSTGRES_PASSWORD: projectgreen
-      POSTGRES_DB: projectgreen
+      POSTGRES_USER: pilosa
+      POSTGRES_PASSWORD: pilosa
+      POSTGRES_DB: pilosa
