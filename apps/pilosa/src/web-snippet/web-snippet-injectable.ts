@@ -48,9 +48,8 @@ type CombinedPayload = {
 declare let SNIPPET_API_ENDPOINT: string;
 declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
 
-const DEFAULT_NONE_EXTENSION = '_';
-
 (() => {
+  const BEACON_API_URL = SNIPPET_API_ENDPOINT;
   const ENTRY_TYPE_RESOURCE = 'resource';
 
   let payloads: Payload[] = [];
@@ -146,7 +145,7 @@ const DEFAULT_NONE_EXTENSION = '_';
 
     if (hasBytes || hasData) {
       // console.log(groupedPayloads);
-      fetch(SNIPPET_API_ENDPOINT, {
+      fetch(BEACON_API_URL, {
         keepalive: true,
         method: 'POST',
         headers: {
@@ -192,7 +191,7 @@ const DEFAULT_NONE_EXTENSION = '_';
             entry.decodedBodySize &&
             entry.decodedBodySize !== entry.encodedBodySize;
 
-          let extension = DEFAULT_NONE_EXTENSION;
+          let extension = '_';
           if (url.pathname.includes('.')) {
             extension = url.pathname.split('.').pop();
           }
@@ -221,7 +220,7 @@ const DEFAULT_NONE_EXTENSION = '_';
           if (
             payload.initiatorType === 'fetch' &&
             payload.crossOrigin.length === 1 &&
-            SNIPPET_API_ENDPOINT.includes(payload.crossOrigin[0])
+            BEACON_API_URL.includes(payload.crossOrigin[0])
           ) {
             return;
           }
