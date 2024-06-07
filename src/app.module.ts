@@ -6,6 +6,8 @@ import { MetricsModule } from './metrics/metrics.module';
 import { validationSchema } from './config/validation.schema';
 import configuration, { DatabaseConfig } from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Client } from './clients/entities/client.entity';
+import { SnippetConfig } from './clients/entities/snippet-config.entity';
 
 @Module({
   imports: [
@@ -20,13 +22,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           configService.get<DatabaseConfig>('database');
 
         return {
-          type: 'mysql',
+          type: 'postgres',
           host,
           port,
           username,
           password,
           database,
-          autoLoadEntities: true,
+          entities: [Client, SnippetConfig],
+          migrations: ['dist/db/migrations/*.js'],
+          cli: {
+            migrationsDir: 'src/db/migrations',
+          },
           // synchronize: true,
         };
       },
