@@ -1,6 +1,4 @@
-const ENTRY_TYPE_RESOURCE = 'resource';
-
-type FullPageLoad = boolean;
+type FirstPageLoad = boolean;
 type Timestamp = number;
 type InitiatorType = string;
 type Domain = string;
@@ -28,10 +26,8 @@ type Payload = {
   extension: FileExtension;
 };
 
-let payloads: Payload[] = [];
-
 type CombinedPayload = {
-  f: FullPageLoad;
+  f: FirstPageLoad;
   t: Timestamp;
   b: [CompressedBytes, UncompressedBytes];
   d: {
@@ -47,6 +43,10 @@ type CombinedPayload = {
     };
   };
 };
+
+const ENTRY_TYPE_RESOURCE = 'resource';
+
+let payloads: Payload[] = [];
 
 // These vars are injected by the endpoint
 declare let SNIPPET_API_ENDPOINT: string;
@@ -71,11 +71,12 @@ const debounce = (fn: () => void, wait: number) => {
   };
 };
 
-let fullPageLoad = true;
+// whether this was the first page load
+let firstPageLoad = true;
 
 const sendBeacon = (): void => {
   const groupedPayloads: CombinedPayload = {
-    f: fullPageLoad,
+    f: firstPageLoad,
     t: Date.now(),
     b: [0, 0],
     d: {},
@@ -139,13 +140,10 @@ const sendBeacon = (): void => {
   }
 
   const hasBytes = groupedPayloads.b.some((bytes) => bytes > 0);
-  const totalBytes = groupedPayloads.b.reduce((acc, bytes) => acc + bytes, 0);
   const hasData = Object.keys(groupedPayloads.d).length > 0;
 
-  console.log('total MB', totalBytes / 1024 / 1024);
-
   if (hasBytes || hasData) {
-    console.log('send!', JSON.stringify(groupedPayloads, null, 2));
+    console.log('Sending beacon', groupedPayloads);
     fetch(SNIPPET_API_ENDPOINT, {
       keepalive: true,
       method: 'POST',
@@ -159,7 +157,7 @@ const sendBeacon = (): void => {
 
   // reset for next batch
   payloads = [];
-  fullPageLoad = false;
+  firstPageLoad = false;
 };
 
 // Send the beacon after a certain amount of time
@@ -208,6 +206,15 @@ const observer = new PerformanceObserver((list) => {
           if (!payload.crossOrigin.includes(origin)) {
             payload.crossOrigin.push(origin);
           }
+        }
+
+        // If the initiator type is fetch, and it's a call to the snippet API, ignore it
+        if (
+          payload.initiatorType === 'fetch' &&
+          payload.crossOrigin.length === 1 &&
+          SNIPPET_API_ENDPOINT.includes(payload.crossOrigin[0])
+        ) {
+          return;
         }
 
         payloads.push(payload);
