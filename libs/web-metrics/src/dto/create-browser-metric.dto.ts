@@ -1,21 +1,11 @@
 export class CreateBrowserMetricDto {
-  /**
-   * path
-   */
-  p: string;
-
-  /**
-   * bytes
-   */
-  b: number;
-
-  /**
-   * cached bytes
-   */
-  bc: number;
-
-  /**
-   * accuracy
-   */
-  a: number;
+  firstLoad: boolean;
+  bytesCompressed: number;
+  bytesUncompressed: number;
+  initiatorType: string;
+  extension: string;
+  domain: string;
+  path: string;
+  userAgent: string;
+  ip: string;
 }

@@ -44,192 +44,197 @@ type CombinedPayload = {
   };
 };
 
-const ENTRY_TYPE_RESOURCE = 'resource';
-
-let payloads: Payload[] = [];
-
 // These vars are injected by the endpoint
 declare let SNIPPET_API_ENDPOINT: string;
 declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
 
-const noop = () => {};
+(() => {
+  const ENTRY_TYPE_RESOURCE = 'resource';
 
-const CLIENT_ID = document.currentScript.getAttribute('data-client-id');
+  let payloads: Payload[] = [];
 
-/**
- * Debounce function
- *
- * @param fn
- * @param wait
- */
-const debounce = (fn: () => void, wait: number) => {
-  let timeout: number | undefined;
+  const noop = () => {};
+  const CLIENT_ID = document.currentScript.getAttribute('data-client-id');
 
-  return () => {
-    clearTimeout(timeout);
-    timeout = window.setTimeout(fn, wait);
-  };
-};
+  /**
+   * Debounce function
+   *
+   * @param fn
+   * @param wait
+   */
+  const debounce = (fn: () => void, wait: number) => {
+    let timeout: number | undefined;
 
-// whether this was the first page load
-let firstPageLoad = true;
-
-const sendBeacon = (): void => {
-  const groupedPayloads: CombinedPayload = {
-    f: firstPageLoad,
-    t: Date.now(),
-    b: [0, 0],
-    d: {},
+    return () => {
+      clearTimeout(timeout);
+      timeout = window.setTimeout(fn, wait);
+    };
   };
 
-  const compressedKey = 0;
-  const uncompressedKey = 1;
+  // whether this was the first page load
+  let firstPageLoad = true;
 
-  for (const payload of payloads) {
-    const domain = payload.domain;
-    const path = payload.path;
-    const initiatorType = payload.initiatorType;
-    const extension = payload.extension;
-    const compressed = payload.compressed;
-    const bytes = payload.bytes;
-    const crossOrigin = payload.crossOrigin;
+  const sendBeacon = (): void => {
+    const groupedPayloads: CombinedPayload = {
+      f: firstPageLoad,
+      t: Date.now(),
+      b: [0, 0],
+      d: {},
+    };
 
-    // If the domain doesn't exist in the groupedPayloads, add it
-    if (!groupedPayloads.d[domain]) {
-      groupedPayloads.d[domain] = {};
-    }
+    const compressedKey = 0;
+    const uncompressedKey = 1;
 
-    // If the path doesn't exist in the groupedPayloads, add it
-    if (!groupedPayloads.d[domain][path]) {
-      groupedPayloads.d[domain][path] = {};
-    }
+    for (const payload of payloads) {
+      const domain = payload.domain;
+      const path = payload.path;
+      const initiatorType = payload.initiatorType;
+      const extension = payload.extension;
+      const compressed = payload.compressed;
+      const bytes = payload.bytes;
+      const crossOrigin = payload.crossOrigin;
 
-    // If the initiatorType doesn't exist in the groupedPayloads, add it
-    if (!groupedPayloads.d[domain][path][initiatorType]) {
-      groupedPayloads.d[domain][path][initiatorType] = {};
-    }
-
-    // If the extension doesn't exist in the groupedPayloads, add it
-    if (!groupedPayloads.d[domain][path][initiatorType][extension]) {
-      groupedPayloads.d[domain][path][initiatorType][extension] = {
-        b: [0, 0],
-        co: [],
-      };
-    }
-
-    // Add the bytes to the groupedPayloads
-    groupedPayloads.d[domain][path][initiatorType][extension].b[
-      compressed ? compressedKey : uncompressedKey
-    ] += bytes;
-
-    // Add the cross-origin origins to the groupedPayloads
-    for (const origin of crossOrigin) {
-      if (
-        !groupedPayloads.d[domain][path][initiatorType][extension].co.includes(
-          origin,
-        )
-      ) {
-        groupedPayloads.d[domain][path][initiatorType][extension].co.push(
-          origin,
-        );
+      // If the domain doesn't exist in the groupedPayloads, add it
+      if (!groupedPayloads.d[domain]) {
+        groupedPayloads.d[domain] = {};
       }
-    }
 
-    // Add the bytes to the total bytes
-    groupedPayloads.b[compressed ? compressedKey : uncompressedKey] += bytes;
-  }
+      // If the path doesn't exist in the groupedPayloads, add it
+      if (!groupedPayloads.d[domain][path]) {
+        groupedPayloads.d[domain][path] = {};
+      }
 
-  const hasBytes = groupedPayloads.b.some((bytes) => bytes > 0);
-  const hasData = Object.keys(groupedPayloads.d).length > 0;
+      // If the initiatorType doesn't exist in the groupedPayloads, add it
+      if (!groupedPayloads.d[domain][path][initiatorType]) {
+        groupedPayloads.d[domain][path][initiatorType] = {};
+      }
 
-  if (hasBytes || hasData) {
-    console.log('Sending beacon', groupedPayloads);
-    fetch(SNIPPET_API_ENDPOINT, {
-      keepalive: true,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-id': CLIENT_ID,
-      },
-      body: JSON.stringify(groupedPayloads),
-    }).catch(noop);
-  }
-
-  // reset for next batch
-  payloads = [];
-  firstPageLoad = false;
-};
-
-// Send the beacon after a certain amount of time
-const sendBeaconDebounced = debounce(sendBeacon, BATCH_REPORT_WAIT_TIME_IN_MS);
-
-const observer = new PerformanceObserver((list) => {
-  list.getEntries().map((entry: PerformanceResourceTiming) => {
-    const domain = window.location.hostname;
-    const path = window.location.pathname + window.location.search;
-
-    switch (entry.entryType) {
-      case ENTRY_TYPE_RESOURCE: {
-        const cached = entry.transferSize === 0 && entry.decodedBodySize > 0;
-
-        if (cached) {
-          return;
-        }
-
-        const url = new URL(entry.name);
-
-        // Check if the resource is compressed
-        const compressed =
-          entry.decodedBodySize &&
-          entry.decodedBodySize !== entry.encodedBodySize;
-
-        let extension = '__none__';
-        if (url.pathname.includes('.')) {
-          extension = url.pathname.split('.').pop();
-        }
-
-        const payload: Payload = {
-          domain,
-          path,
-          compressed,
-          initiatorType: entry.initiatorType,
-          bytes: entry.transferSize,
-          crossOrigin: [],
-          extension,
+      // If the extension doesn't exist in the groupedPayloads, add it
+      if (!groupedPayloads.d[domain][path][initiatorType][extension]) {
+        groupedPayloads.d[domain][path][initiatorType][extension] = {
+          b: [0, 0],
+          co: [],
         };
-
-        // If the transfer size is 0, it's a cross-origin request
-        if (entry.transferSize === 0) {
-          const origin = url.host;
-
-          // Only add the origin if it's not already in the list
-          if (!payload.crossOrigin.includes(origin)) {
-            payload.crossOrigin.push(origin);
-          }
-        }
-
-        // If the initiator type is fetch, and it's a call to the snippet API, ignore it
-        if (
-          payload.initiatorType === 'fetch' &&
-          payload.crossOrigin.length === 1 &&
-          SNIPPET_API_ENDPOINT.includes(payload.crossOrigin[0])
-        ) {
-          return;
-        }
-
-        payloads.push(payload);
-
-        break;
       }
+
+      // Add the bytes to the groupedPayloads
+      groupedPayloads.d[domain][path][initiatorType][extension].b[
+        compressed ? compressedKey : uncompressedKey
+      ] += bytes;
+
+      // Add the cross-origin origins to the groupedPayloads
+      for (const origin of crossOrigin) {
+        if (
+          !groupedPayloads.d[domain][path][initiatorType][
+            extension
+          ].co.includes(origin)
+        ) {
+          groupedPayloads.d[domain][path][initiatorType][extension].co.push(
+            origin,
+          );
+        }
+      }
+
+      // Add the bytes to the total bytes
+      groupedPayloads.b[compressed ? compressedKey : uncompressedKey] += bytes;
+    }
+
+    const hasBytes = groupedPayloads.b.some((bytes) => bytes > 0);
+    const hasData = Object.keys(groupedPayloads.d).length > 0;
+
+    if (hasBytes || hasData) {
+      // console.log(groupedPayloads);
+      console.log('Sending beacon', groupedPayloads);
+      fetch(SNIPPET_API_ENDPOINT, {
+        keepalive: true,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-id': CLIENT_ID,
+        },
+        body: JSON.stringify(groupedPayloads),
+      }).catch(noop);
+    }
+
+    // reset for next batch
+    payloads = [];
+    firstPageLoad = false;
+  };
+
+  // Send the beacon after a certain amount of time
+  const sendBeaconDebounced = debounce(
+    sendBeacon,
+    BATCH_REPORT_WAIT_TIME_IN_MS,
+  );
+
+  const observer = new PerformanceObserver((list) => {
+    list.getEntries().map((entry: PerformanceResourceTiming) => {
+      const domain = window.location.hostname;
+      const path = window.location.pathname + window.location.search;
+
+      switch (entry.entryType) {
+        case ENTRY_TYPE_RESOURCE: {
+          const cached = entry.transferSize === 0 && entry.decodedBodySize > 0;
+
+          if (cached) {
+            return;
+          }
+
+          const url = new URL(entry.name);
+
+          // Check if the resource is compressed
+          const compressed =
+            entry.decodedBodySize &&
+            entry.decodedBodySize !== entry.encodedBodySize;
+
+          let extension = '__none__';
+          if (url.pathname.includes('.')) {
+            extension = url.pathname.split('.').pop();
+          }
+
+          const payload: Payload = {
+            domain,
+            path,
+            compressed,
+            initiatorType: entry.initiatorType,
+            bytes: entry.transferSize,
+            crossOrigin: [],
+            extension,
+          };
+
+          // If the transfer size is 0, it's a cross-origin request
+          if (entry.transferSize === 0) {
+            const origin = url.host;
+
+            // Only add the origin if it's not already in the list
+            if (!payload.crossOrigin.includes(origin)) {
+              payload.crossOrigin.push(origin);
+            }
+          }
+
+          // If the initiator type is fetch, and it's a call to the snippet API, ignore it
+          if (
+            payload.initiatorType === 'fetch' &&
+            payload.crossOrigin.length === 1 &&
+            SNIPPET_API_ENDPOINT.includes(payload.crossOrigin[0])
+          ) {
+            return;
+          }
+
+          payloads.push(payload);
+
+          break;
+        }
+      }
+    });
+
+    // If there are payloads, send the beacon
+    if (payloads.length > 0) {
+      sendBeaconDebounced();
     }
   });
 
-  // If there are payloads, send the beacon
-  if (payloads.length > 0) {
-    sendBeaconDebounced();
-  }
-});
+  document.addEventListener('visibilitychange', () => sendBeacon());
 
-document.addEventListener('visibilitychange', () => sendBeacon());
-
-observer.observe({ type: ENTRY_TYPE_RESOURCE, buffered: true });
+  observer.observe({ type: ENTRY_TYPE_RESOURCE, buffered: true });
+})();

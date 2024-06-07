@@ -28,6 +28,7 @@ import { UserOrganizationRole } from '@app/project/entities/user-organization-ro
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 import { Project } from '@app/project/entities/project.entity';
 import { MetricsModule } from '@app/metrics';
+import { BrowserMetricCrossOrigin } from '@app/web-metrics/entities/browser-metric-cross-origin.entity';
 
 @Module({
   providers: [
@@ -54,7 +55,7 @@ import { MetricsModule } from '@app/metrics';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const { port, host, database, username, password } =
+        const { port, host, database, username, password, ssl } =
           configService.get<DatabaseConfig>('database');
 
         return {
@@ -64,16 +65,17 @@ import { MetricsModule } from '@app/metrics';
           username,
           password,
           database,
-          ssl: true,
+          ssl,
           entities: [
-            Project,
+            BrowserMetric,
+            BrowserMetricCrossOrigin,
             CloudProviderAccount,
+            FrontendApp,
+            Organization,
+            Project,
             ServerInstance,
             ServerMetric,
-            FrontendApp,
-            BrowserMetric,
             User,
-            Organization,
             UserOrganizationRole,
             UserProjectRole,
           ],

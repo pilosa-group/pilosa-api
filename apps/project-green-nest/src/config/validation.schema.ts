@@ -11,6 +11,7 @@ export const validationSchema = Joi.object({
   DB_USERNAME: Joi.string().required(),
   DB_PASSWORD: Joi.string().required(),
   DB_DATABASE: Joi.string().required(),
+  DB_SSL: Joi.number().required(),
 
   // WebSnippet
   SNIPPET_BEACON_API_URL: Joi.string().required(),

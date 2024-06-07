@@ -23,23 +23,12 @@ export class BrowserMetricService {
   ) {}
 
   async create(
-    browserMetricDto: CreateBrowserMetricDto & {
-      u: string;
-      d: string;
-      ip: string;
-    },
+    browserMetricDto: CreateBrowserMetricDto,
     frontendApp: FrontendApp,
   ): Promise<BrowserMetric> {
     return this.browserMetricRepository.create({
       frontendApp: frontendApp,
-      time: new Date(),
-      bytes: browserMetricDto.b,
-      bytesCached: browserMetricDto.bc,
-      domain: browserMetricDto.d,
-      path: browserMetricDto.p,
-      userAgent: browserMetricDto.u,
-      accuracy: browserMetricDto.a,
-      ip: browserMetricDto.ip,
+      ...browserMetricDto,
     });
   }
 

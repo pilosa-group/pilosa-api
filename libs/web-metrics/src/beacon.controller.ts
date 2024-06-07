@@ -21,6 +21,36 @@ import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
 
 const FRONTEND_APP_ID = 'x-id';
 
+// TODO this is duplicated
+type FirstPageLoad = boolean;
+type Timestamp = number;
+type InitiatorType = string;
+type Domain = string;
+type Path = string;
+type Origin = string;
+type NumberOfBytes = number;
+type FileExtension = string;
+type CompressedBytes = NumberOfBytes;
+type UncompressedBytes = NumberOfBytes;
+
+type CombinedPayload = {
+  f: FirstPageLoad;
+  t: Timestamp;
+  b: [CompressedBytes, UncompressedBytes];
+  d: {
+    [key: Domain]: {
+      [key: Path]: {
+        [key: InitiatorType]: {
+          [key: FileExtension]: {
+            b: [CompressedBytes, UncompressedBytes];
+            co: Origin[];
+          };
+        };
+      };
+    };
+  };
+};
+
 @Controller('beacon')
 export class BeaconController {
   constructor(
@@ -51,7 +81,7 @@ export class BeaconController {
     [FRONTEND_APP_ID, 'Content-Type'].join(','),
   )
   async create(
-    @Body() createBrowserMetricDto: CreateBrowserMetricDto,
+    @Body() createBrowserMetricDto: CombinedPayload,
     @Req() req: Request,
     @ClientIp() clientIp: string,
   ) {
@@ -77,18 +107,52 @@ export class BeaconController {
       throw new ForbiddenException('Invalid domain');
     }
 
-    const browserMetric = await this.browserMetricService.create(
-      {
-        ...createBrowserMetricDto,
-        p: url.pathname,
-        u: req.headers['user-agent'] as string,
-        d: url.hostname,
-        ip: clientIp,
-      },
-      frontendApp,
-    );
+    console.log(JSON.stringify(createBrowserMetricDto, null, 2));
 
-    void this.browserMetricService.save(browserMetric);
+    Object.keys(createBrowserMetricDto.d).forEach((domain) => {
+      Object.keys(createBrowserMetricDto.d[domain]).forEach((path) => {
+        Object.keys(createBrowserMetricDto.d[domain][path]).forEach(
+          (initiatorType) => {
+            Object.keys(
+              createBrowserMetricDto.d[domain][path][initiatorType],
+            ).forEach(async (extension) => {
+              const { b: bytes, co: crossOrigins } =
+                createBrowserMetricDto.d[domain][path][initiatorType][
+                  extension
+                ];
+
+              const [bytesCompressed, bytesUncompressed] = bytes;
+
+              if (bytesCompressed > 0 || bytesUncompressed > 0) {
+                const metric: CreateBrowserMetricDto = {
+                  firstLoad: createBrowserMetricDto.f,
+                  domain,
+                  path,
+                  initiatorType,
+                  extension: extension === '__none__' ? null : extension,
+                  bytesCompressed,
+                  bytesUncompressed,
+                  userAgent: req.headers['user-agent'] as string,
+                  ip: clientIp,
+                };
+
+                const browserMetric = await this.browserMetricService.create(
+                  metric,
+                  frontendApp,
+                );
+
+                void this.browserMetricService.save(browserMetric);
+              }
+
+              if(crossOrigins.length) {
+                // TODO store this in backend, so we can tell the client to add these to the CORS policy
+                console.log(initiatorType, extension, crossOrigins)
+              }
+            });
+          },
+        );
+      });
+    });
 
     return null;
   }

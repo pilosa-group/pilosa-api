@@ -19,7 +19,7 @@ export class UserProjectRole {
 
   @Column('simple-array')
   @Field((type) => [GraphQLString])
-  public roles: string;
+  public roles: string[];
 
   @ManyToOne(() => Project, (project) => project.userRoles)
   @Field((type) => Project)

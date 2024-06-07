@@ -13,6 +13,9 @@ export class BrowserMetric {
   time: Date;
 
   @Column()
+  firstLoad: boolean;
+
+  @Column()
   @Field()
   domain: string;
 
@@ -20,24 +23,26 @@ export class BrowserMetric {
   @Field()
   path: string;
 
+  @Column({ nullable: true })
+  initiatorType: string;
+
+  @Column({ nullable: true })
+  extension: string;
+
+  @Column('float')
+  @Field((type) => GraphQLFloat)
+  bytesCompressed: number;
+
+  @Column('float')
+  @Field((type) => GraphQLFloat)
+  bytesUncompressed: number;
+
   @Column()
   @Field()
   userAgent: string;
 
   @Column({ nullable: true })
   ip: string;
-
-  @Column('float')
-  @Field((type) => GraphQLFloat)
-  bytes: number;
-
-  @Column('float')
-  @Field((type) => GraphQLFloat)
-  bytesCached: number;
-
-  @Column('float')
-  @Field((type) => GraphQLFloat)
-  accuracy: number;
 
   @ManyToOne(
     () => FrontendApp,

@@ -8,6 +8,7 @@ export type DatabaseConfig = {
   username: string;
   password: string;
   database: string;
+  ssl: boolean;
 };
 
 export type ClerkConfig = {
@@ -27,6 +28,7 @@ export default (): Config => ({
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
+    ssl: Number(process.env.DB_SSL) === 1,
   },
   webSnippet: {
     beaconApiUrl: process.env.SNIPPET_BEACON_API_URL,

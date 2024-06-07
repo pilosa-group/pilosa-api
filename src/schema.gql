@@ -3,9 +3,8 @@
 # ------------------------------------------------------
 
 type BrowserMetric {
-  accuracy: Float!
-  bytes: Float!
-  bytesCached: Float!
+  bytesCompressed: Float!
+  bytesUncompressed: Float!
   domain: String!
   frontendApp: FrontendApp!
   path: String!
@@ -32,6 +31,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type FrontendApp {
+  crossOrigins: [BrowserMetric]!
   id: ID!
   metrics: [BrowserMetric]!
   name: String!
