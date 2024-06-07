@@ -8,6 +8,7 @@ import {
   Req,
   Header,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -15,6 +16,7 @@ import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
 import { FrontendAppService } from './frontend-app.service';
 import { BrowserMetricService } from './browser-metric.service';
 import { Client } from '@app/client';
+import { Public } from '@app/auth/decorators/public.decorator';
 
 const FRONTEND_APP_ID = 'x-id';
 
@@ -26,6 +28,7 @@ export class BeaconController {
   ) {}
 
   @Options()
+  @Public()
   @HttpCode(HttpStatus.ACCEPTED)
   @Header('Access-Control-Allow-Origin', '*')
   @Header('Access-Control-Allow-Methods', 'POST')
@@ -38,6 +41,7 @@ export class BeaconController {
   }
 
   @Post()
+  @Public()
   @HttpCode(HttpStatus.ACCEPTED)
   @Header('Access-Control-Allow-Origin', '*')
   @Header('Access-Control-Allow-Methods', 'POST')
@@ -55,6 +59,10 @@ export class BeaconController {
 
     if (!frontendApp) {
       throw new ForbiddenException(`App ${frontendAppId} not found`);
+    }
+
+    if (!req.headers['referer']) {
+      throw new BadRequestException('Missing referer');
     }
 
     const url = new URL(req.headers['referer'] as string);

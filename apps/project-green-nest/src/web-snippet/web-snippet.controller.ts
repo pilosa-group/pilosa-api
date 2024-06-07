@@ -3,12 +3,14 @@ import esbuild from 'esbuild';
 import * as util from 'util';
 import * as path from 'path';
 import * as fs from 'fs';
+import { Public } from '@app/auth/decorators/public.decorator';
 
 const readFile = util.promisify(fs.readFile);
 
 @Controller('snippet.js')
 export class WebSnippetController {
   @Get()
+  @Public()
   @Header('Content-Type', 'text/javascript')
   async snippet() {
     const currentDir = path.resolve(__dirname);
