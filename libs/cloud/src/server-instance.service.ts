@@ -48,10 +48,21 @@ export class ServerInstanceService {
 
   findAllByProject(projectId: Project['id']): Promise<ServerInstance[]> {
     return this.serverInstanceRepository
-      .createQueryBuilder('ci')
-      .innerJoin('ci.cloudProviderAccount', 'cpa')
+      .createQueryBuilder('si')
+      .innerJoin('si.cloudProviderAccount', 'cpa')
       .innerJoin('cpa.project', 'project', 'project.id = :projectId', {
         projectId,
+      })
+      .getMany();
+  }
+
+  findAllByCloudProviderAccount(
+    cloudProviderAccount: CloudProviderAccount,
+  ): Promise<ServerInstance[]> {
+    return this.serverInstanceRepository
+      .createQueryBuilder('si')
+      .where('si.cloudProviderAccount = :cloudProviderAccountId', {
+        cloudProviderAccountId: cloudProviderAccount.id,
       })
       .getMany();
   }

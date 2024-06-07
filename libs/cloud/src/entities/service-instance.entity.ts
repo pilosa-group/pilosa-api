@@ -14,6 +14,14 @@ import { InstanceTag } from '../cloud-provider-instance-list.interface';
 import { ServerMetric } from '@app/cloud-metrics/entities/server-metric.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
+class ServerInstanceTag {
+  @Field()
+  key: string;
+  @Field()
+  value: string;
+}
+
 @Entity()
 @ObjectType()
 export class ServerInstance {
@@ -43,6 +51,7 @@ export class ServerInstance {
   instanceId: string;
 
   @Column('simple-json')
+  @Field((type) => [ServerInstanceTag], { nullable: 'items' })
   tags: InstanceTag[] = [];
 
   @ManyToOne(

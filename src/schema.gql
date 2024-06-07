@@ -13,11 +13,15 @@ type BrowserMetric {
   userAgent: String!
 }
 
+enum CloudProvider {
+  AWS
+}
+
 type CloudProviderAccount {
   id: ID!
   lastImportedAt: DateTime!
   project: Project!
-  provider: String!
+  provider: CloudProvider!
   region: String!
   serverInstances: [ServerInstance]!
 }
@@ -63,6 +67,12 @@ type ServerInstance {
   instanceId: String!
   metrics: [ServerMetric]!
   state: String!
+  tags: [ServerInstanceTag]!
+}
+
+type ServerInstanceTag {
+  key: String!
+  value: String!
 }
 
 type ServerMetric {

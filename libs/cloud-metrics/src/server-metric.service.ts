@@ -55,6 +55,17 @@ export class ServerMetricService {
     return this.serverMetricRepository.save(serverMetric);
   }
 
+  findAllByServerInstance(
+    serverInstance: ServerInstance,
+  ): Promise<ServerMetric[]> {
+    return this.serverMetricRepository
+      .createQueryBuilder('sm')
+      .where('sm.serverInstance = :instanceId', {
+        instanceId: serverInstance.id,
+      })
+      .getMany();
+  }
+
   async getMetricsByPeriod(
     serverInstanceId: ServerInstance['id'],
     timeBucket: TimeBucket,

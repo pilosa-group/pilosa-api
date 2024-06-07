@@ -13,6 +13,7 @@ import { availableCloudProviders } from '../available-cloud-providers';
 import { ServerInstance } from './service-instance.entity';
 import { Project } from '@app/project/entities/project.entity';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { CloudProvider } from '@app/cloud/enum/cloud-provider';
 
 @Entity()
 @ObjectType()
@@ -33,8 +34,8 @@ export class CloudProviderAccount {
   @Column('simple-enum', {
     enum: availableCloudProviders,
   })
-  @Field()
-  provider: 'aws';
+  @Field((type) => CloudProvider)
+  provider: CloudProvider = CloudProvider.AWS;
 
   @Column('timestamp', {
     nullable: true,
