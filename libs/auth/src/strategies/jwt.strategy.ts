@@ -7,7 +7,7 @@ import {
   AppConfig,
   ClerkConfig,
   ENV_DEVELOPMENT,
-} from '../../../../apps/project-green-nest/src/config/configuration';
+} from '../../../../apps/pilosa/src/config/configuration';
 import { JWTPayload } from '@app/auth/types';
 import { UserService } from '@app/user/user.service';
 import { User } from '@app/user/entities/user.entity';

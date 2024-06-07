@@ -80,9 +80,7 @@ import { CacheModule } from '@nestjs/cache-manager';
             UserOrganizationRole,
             UserProjectRole,
           ],
-          migrations: [
-            'dist/apps/project-green-nest/apps/project-green-nest/src/db/*-migrations.js',
-          ],
+          migrations: ['dist/apps/pilosa/apps/pilosa/src/db/*-migrations.js'],
           cli: {
             migrationsDir: 'src/db/migrations',
           },

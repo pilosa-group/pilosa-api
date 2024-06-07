@@ -1,22 +1,22 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/project-green-nest/src",
+  "sourceRoot": "apps/pilosa/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": false,
-    "tsConfigPath": "apps/project-green-nest/tsconfig.app.json"
+    "tsConfigPath": "apps/pilosa/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/project-green-nest",
+  "root": "apps/pilosa",
   "projects": {
-    "project-green-nest": {
+    "pilosa": {
       "type": "application",
-      "root": "apps/project-green-nest",
+      "root": "apps/pilosa",
       "entryFile": "main",
-      "sourceRoot": "apps/project-green-nest/src",
+      "sourceRoot": "apps/pilosa/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/project-green-nest/tsconfig.app.json"
+        "tsConfigPath": "apps/pilosa/tsconfig.app.json"
       }
     },
     "project": {
