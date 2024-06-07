@@ -1,15 +1,7 @@
-import {
-  ClassSerializerInterceptor,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { ClientService } from './client.service';
 
 @Controller('clients')
-@UseInterceptors(ClassSerializerInterceptor)
 export class ClientController {
   constructor(private readonly clientsService: ClientService) {}
 

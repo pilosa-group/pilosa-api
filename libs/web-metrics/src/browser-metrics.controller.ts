@@ -1,9 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
-import { ServerMetricService } from './server-metric.service';
+import { BrowserMetricService } from '@app/web-metrics/browser-metric.service';
 
-@Controller('metrics/server')
-export class ServerMetricsController {
-  constructor(private serverMetricService: ServerMetricService) {}
+@Controller('metrics/browser')
+export class BrowserMetricsController {
+  constructor(private browserMetricsService: BrowserMetricService) {}
 
   @Get()
   async getMetrics() {
@@ -12,9 +12,9 @@ export class ServerMetricsController {
     const startDate = new Date(endDate);
     startDate.setHours(startDate.getHours() - 1);
 
-    return this.serverMetricService.getMetricsByPeriod(
+    return this.browserMetricsService.getMetricsByPeriod(
       '3c122f81-f090-4275-9670-ebf326bd9dea',
-      '15 minutes',
+      '1 hour',
       startDate,
       endDate,
     );

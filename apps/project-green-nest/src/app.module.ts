@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientModule, Client } from '@app/client';
 import { validationSchema } from './config/validation.schema';
@@ -15,8 +15,23 @@ import { ServerMetric } from '@app/cloud-metrics/entities/server-metric.entity';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
 import { HealthModule } from '@app/health';
+import { AuthModule } from '@app/auth';
+import { UserModule } from '@app/user';
+import { User } from '@app/user/entities/user.entity';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 
 @Module({
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
   imports: [
     ConfigModule.forRoot({
       load: [configuration],
@@ -43,8 +58,11 @@ import { HealthModule } from '@app/health';
             ServerMetric,
             FrontendApp,
             BrowserMetric,
+            User,
           ],
-          migrations: ['dist/db/*-migrations.js'],
+          migrations: [
+            'dist/apps/project-green-nest/apps/project-green-nest/src/db/*-migrations.js',
+          ],
           cli: {
             migrationsDir: 'src/db/migrations',
           },
@@ -53,14 +71,15 @@ import { HealthModule } from '@app/health';
       },
       inject: [ConfigService],
     }),
+    AuthModule,
     ClientModule,
     WebMetricsModule,
     CloudMetricsModule,
     CloudModule,
     CloudAwsModule,
+    UserModule,
     WebSnippetModule,
     HealthModule,
   ],
-  controllers: [],
 })
 export class AppModule {}
