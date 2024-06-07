@@ -19,13 +19,13 @@
         "tsConfigPath": "apps/project-green-nest/tsconfig.app.json"
       }
     },
-    "client": {
+    "project": {
       "type": "library",
-      "root": "libs/client",
+      "root": "libs/project",
       "entryFile": "index",
-      "sourceRoot": "libs/client/src",
+      "sourceRoot": "libs/project/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/client/tsconfig.lib.json"
+        "tsConfigPath": "libs/project/tsconfig.lib.json"
       }
     },
     "cloud-aws": {

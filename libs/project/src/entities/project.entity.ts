@@ -13,7 +13,7 @@ import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account
 
 @Entity()
 @Exclude()
-export class Client {
+export class Project {
   @PrimaryGeneratedColumn('uuid')
   @Expose()
   id: string;
@@ -33,13 +33,14 @@ export class Client {
 
   @OneToMany(
     () => CloudProviderAccount,
-    (cloudProviderAccount: CloudProviderAccount) => cloudProviderAccount.client,
+    (cloudProviderAccount: CloudProviderAccount) =>
+      cloudProviderAccount.project,
   )
   cloudProviderAccounts: CloudProviderAccount[];
 
   @OneToMany(
     () => FrontendApp,
-    (frontendApp: FrontendApp) => frontendApp.client,
+    (frontendApp: FrontendApp) => frontendApp.project,
   )
   frontendApps: FrontendApp[];
 }

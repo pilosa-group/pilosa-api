@@ -24,9 +24,11 @@
     "migration:show": "npm run build && npm run typeorm -- migration:show"
   },
   "dependencies": {
+    "@apollo/server": "^4.10.4",
     "@aws-sdk/client-cloudwatch": "^3.529.1",
     "@aws-sdk/client-ec2": "^3.532.0",
     "@influxdata/influxdb-client": "^1.33.2",
+    "@nestjs/apollo": "^12.1.0",
     "@nestjs/cache-manager": "^2.2.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.0",
@@ -41,6 +43,7 @@
     "bcrypt": "^5.1.1",
     "cache-manager": "^5.5.0",
     "class-transformer": "^0.5.1",
+    "graphql": "^16.8.1",
     "joi": "^17.12.2",
     "jwks-rsa": "^3.1.0",
     "passport": "^0.7.0",
@@ -98,7 +101,7 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/client(|/.*)$": "<rootDir>/libs/client/src/$1",
+      "^@app/project(|/.*)$": "<rootDir>/libs/project/src/$1",
       "^@app/cloud-aws(|/.*)$": "<rootDir>/libs/cloud-aws/src/$1",
       "^@app/cloud-core(|/.*)$": "<rootDir>/libs/cloud-core/src/$1",
       "^@app/cloud(|/.*)$": "<rootDir>/libs/cloud/src/$1",

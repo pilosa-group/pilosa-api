@@ -1,6 +1,6 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientModule, Client } from '@app/client';
+import { ProjectModule, Project } from '@app/project';
 import { validationSchema } from './config/validation.schema';
 import configuration, { DatabaseConfig } from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -20,6 +20,9 @@ import { UserModule } from '@app/user';
 import { User } from '@app/user/entities/user.entity';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import * as path from 'path';
 
 @Module({
   providers: [
@@ -37,6 +40,11 @@ import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
       load: [configuration],
       validationSchema,
     }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
@@ -52,7 +60,7 @@ import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
           database,
           ssl: true,
           entities: [
-            Client,
+            Project,
             CloudProviderAccount,
             ServerInstance,
             ServerMetric,
@@ -72,7 +80,7 @@ import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
       inject: [ConfigService],
     }),
     AuthModule,
-    ClientModule,
+    ProjectModule,
     WebMetricsModule,
     CloudMetricsModule,
     CloudModule,

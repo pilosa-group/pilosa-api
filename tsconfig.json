@@ -18,11 +18,11 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/client": [
-        "libs/client/src"
+      "@app/project": [
+        "libs/project/src"
       ],
-      "@app/client/*": [
-        "libs/client/src/*"
+      "@app/project/*": [
+        "libs/project/src/*"
       ],
       "@app/cloud-aws": [
         "libs/cloud-aws/src"

@@ -1,17 +1,17 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ServerInstanceService } from './server-instance.service';
-import { Client } from '@app/client';
+import { Project } from '@app/project';
 
 type GetAllParams = {
-  clientId: Client['id'];
+  projectId: Project['id'];
 };
 
-@Controller('servers/:clientId')
+@Controller('servers/:projectId')
 export class ServersController {
   constructor(private serverInstance: ServerInstanceService) {}
 
   @Get()
-  async getAll(@Param() { clientId }: GetAllParams) {
-    return this.serverInstance.findAllByClient(clientId);
+  async getAll(@Param() { projectId }: GetAllParams) {
+    return this.serverInstance.findAllByProject(projectId);
   }
 }

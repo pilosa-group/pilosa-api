@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
 import { BrowserMetric } from './browser-metric.entity';
-import { Client } from '@app/client';
+import { Project } from '@app/project';
 
 @Entity()
 @Exclude()
@@ -37,9 +37,9 @@ export class FrontendApp {
   @Expose()
   urls: string[];
 
-  @ManyToOne(() => Client, (client: Client) => client.frontendApps)
+  @ManyToOne(() => Project, (project: Project) => project.frontendApps)
   @JoinColumn()
-  client: Client;
+  project: Project;
 
   @OneToMany(() => BrowserMetric, (metric: BrowserMetric) => metric.frontendApp)
   metrics: BrowserMetric[];

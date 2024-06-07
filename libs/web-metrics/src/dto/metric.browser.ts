@@ -1,5 +1,5 @@
 export interface BrowserMetric {
-  clientId: string;
+  projectId: string;
   domain: string;
   path: string;
   bytes: number;

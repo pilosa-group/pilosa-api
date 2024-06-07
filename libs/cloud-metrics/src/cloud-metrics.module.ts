@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ClientModule } from '@app/client';
+import { ProjectModule } from '@app/project';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServerMetric } from '@app/cloud-metrics/entities/server-metric.entity';
@@ -10,7 +10,7 @@ import { ServerMetricService } from '@app/cloud-metrics/server-metric.service';
   controllers: [ServerMetricsController],
   providers: [ServerMetricService],
   imports: [
-    ClientModule,
+    ProjectModule,
     ConfigModule,
     TypeOrmModule.forFeature([ServerMetric]),
   ],

@@ -23,7 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         jwksRequestsPerMinute: 5,
         jwksUri: `${clerkConfig.issuerUrl}/.well-known/jwks.json`,
       }),
-
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       issuer: clerkConfig.issuerUrl,
       algorithms: ['RS256'],
@@ -31,6 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JWTPayload): Promise<UserDTO> {
+    console.log(payload);
     const user = await this.userService.findOrCreateOneByClerkId(payload.sub);
 
     return {

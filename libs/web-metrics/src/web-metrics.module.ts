@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ClientModule } from '@app/client';
+import { ProjectModule } from '@app/project';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BeaconController } from '@app/web-metrics/beacon.controller';
@@ -13,7 +13,7 @@ import { BrowserMetricsController } from '@app/web-metrics/browser-metrics.contr
   controllers: [BeaconController, BrowserMetricsController],
   providers: [FrontendAppService, BrowserMetricService],
   imports: [
-    ClientModule,
+    ProjectModule,
     ConfigModule,
     TypeOrmModule.forFeature([BrowserMetric, FrontendApp]),
   ],

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Instance } from './cloud-provider-instance-list.interface';
-import { Client } from '@app/client';
+import { Project } from '@app/project';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
 
@@ -46,11 +46,13 @@ export class ServerInstanceService {
     return this.save(newInstance);
   }
 
-  findAllByClient(clientId: Client['id']): Promise<ServerInstance[]> {
+  findAllByProject(projectId: Project['id']): Promise<ServerInstance[]> {
     return this.serverInstanceRepository
       .createQueryBuilder('ci')
       .innerJoin('ci.cloudProviderAccount', 'cpa')
-      .innerJoin('cpa.client', 'client', 'client.id = :clientId', { clientId })
+      .innerJoin('cpa.project', 'project', 'project.id = :projectId', {
+        projectId,
+      })
       .getMany();
   }
 

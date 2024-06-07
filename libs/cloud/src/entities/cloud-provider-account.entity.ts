@@ -12,7 +12,7 @@ import {
 import { Exclude, Expose } from 'class-transformer';
 import { availableCloudProviders } from '../available-cloud-providers';
 import { ServerInstance } from './service-instance.entity';
-import { Client } from '@app/client';
+import { Project } from '@app/project';
 
 @Entity()
 export class CloudProviderAccount {
@@ -51,9 +51,9 @@ export class CloudProviderAccount {
   @Exclude()
   region: string;
 
-  @ManyToOne(() => Client, (client: Client) => client.cloudProviderAccounts)
+  @ManyToOne(() => Project, (project: Project) => project.cloudProviderAccounts)
   @JoinColumn()
-  client: Client;
+  project: Project;
 
   @OneToMany(
     () => ServerInstance,

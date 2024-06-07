@@ -1,0 +1,13 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Project {
+  id: ID!
+  name: String
+}
+
+type Query {
+  project(id: String!): Project!
+  projects: [Project!]!
+}

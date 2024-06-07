@@ -1,5 +1,5 @@
 export interface ServerMetric {
-  clientId: string;
+  projectId: string;
   cpu?: number;
   networkIn?: number;
   networkOut?: number;
