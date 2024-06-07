@@ -30,6 +30,10 @@ export class AwsInstanceList implements CloudProviderInstanceList {
           instances.push({
             provider: 'aws',
             type: 'vm',
+            tags: instance.Tags?.map((tag) => ({
+              key: tag.Key as string,
+              value: tag.Value as string,
+            })),
             class: instance.InstanceType as string,
             state: instance.State?.Name as Instance['state'],
             id: instance.InstanceId as string,

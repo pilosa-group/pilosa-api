@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
 import { SnippetConfig } from './snippet-config.entity';
-import { CloudImport } from '../../cloud/entities/cloud-import';
+import { CloudProviderAccount } from '../../cloud/entities/cloud-provider-account';
 
 @Entity()
 @Exclude()
@@ -41,8 +41,8 @@ export class Client {
   snippetConfig: SnippetConfig;
 
   @OneToMany(
-    () => CloudImport,
-    (cloudImport: CloudImport) => cloudImport.client,
+    () => CloudProviderAccount,
+    (cloudProviderAccount: CloudProviderAccount) => cloudProviderAccount.client,
   )
-  cloudImports: CloudImport[];
+  cloudProviderAccounts: CloudProviderAccount[];
 }

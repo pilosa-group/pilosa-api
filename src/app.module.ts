@@ -8,9 +8,11 @@ import configuration, { DatabaseConfig } from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Client } from './clients/entities/client.entity';
 import { SnippetConfig } from './clients/entities/snippet-config.entity';
-import { AWSCredentials } from './clients/entities/aws-credentials.spec';
 import { AwsModule } from './aws/aws.module';
-import { CloudImport } from './cloud/entities/cloud-import';
+import { HealthController } from './health/health.controller';
+import { CloudProviderAccount } from './cloud/entities/cloud-provider-account';
+import { ServerInstance } from './cloud/entities/service-instance.entity';
+import { ServerMetric } from './metrics/entities/server-metric.entity';
 
 @Module({
   imports: [
@@ -31,7 +33,13 @@ import { CloudImport } from './cloud/entities/cloud-import';
           username,
           password,
           database,
-          entities: [Client, SnippetConfig, AWSCredentials, CloudImport],
+          entities: [
+            Client,
+            SnippetConfig,
+            CloudProviderAccount,
+            ServerInstance,
+            ServerMetric,
+          ],
           migrations: ['dist/db/*-migrations.js'],
           cli: {
             migrationsDir: 'src/db/migrations',
@@ -47,5 +55,6 @@ import { CloudImport } from './cloud/entities/cloud-import';
     MetricsModule,
     AwsModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
