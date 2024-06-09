@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://avatars.githubusercontent.com/u/168510985?s=200&v=4" alt="Pilosa Logo" />
+</p>
+
 # Pilosa - Real-time carbon footprint metrics for your entire stack
 
 Pilosa allows you to get carbon footprint insights in your server infrastructure as well as your frontend applications by collecting real-time data from servers and visitors.
