@@ -59,6 +59,8 @@ type CombinedPayload = {
   };
 };
 
+const nullableExtensions = ['__none__', '_'];
+
 const isValidInitiatorType = (initiatorType: string): boolean =>
   [
     'audio',
@@ -166,7 +168,9 @@ export class BeaconController {
                     domain,
                     path,
                     initiatorType,
-                    extension: extension === '_' ? null : extension,
+                    extension: nullableExtensions.includes(extension)
+                      ? null
+                      : extension,
                     bytesCompressed,
                     bytesUncompressed,
                     userAgent,
