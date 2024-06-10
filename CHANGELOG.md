@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/pilosa-group/pilosa-api/compare/v1.1.0...v1.2.0) (2024-06-10)
+
+
+### Features
+
+* remove storing of user agent ([25b5ea0](https://github.com/pilosa-group/pilosa-api/commit/25b5ea0b87a9050957c7b3a25e772db0fbb65b85))
+
 # [1.1.0](https://github.com/pilosa-group/pilosa-api/compare/v1.0.1...v1.1.0) (2024-06-10)
 
 
