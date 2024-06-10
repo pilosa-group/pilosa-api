@@ -13,6 +13,17 @@ import {
 import { Request } from 'express';
 
 import { UAParser } from 'ua-parser-js';
+import {
+  Crawlers,
+  CLIs,
+  Emails,
+  ExtraDevices,
+  InApps,
+  Fetchers,
+  MediaPlayers,
+  Modules,
+  // @ts-expect-error import for extension breaks
+} from 'ua-parser-js/extensions';
 import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
 import { FrontendAppService } from './frontend-app.service';
 import { BrowserMetricService } from './browser-metric.service';
@@ -144,12 +155,24 @@ export class BeaconController {
       throw new ForbiddenException('Invalid domain');
     }
 
-    const userAgentParser = new UAParser(req.headers['user-agent'] as string);
+    const userAgentParser = new UAParser(req.headers['user-agent'] as string, [
+      Crawlers,
+      CLIs,
+      Emails,
+      ExtraDevices,
+      InApps,
+      Fetchers,
+      MediaPlayers,
+      Modules,
+    ]);
     const userAgent = userAgentParser.getResult();
-    const cpu = userAgent.cpu.architecture;
-    const browser = userAgent.browser.toString();
-    const device = userAgent.device.toString();
-    const os = userAgent.os.toString();
+    const deviceType = userAgent.device?.type || 'desktop';
+    const device = userAgent.device.model ? userAgent.device.toString() : null;
+    const os = userAgent.os ? userAgent.os.toString() : null;
+    const browser = userAgent.browser.name
+      ? userAgent.browser.toString()
+      : null;
+    const cpu = userAgent.cpu?.architecture ? userAgent.cpu.architecture : null;
 
     const visitor = hashValue(`${clientIp}${userAgent}`);
 
@@ -183,6 +206,7 @@ export class BeaconController {
                     bytesUncompressed,
                     cpu,
                     browser,
+                    deviceType,
                     device,
                     os,
                     visitor,

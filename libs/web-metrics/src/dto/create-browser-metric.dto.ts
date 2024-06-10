@@ -8,6 +8,7 @@ export class CreateBrowserMetricDto {
   domain: string;
   path: string;
   visitor: string;
+  deviceType: string;
   device: string;
   os: string;
   browser: string;

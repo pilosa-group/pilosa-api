@@ -44,11 +44,10 @@ export class BrowserMetric {
   bytesUncompressed: number;
 
   @Column({ nullable: true })
-  @Field()
-  userAgent: string;
+  visitor: string;
 
   @Column({ nullable: true })
-  visitor: string;
+  deviceType: string;
 
   @Column({ nullable: true })
   device: string;
