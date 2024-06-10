@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/pilosa-group/pilosa-api/compare/v1.0.0...v1.0.1) (2024-06-10)
+
+
+### Bug Fixes
+
+* store (cached) __none__ as null value ([59a0bf3](https://github.com/pilosa-group/pilosa-api/commit/59a0bf3c5d094546216ababcda394bfa171afbf5))
+
 # 1.0.0 (2024-06-09)
 
 
