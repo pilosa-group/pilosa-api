@@ -43,12 +43,24 @@ export class BrowserMetric {
   @Field(() => GraphQLFloat)
   bytesUncompressed: number;
 
-  @Column()
+  @Column({ nullable: true })
   @Field()
   userAgent: string;
 
   @Column({ nullable: true })
   visitor: string;
+
+  @Column({ nullable: true })
+  device: string;
+
+  @Column({ nullable: true })
+  os: string;
+
+  @Column({ nullable: true })
+  browser: string;
+
+  @Column({ nullable: true })
+  cpu: string;
 
   @ManyToOne(
     () => FrontendApp,

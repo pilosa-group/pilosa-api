@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 
+import { UAParser } from 'ua-parser-js';
 import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
 import { FrontendAppService } from './frontend-app.service';
 import { BrowserMetricService } from './browser-metric.service';
@@ -21,8 +22,9 @@ import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
 import * as crypto from 'crypto';
 
 function hashValue(value: string) {
+  const salt = new Date().toISOString().split('T')[0];
   const hash = crypto.createHash('sha256');
-  hash.update(value);
+  hash.update(`${salt}${value}`);
   return hash.digest('hex');
 }
 
@@ -142,7 +144,13 @@ export class BeaconController {
       throw new ForbiddenException('Invalid domain');
     }
 
-    const userAgent = req.headers['user-agent'] as string;
+    const userAgentParser = new UAParser(req.headers['user-agent'] as string);
+    const userAgent = userAgentParser.getResult();
+    const cpu = userAgent.cpu.architecture;
+    const browser = userAgent.browser.toString();
+    const device = userAgent.device.toString();
+    const os = userAgent.os.toString();
+
     const visitor = hashValue(`${clientIp}${userAgent}`);
 
     Object.keys(createBrowserMetricDto.d).forEach((domain) => {
@@ -173,7 +181,10 @@ export class BeaconController {
                       : extension,
                     bytesCompressed,
                     bytesUncompressed,
-                    userAgent,
+                    cpu,
+                    browser,
+                    device,
+                    os,
                     visitor,
                   };
 
@@ -196,7 +207,7 @@ export class BeaconController {
 
                 if (crossOrigins.length) {
                   // TODO store this in backend, so we can tell the client to add these to the CORS policy
-                  console.log(initiatorType, extension, crossOrigins);
+                  // console.log(initiatorType, extension, crossOrigins);
                 }
               });
             }

@@ -7,6 +7,9 @@ export class CreateBrowserMetricDto {
   extension: string;
   domain: string;
   path: string;
-  userAgent: string;
   visitor: string;
+  device: string;
+  os: string;
+  browser: string;
+  cpu: string;
 }
