@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/pilosa-group/pilosa-api/compare/v1.0.1...v1.1.0) (2024-06-10)
+
+
+### Features
+
+* parse user agent before storing ([6b86042](https://github.com/pilosa-group/pilosa-api/commit/6b860422e7ca04fa96336ea66b50e1b89fbda7ae))
+
 ## [1.0.1](https://github.com/pilosa-group/pilosa-api/compare/v1.0.0...v1.0.1) (2024-06-10)
 
 
