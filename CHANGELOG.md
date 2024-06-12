@@ -1,3 +1,11 @@
+# [1.3.0](https://github.com/pilosa-group/pilosa-api/compare/v1.2.0...v1.3.0) (2024-06-12)
+
+
+### Features
+
+* add basic sentry support ([2c9a5de](https://github.com/pilosa-group/pilosa-api/commit/2c9a5de097f87b45ea0cc7afd30a746b97ecb574))
+* update schema.gql ([a042dec](https://github.com/pilosa-group/pilosa-api/commit/a042dec6dcd220ba2b7d52229763a85286ec0075))
+
 # [1.2.0](https://github.com/pilosa-group/pilosa-api/compare/v1.1.0...v1.2.0) (2024-06-10)
 
 
