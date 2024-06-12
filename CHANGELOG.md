@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/pilosa-group/pilosa-api/compare/v1.6.0...v1.7.0) (2024-06-12)
+
+
+### Features
+
+* add Cross-Origin-Resource-Policy: cross-origin header for sloth.js ([#5](https://github.com/pilosa-group/pilosa-api/issues/5)) ([d0145d8](https://github.com/pilosa-group/pilosa-api/commit/d0145d8fec15b022e179114807bfc3ba8c8b496b))
+
 # [1.6.0](https://github.com/pilosa-group/pilosa-api/compare/v1.5.1...v1.6.0) (2024-06-12)
 
 
