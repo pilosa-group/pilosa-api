@@ -2,7 +2,7 @@ import * as Joi from 'joi';
 
 export const validationSchema = Joi.object({
   NODE_ENV: Joi.string()
-    .valid('development', 'production', 'test', 'provision')
+    .valid('development', 'production', 'test')
     .default('development'),
 
   // Database
@@ -18,4 +18,9 @@ export const validationSchema = Joi.object({
 
   // Clerk
   CLERK_ISSUER_URL: Joi.string().required(),
+
+  // Sentry
+  SENTRY_DSN: Joi.string().required(),
+  SENTRY_TRACES_SAMPLE_RATE: Joi.number().default(1.0),
+  SENTRY_PROFILES_SAMPLE_RATE: Joi.number().default(1.0),
 });
