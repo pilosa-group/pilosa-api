@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/pilosa-group/pilosa-api/compare/v1.5.1...v1.6.0) (2024-06-12)
+
+
+### Features
+
+* add redirect from app to pilosa waitlist homepage ([#4](https://github.com/pilosa-group/pilosa-api/issues/4)) ([b849439](https://github.com/pilosa-group/pilosa-api/commit/b84943990a71c0a4f55f531b58261bc0e98a0ede))
+
 ## [1.5.1](https://github.com/pilosa-group/pilosa-api/compare/v1.5.0...v1.5.1) (2024-06-12)
 
 
