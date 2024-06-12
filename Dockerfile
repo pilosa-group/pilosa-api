@@ -1,11 +1,12 @@
 FROM node:20
 
 RUN apt-get update && apt-get install -y curl
-RUN npx playwright install --with-deps chromium
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
+RUN npx playwright install --with-deps chromium
+
 COPY . .
 RUN npm run build
 
