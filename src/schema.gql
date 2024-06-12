@@ -9,7 +9,6 @@ type BrowserMetric {
   frontendApp: FrontendApp!
   path: String!
   time: DateTime!
-  userAgent: String!
 }
 
 enum CloudProvider {
