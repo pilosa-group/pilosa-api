@@ -134,6 +134,11 @@ export class BeaconController {
     @ClientIp() clientIp: string,
   ) {
     const frontendAppId = req.headers[FRONTEND_APP_ID] as Project['id'];
+
+    if (!frontendAppId || frontendAppId.length < 32) {
+      throw new BadRequestException('Invalid frontend app id');
+    }
+
     const frontendApp =
       await this.frontendAppService.findOneById(frontendAppId);
 
