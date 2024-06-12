@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/pilosa-group/pilosa-api/compare/v1.4.0...v1.5.0) (2024-06-12)
+
+
+### Features
+
+* check for frontend app id length ([#2](https://github.com/pilosa-group/pilosa-api/issues/2)) ([6762015](https://github.com/pilosa-group/pilosa-api/commit/67620159b8a102c146768fd8640a12765713eb96))
+
 # [1.4.0](https://github.com/pilosa-group/pilosa-api/compare/v1.3.0...v1.4.0) (2024-06-12)
 
 
