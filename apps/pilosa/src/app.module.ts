@@ -31,8 +31,10 @@ import { MetricsModule } from '@app/metrics';
 import { BrowserMetricCrossOrigin } from '@app/web-metrics/entities/browser-metric-cross-origin.entity';
 import { SyntheticScanModule } from '@app/synthetic-scan';
 import { CacheModule } from '@nestjs/cache-manager';
+import { IndexController } from './controllers/index.controller';
 
 @Module({
+  controllers: [IndexController],
   providers: [
     {
       provide: APP_GUARD,
