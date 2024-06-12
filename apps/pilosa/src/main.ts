@@ -14,6 +14,7 @@ async function bootstrap() {
   process.env.SENTRY_DSN &&
     initSentry({
       dsn: process.env.SENTRY_DSN,
+      tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE),
     });
 
   const app = await NestFactory.create(AppModule);
