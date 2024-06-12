@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/pilosa-group/pilosa-api/compare/v1.3.0...v1.4.0) (2024-06-12)
+
+
+### Features
+
+* use npm ci and install playwright after ([e311554](https://github.com/pilosa-group/pilosa-api/commit/e3115542b4ea5ba08dd70bcb8c6cab2ac37437d1))
+
 # [1.3.0](https://github.com/pilosa-group/pilosa-api/compare/v1.2.0...v1.3.0) (2024-06-12)
 
 
