@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/pilosa-group/pilosa-api/compare/v1.5.0...v1.5.1) (2024-06-12)
+
+
+### Bug Fixes
+
+* sentry tracesSampleRate through env var ([#3](https://github.com/pilosa-group/pilosa-api/issues/3)) ([1444231](https://github.com/pilosa-group/pilosa-api/commit/1444231b218d8b5bb612e56b9aa9765b925f4562))
+
 # [1.5.0](https://github.com/pilosa-group/pilosa-api/compare/v1.4.0...v1.5.0) (2024-06-12)
 
 
