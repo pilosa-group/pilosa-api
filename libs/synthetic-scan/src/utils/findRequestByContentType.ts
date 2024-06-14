@@ -1,7 +1,7 @@
 import { NetworkRequest } from '../synthetic-scan.service';
 
 export const findRequestByContentType =
-  (contentType: string) => (value: NetworkRequest) => {
+  (contentType: string[]) => (value: NetworkRequest) => {
     const response = value.response;
 
     if (!response) {
@@ -10,5 +10,5 @@ export const findRequestByContentType =
 
     const headers = response.headers();
 
-    return headers['content-type']?.includes(contentType);
+    return contentType.some((type) => headers['content-type']?.includes(type));
   };

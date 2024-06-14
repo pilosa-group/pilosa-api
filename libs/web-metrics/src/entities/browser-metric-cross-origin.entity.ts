@@ -1,29 +1,16 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { PrimaryKey, Entity, ManyToOne, Property } from '@mikro-orm/core';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 
 @Entity()
-@ObjectType()
 export class BrowserMetricCrossOrigin {
-  @PrimaryGeneratedColumn('uuid')
-  @Field(() => ID)
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
-  @Column()
-  @Field()
-  domain: string;
+  @Property()
+  domain!: string;
 
-  @ManyToOne(
-    () => FrontendApp,
-    (frontendApp: FrontendApp) => frontendApp.crossOrigins,
-  )
-  @JoinColumn()
-  @Field(() => FrontendApp)
-  frontendApp: FrontendApp;
+  @ManyToOne({
+    entity: () => FrontendApp,
+  })
+  frontendApp!: FrontendApp;
 }

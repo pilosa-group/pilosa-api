@@ -1,73 +1,46 @@
 import {
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
-  DeleteDateColumn,
   OneToMany,
-  JoinColumn,
   ManyToOne,
-} from 'typeorm';
+  PrimaryKey,
+  Property,
+  Collection,
+} from '@mikro-orm/core';
 import { CloudProviderAccount } from './cloud-provider-account.entity';
 import { InstanceTag } from '../cloud-provider-instance-list.interface';
 import { ServerMetric } from '@app/cloud-metrics/entities/server-metric.entity';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Metric } from '@app/metrics/models/metric.model';
-
-@ObjectType()
-class ServerInstanceTag {
-  @Field()
-  key: string;
-  @Field()
-  value: string;
-}
 
 @Entity()
-@ObjectType()
 export class ServerInstance {
-  @PrimaryGeneratedColumn('uuid')
-  @Field(() => ID)
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Property()
+  createdAt = new Date();
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @Property({ onUpdate: () => new Date() })
+  updatedAt?: Date;
 
-  @DeleteDateColumn()
-  deletedAt: Date;
+  @Property()
+  class!: string;
 
-  @Column()
-  @Field()
-  class: string;
+  @Property()
+  state!: string;
 
-  @Column()
-  @Field()
-  state: string;
+  @Property()
+  instanceId!: string;
 
-  @Column()
-  @Field()
-  instanceId: string;
-
-  @Column('simple-json')
-  @Field(() => [ServerInstanceTag], { nullable: 'items' })
+  @Property({ type: 'json' })
   tags: InstanceTag[] = [];
 
-  @ManyToOne(
-    () => CloudProviderAccount,
-    (cloudProviderAccount: CloudProviderAccount) =>
-      cloudProviderAccount.serverInstances,
-  )
-  @JoinColumn()
-  @Field(() => [CloudProviderAccount], { nullable: 'items' })
-  cloudProviderAccount: CloudProviderAccount;
+  @ManyToOne({
+    entity: () => CloudProviderAccount,
+  })
+  cloudProviderAccount!: CloudProviderAccount;
 
   @OneToMany(
     () => ServerMetric,
     (metric: ServerMetric) => metric.serverInstance,
   )
-  @Field(() => [Metric], { nullable: 'items' })
-  metrics: ServerMetric[];
+  metrics = new Collection<ServerMetric>(this);
 }

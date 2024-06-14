@@ -1,67 +1,50 @@
 import {
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
+  PrimaryKey,
   Entity,
-  PrimaryGeneratedColumn,
-  DeleteDateColumn,
-  JoinColumn,
   OneToMany,
   ManyToOne,
-} from 'typeorm';
-import { availableCloudProviders } from '../available-cloud-providers';
+  Property,
+  Enum,
+  Collection,
+} from '@mikro-orm/core';
 import { ServerInstance } from './service-instance.entity';
 import { Project } from '@app/project/entities/project.entity';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { CloudProvider } from '@app/cloud/enum/cloud-provider.enum';
 
 @Entity()
-@ObjectType()
 export class CloudProviderAccount {
-  @PrimaryGeneratedColumn('uuid')
-  @Field(() => ID)
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Property()
+  createdAt = new Date();
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @Property({ onUpdate: () => new Date() })
+  updatedAt?: Date;
 
-  @DeleteDateColumn()
-  deletedAt: Date;
-
-  @Column('simple-enum', {
-    enum: availableCloudProviders,
-  })
-  @Field(() => CloudProvider)
+  @Enum(() => CloudProvider)
   provider: CloudProvider = CloudProvider.AWS;
 
-  @Column('timestamp', {
-    nullable: true,
+  @Property()
+  lastImportedAt!: Date;
+
+  @Property()
+  accessKeyId!: string;
+
+  @Property()
+  secretAccessKey!: string;
+
+  @Property()
+  region!: string;
+
+  @ManyToOne({
+    entity: () => Project,
   })
-  @Field()
-  lastImportedAt: Date;
-
-  @Column()
-  accessKeyId: string;
-
-  @Column()
-  secretAccessKey: string;
-
-  @Column()
-  @Field()
-  region: string;
-
-  @ManyToOne(() => Project, (project: Project) => project.cloudProviderAccounts)
-  @Field(() => Project)
-  @JoinColumn()
-  project: Project;
+  project!: Project;
 
   @OneToMany(
     () => ServerInstance,
     (serverInstance: ServerInstance) => serverInstance.cloudProviderAccount,
   )
-  @Field(() => [ServerInstance], { nullable: 'items' })
-  serverInstances: ServerInstance[];
+  serverInstances = new Collection<ServerInstance>(this);
 }

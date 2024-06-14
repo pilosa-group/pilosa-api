@@ -1,36 +1,33 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
-import { Field } from '@nestjs/graphql';
+import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 
 @Entity()
 export class ServerMetric {
-  @PrimaryColumn('timestamptz', {
-    default: () => 'CURRENT_TIMESTAMP',
+  @PrimaryKey({
+    unique: false,
+    type: 'timestamptz',
+    defaultRaw: 'CURRENT_TIMESTAMP',
   })
-  time: Date;
+  time!: Date;
 
-  period: Date;
+  @Property({ type: 'float' })
+  cpu: number = 0;
 
-  @Column('float')
-  cpu: number;
+  @Property({ type: 'float', nullable: true })
+  networkIn?: number;
 
-  @Column('float', { nullable: true })
-  networkIn: number;
+  @Property({ type: 'float', nullable: true })
+  networkOut?: number;
 
-  @Column('float', { nullable: true })
-  networkOut: number;
+  @Property({ type: 'float', nullable: true })
+  diskReadOps?: number;
 
-  @Column('float', { nullable: true })
-  diskReadOps: number;
+  @Property({ type: 'float', nullable: true })
+  diskWriteOps?: number;
 
-  @Column('float', { nullable: true })
-  diskWriteOps: number;
-
-  @ManyToOne(
-    () => ServerInstance,
-    (serverInstance: ServerInstance) => serverInstance.metrics,
-  )
-  @JoinColumn()
-  @Field(() => [ServerInstance], { nullable: 'items' })
+  @ManyToOne({
+    entity: () => ServerInstance,
+  })
   serverInstance: ServerInstance;
 }

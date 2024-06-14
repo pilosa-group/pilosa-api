@@ -1,28 +1,28 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
+  Header,
   HttpCode,
   HttpStatus,
   Options,
   Post,
   Req,
-  Header,
-  ForbiddenException,
-  BadRequestException,
 } from '@nestjs/common';
 import { Request } from 'express';
 
 import { UAParser } from 'ua-parser-js';
 import {
-  Crawlers,
   CLIs,
+  Crawlers,
   Emails,
   ExtraDevices,
-  InApps,
   Fetchers,
+  InApps,
   MediaPlayers,
   Modules,
-  // @ts-expect-error import for extension breaks
+  // @ts-expect-error - missing types
 } from 'ua-parser-js/extensions';
 import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
 import { FrontendAppService } from './frontend-app.service';
@@ -31,6 +31,7 @@ import { Project } from '@app/project/entities/project.entity';
 import { Public } from '@app/auth/decorators/public.decorator';
 import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
 import * as crypto from 'crypto';
+import { ColorScheme } from '@app/web-metrics/entities/browser-metric.entity';
 
 function hashValue(value: string) {
   const salt = new Date().toISOString().split('T')[0];
@@ -200,7 +201,9 @@ export class BeaconController {
                   const metric: CreateBrowserMetricDto = {
                     firstLoad: createBrowserMetricDto.f,
                     colorScheme:
-                      createBrowserMetricDto.m === 'd' ? 'dark' : 'light',
+                      createBrowserMetricDto.m === 'd'
+                        ? ColorScheme.Dark
+                        : ColorScheme.Light,
                     domain,
                     path,
                     initiatorType,

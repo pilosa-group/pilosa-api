@@ -1,23 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Instance } from './cloud-provider-instance-list.interface';
 import { Project } from '@app/project/entities/project.entity';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityRepository } from '@mikro-orm/postgresql';
 
 @Injectable()
 export class ServerInstanceService {
   constructor(
     @InjectRepository(ServerInstance)
-    private serverInstanceRepository: Repository<ServerInstance>,
+    private serverInstanceRepository: EntityRepository<ServerInstance>,
   ) {}
 
   async findOneById(id: string): Promise<ServerInstance> {
-    return this.serverInstanceRepository
-      .createQueryBuilder('si')
-      .where('si.id = :id', { id })
-      .getOne();
+    return this.serverInstanceRepository.findOne({ id });
   }
 
   /**
@@ -28,13 +25,10 @@ export class ServerInstanceService {
     instance: Instance,
     cloudProviderAccount: CloudProviderAccount,
   ): Promise<ServerInstance | null> {
-    const serverInstance = await this.serverInstanceRepository
-      .createQueryBuilder('ci')
-      .where('ci.instanceId = :instanceId', { instanceId: instance.id })
-      .andWhere('ci.cloudProviderAccount = :cloudProviderAccount', {
-        cloudProviderAccount: cloudProviderAccount.id,
-      })
-      .getOne();
+    const serverInstance = await this.serverInstanceRepository.findOne({
+      instanceId: instance.id,
+      cloudProviderAccount,
+    });
 
     if (serverInstance) {
       serverInstance.state = instance.state;
@@ -55,23 +49,26 @@ export class ServerInstanceService {
 
   findAllByProject(projectId: Project['id']): Promise<ServerInstance[]> {
     return this.serverInstanceRepository
-      .createQueryBuilder('si')
-      .innerJoin('si.cloudProviderAccount', 'cpa')
-      .innerJoin('cpa.project', 'project', 'project.id = :projectId', {
-        projectId,
+      .createQueryBuilder()
+      .where({
+        cloudProviderAccount: {
+          project: {
+            id: projectId,
+          },
+        },
       })
-      .getMany();
+      .getResult();
   }
 
   findAllByCloudProviderAccount(
     cloudProviderAccount: CloudProviderAccount,
   ): Promise<ServerInstance[]> {
     return this.serverInstanceRepository
-      .createQueryBuilder('si')
-      .where('si.cloudProviderAccount = :cloudProviderAccountId', {
-        cloudProviderAccountId: cloudProviderAccount.id,
+      .createQueryBuilder()
+      .where({
+        cloudProviderAccount: cloudProviderAccount.id,
       })
-      .getMany();
+      .getResult();
   }
 
   /**
@@ -80,6 +77,6 @@ export class ServerInstanceService {
    * @param serverInstance
    */
   async save(serverInstance: ServerInstance): Promise<ServerInstance> {
-    return this.serverInstanceRepository.save(serverInstance);
+    return this.serverInstanceRepository.upsert(serverInstance);
   }
 }

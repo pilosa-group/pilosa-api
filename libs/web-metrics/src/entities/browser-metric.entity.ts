@@ -1,71 +1,64 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Property, Entity, ManyToOne, Enum, PrimaryKey } from '@mikro-orm/core';
 import { FrontendApp } from './frontend-app.entity';
-import { Field, ObjectType } from '@nestjs/graphql';
-import { GraphQLFloat } from 'graphql/type';
+
+export enum ColorScheme {
+  Dark = 'dark',
+  Light = 'light',
+}
 
 @Entity()
-@ObjectType()
 export class BrowserMetric {
-  @PrimaryColumn('timestamptz', {
-    default: () => 'CURRENT_TIMESTAMP',
+  @PrimaryKey({
+    unique: false,
+    type: 'timestamptz',
+    defaultRaw: 'CURRENT_TIMESTAMP',
   })
-  @Field()
-  time: Date;
+  time!: Date;
 
-  @Column({ default: false })
-  firstLoad: boolean;
+  @Property()
+  firstLoad!: boolean;
 
-  @Column('simple-enum', {
-    enum: ['dark', 'light'],
-    default: 'light',
+  @Enum(() => ColorScheme)
+  colorScheme: ColorScheme = ColorScheme.Light;
+
+  @Property()
+  domain!: string;
+
+  @Property()
+  path!: string;
+
+  @Property({ nullable: true })
+  initiatorType?: string;
+
+  @Property({ nullable: true })
+  extension?: string;
+
+  @Property({ type: 'float' })
+  bytesCompressed!: number;
+
+  @Property({ type: 'float' })
+  bytesUncompressed!: number;
+
+  @Property({ nullable: true })
+  visitor?: string;
+
+  @Property({ nullable: true })
+  deviceType?: string;
+
+  @Property({ nullable: true })
+  device?: string;
+
+  @Property({ nullable: true })
+  os?: string;
+
+  @Property({ nullable: true })
+  browser?: string;
+
+  @Property({ nullable: true })
+  cpu?: string;
+
+  @ManyToOne({
+    entity: () => FrontendApp,
   })
-  colorScheme: string = 'light';
-
-  @Column()
-  @Field()
-  domain: string;
-
-  @Column()
-  @Field()
-  path: string;
-
-  @Column({ nullable: true })
-  initiatorType: string;
-
-  @Column({ nullable: true })
-  extension: string;
-
-  @Column('float')
-  @Field(() => GraphQLFloat)
-  bytesCompressed: number;
-
-  @Column('float')
-  @Field(() => GraphQLFloat)
-  bytesUncompressed: number;
-
-  @Column({ nullable: true })
-  visitor: string;
-
-  @Column({ nullable: true })
-  deviceType: string;
-
-  @Column({ nullable: true })
-  device: string;
-
-  @Column({ nullable: true })
-  os: string;
-
-  @Column({ nullable: true })
-  browser: string;
-
-  @Column({ nullable: true })
-  cpu: string;
-
-  @ManyToOne(
-    () => FrontendApp,
-    (frontendApp: FrontendApp) => frontendApp.metrics,
-  )
-  @JoinColumn()
-  @Field(() => FrontendApp)
-  frontendApp: FrontendApp;
+  frontendApp!: FrontendApp;
 }

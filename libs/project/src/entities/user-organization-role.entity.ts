@@ -1,31 +1,28 @@
-import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  ArrayType,
+  Entity,
+  ManyToOne,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { Organization } from '@app/project/entities/organization.entity';
 import { User } from '@app/user/entities/user.entity';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { GraphQLString } from 'graphql/type';
 
-@Entity({ name: 'organization_to_user' })
-@ObjectType()
+@Entity({ tableName: 'organization_to_user' })
 export class UserOrganizationRole {
-  @PrimaryGeneratedColumn('uuid')
-  @Field(() => ID)
-  public id: string;
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  id: string;
 
-  @Column()
-  public organizationId: string;
+  @Property({ type: ArrayType })
+  roles: string[];
 
-  @Column()
-  public userId: string;
+  @ManyToOne({
+    entity: () => Organization,
+  })
+  organization!: Organization;
 
-  @Column('simple-array')
-  @Field(() => [GraphQLString])
-  public roles: string[];
-
-  @ManyToOne(() => Organization, (organization) => organization.userRoles)
-  @Field(() => Organization)
-  public organization: Organization;
-
-  @ManyToOne(() => User, (user) => user.organizationRoles)
-  @Field(() => User)
-  public user: User;
+  @ManyToOne({
+    entity: () => User,
+  })
+  user: User;
 }

@@ -6,18 +6,22 @@ import { AwsGetMetrics } from '@app/cloud-aws/aws-get-metrics';
 import { AwsInstanceList } from '@app/cloud-aws/aws-instance-list';
 import { ServerMetricService } from '@app/cloud-metrics/server-metric.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { CreateRequestContext } from '@mikro-orm/core';
+import { MikroORM } from '@mikro-orm/core';
 
 @Injectable()
 export class MonitoringService {
   private isRunning = false;
 
   constructor(
+    private readonly orm: MikroORM,
     private readonly serverInstanceService: ServerInstanceService,
     private readonly cloudProviderAccountService: CloudProviderAccountService,
     private readonly serverMetricService: ServerMetricService,
   ) {}
 
   @Cron(CronExpression.EVERY_5_SECONDS)
+  @CreateRequestContext()
   async run() {
     if (this.isRunning) {
       return;
@@ -27,6 +31,8 @@ export class MonitoringService {
 
     const cloudProviderAccount =
       await this.cloudProviderAccountService.findOneLatestImported();
+
+    console.log({ cloudProviderAccount });
 
     if (cloudProviderAccount) {
       console.log('importing metrics for account', cloudProviderAccount.id);

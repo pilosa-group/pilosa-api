@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { ServerMetric } from './entities/server-metric.entity';
 import { MetricResult } from '@app/cloud/cloud-provider-metrics.interface';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
 import { MetricPeriodValue } from '@app/cloud/enum/metric-period.enum';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityRepository } from '@mikro-orm/postgresql';
 
 @Injectable()
 export class ServerMetricService {
   constructor(
     @InjectRepository(ServerMetric)
-    private serverMetricRepository: Repository<ServerMetric>,
+    private serverMetricRepository: EntityRepository<ServerMetric>,
   ) {}
 
   async create(
@@ -30,12 +30,16 @@ export class ServerMetricService {
 
   async getLastImportedDate(serverInstance: ServerInstance): Promise<Date> {
     const metric = await this.serverMetricRepository
-      .createQueryBuilder('sm')
-      .where('sm.serverInstance = :instanceId', {
-        instanceId: serverInstance.id,
+      .createQueryBuilder()
+      .where({
+        serverInstance: {
+          id: serverInstance.id,
+        },
       })
-      .orderBy('sm.time', 'DESC')
-      .getOne();
+      .orderBy({
+        time: 'DESC',
+      })
+      .getSingleResult();
 
     if (!metric) {
       return null;
@@ -45,44 +49,46 @@ export class ServerMetricService {
   }
 
   async save(serverMetric: ServerMetric): Promise<ServerMetric> {
-    return this.serverMetricRepository.save(serverMetric);
+    return this.serverMetricRepository.upsert(serverMetric);
   }
 
   findAllByServerInstance(
     serverInstance: ServerInstance,
   ): Promise<ServerMetric[]> {
     return this.serverMetricRepository
-      .createQueryBuilder('sm')
-      .where('sm.serverInstance = :instanceId', {
-        instanceId: serverInstance.id,
+      .createQueryBuilder()
+      .where({
+        serverInstance: {
+          id: serverInstance.id,
+        },
       })
-      .getMany();
+      .getResult();
   }
 
-  async getMetricsByPeriod(
-    serverInstance: ServerInstance,
-    timeBucket: MetricPeriodValue,
-    start: Date,
-    end: Date,
-  ): Promise<ServerMetric[]> {
-    return this.serverMetricRepository.manager.query(
-      `SELECT time_bucket($1, sm.time) AS period,
-              COUNT(*),
-              AVG(sm.cpu) AS cpu,
-              AVG(sm."networkIn") AS networkIn,
-              AVG(sm."networkOut") AS networkOut,
-              AVG(sm."diskReadOps") AS diskReadOps,
-              AVG(sm."diskWriteOps") AS diskWriteOps
-
-       FROM server_metric sm
-
-       WHERE sm."serverInstanceId" = $2
-       AND sm.time > $3
-        AND sm.time < $4
-
-       GROUP BY period
-       ORDER BY period DESC`,
-      [timeBucket, serverInstance.id, start, end],
-    );
-  }
+  // async getMetricsByPeriod(
+  //   serverInstance: ServerInstance,
+  //   timeBucket: MetricPeriodValue,
+  //   start: Date,
+  //   end: Date,
+  // ): Promise<ServerMetric[]> {
+  //   return this.serverMetricRepository.manager.query(
+  //     `SELECT time_bucket($1, sm.time) AS period,
+  //             COUNT(*),
+  //             AVG(sm.cpu) AS cpu,
+  //             AVG(sm."networkIn") AS networkIn,
+  //             AVG(sm."networkOut") AS networkOut,
+  //             AVG(sm."diskReadOps") AS diskReadOps,
+  //             AVG(sm."diskWriteOps") AS diskWriteOps
+  //
+  //      FROM server_metric sm
+  //
+  //      WHERE sm."serverInstanceId" = $2
+  //      AND sm.time > $3
+  //       AND sm.time < $4
+  //
+  //      GROUP BY period
+  //      ORDER BY period DESC`,
+  //     [timeBucket, serverInstance.id, start, end],
+  //   );
+  // }
 }
