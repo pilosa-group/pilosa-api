@@ -4,6 +4,7 @@ import {
   SyntheticScanService,
   VisitResult,
 } from '@app/synthetic-scan/synthetic-scan.service';
+import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-domain.entity';
 
 type ScanPayload = {
   url: string;
@@ -15,7 +16,7 @@ export class SyntheticScanController {
 
   @Post()
   @Public()
-  scan(@Body() { url }: ScanPayload): Promise<VisitResult> {
+  scan(@Body() { url }: ScanPayload): Promise<BrowserMetricDomain> {
     try {
       return this.syntheticScanService.run(url);
     } catch (error) {

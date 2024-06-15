@@ -18,16 +18,17 @@ export class BrowserMetricPathService {
     const path = new BrowserMetricPath();
     wrap(path).assign(pathDto);
 
-    // newPath.assetGroups = [];
-    await this.browserMetricPathRepository.upsert(path);
-
     return path;
   }
 
   async save(browserMetricPath: BrowserMetricPath): Promise<BrowserMetricPath> {
     const path = this.browserMetricPathRepository.create(browserMetricPath);
 
-    return this.browserMetricPathRepository.upsert(path);
+    await this.browserMetricPathRepository
+      .getEntityManager()
+      .persistAndFlush(path);
+
+    return path;
   }
 
   async findOneByDomainPath(

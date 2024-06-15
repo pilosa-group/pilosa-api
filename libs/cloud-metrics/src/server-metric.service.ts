@@ -49,7 +49,11 @@ export class ServerMetricService {
   }
 
   async save(serverMetric: ServerMetric): Promise<ServerMetric> {
-    return this.serverMetricRepository.upsert(serverMetric);
+    this.serverMetricRepository.getEntityManager().persist(serverMetric);
+
+    await this.serverMetricRepository.getEntityManager().flush();
+
+    return serverMetric;
   }
 
   findAllByServerInstance(

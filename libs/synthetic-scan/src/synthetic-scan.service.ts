@@ -1,21 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Request, Response } from 'playwright';
 import { chromium } from 'playwright';
-import { co2, hosting } from '@tgwf/co2';
+import { co2 } from '@tgwf/co2';
 import { calculateTotalSize } from './utils/calculateTotalSize';
-import { getTopDomain } from './utils/getTopDomain';
-import { formatBytes } from './utils/formatBytes';
 import { isCdn } from './utils/isCdn';
-import { isCompressed } from './utils/isCompressed';
 import { isCacheable } from './utils/isCacheable';
 import { findRequestByContentType } from './utils/findRequestByContentType';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-domain.entity';
 import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path.entity';
 import { findRequestByDomain } from '@app/synthetic-scan/utils/findRequestByDomain';
 import {
   AssetGroup,
+  assetGroupKeys,
   assetGroups,
   BrowserMetricAssetGroup,
 } from '@app/web-metrics/entities/browser-metric-asset-group.entity';
@@ -23,6 +20,7 @@ import { GreenHostingService } from '@app/synthetic-scan/green-hosting.service';
 import { BrowserMetricDomainService } from '@app/web-metrics/browser-metric-domain.service';
 import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.service';
 import { BrowserMetricPathStats } from '@app/web-metrics/entities/browser-metric-path-stats.entity';
+import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-domain.entity';
 
 export type NetworkRequest = {
   url: string;
@@ -132,8 +130,8 @@ export class SyntheticScanService {
     private browserMetricsPathService: BrowserMetricPathService,
   ) {}
 
-  async run(url: string): Promise<VisitResult> {
-    const cachedResult = await this.cacheManager.get<VisitResult>(url);
+  async run(url: string): Promise<BrowserMetricDomain> {
+    const cachedResult = await this.cacheManager.get<BrowserMetricDomain>(url);
 
     if (cachedResult) {
       console.log('from cache', url);
@@ -225,8 +223,9 @@ export class SyntheticScanService {
     pathStats.domReadyTime = domReadyTime;
     pathStats.loadTime = loadTime;
     pathStats.networkIdleTime = networkIdleTime;
+    path.stats.add(pathStats);
 
-    // await this.browserMetricsPathService.save(path);
+    await this.browserMetricsPathService.save(path);
 
     const domains = Array.from(
       new Set(
@@ -236,7 +235,7 @@ export class SyntheticScanService {
       ),
     );
 
-    for (const assetGroupName of Object.keys(assetGroups)) {
+    for (const assetGroupName of assetGroupKeys) {
       const matchContentTypes = assetGroups[assetGroupName];
 
       for (const domain of domains) {
@@ -265,8 +264,8 @@ export class SyntheticScanService {
           assetGroup.bytesUncompressed = await calculateTotalSize(
             matchingAssetRequests,
           );
-          assetGroup.name =
-            AssetGroup[assetGroupName as keyof typeof AssetGroup];
+          assetGroup.name = assetGroupName;
+
           assetGroup.cdnPercentage =
             (matchingAssetRequests.filter(isCdn).length /
               matchingAssetRequests.length) *
@@ -281,9 +280,11 @@ export class SyntheticScanService {
       }
     }
 
+    await this.browserMetricsPathService.save(path);
+
     console.log(JSON.stringify(topDomain, null, 2));
 
-    return {};
+    return topDomain;
 
     // const pageTitle = await page.title();
     //

@@ -16,7 +16,7 @@ export class Organization {
   @Property()
   createdAt = new Date();
 
-  @Property({ onUpdate: () => new Date() })
+  @Property({ onUpdate: () => new Date(), nullable: true })
   updatedAt?: Date;
 
   @Property()

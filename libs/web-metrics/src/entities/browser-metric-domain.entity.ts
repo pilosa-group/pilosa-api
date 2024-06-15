@@ -13,7 +13,7 @@ export class BrowserMetricDomain {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
-  @Property({ unique: true })
+  @PrimaryKey({ type: 'string', unique: true })
   domain!: string;
 
   @Property({ type: 'boolean' })

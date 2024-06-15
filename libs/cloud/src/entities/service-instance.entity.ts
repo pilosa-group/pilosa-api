@@ -18,7 +18,7 @@ export class ServerInstance {
   @Property()
   createdAt = new Date();
 
-  @Property({ onUpdate: () => new Date() })
+  @Property({ onUpdate: () => new Date(), nullable: true })
   updatedAt?: Date;
 
   @Property()

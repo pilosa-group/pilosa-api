@@ -24,7 +24,7 @@ export class BrowserMetric {
   @Property()
   domain!: string;
 
-  @Property()
+  @Property({ type: 'text' })
   path!: string;
 
   @Property({ nullable: true })

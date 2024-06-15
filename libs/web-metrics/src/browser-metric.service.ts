@@ -20,13 +20,15 @@ export class BrowserMetricService {
     wrap(metric).assign(browserMetricDto);
     metric.frontendApp = frontendApp;
 
-    await this.browserMetricRepository.upsert(metric);
-
     return metric;
   }
 
   async save(browserMetric: BrowserMetric): Promise<BrowserMetric> {
-    return this.browserMetricRepository.upsert(browserMetric);
+    this.browserMetricRepository.getEntityManager().persist(browserMetric);
+
+    await this.browserMetricRepository.getEntityManager().flush();
+
+    return browserMetric;
   }
 
   // async findAllByFrontendApp(

@@ -77,6 +77,10 @@ export class ServerInstanceService {
    * @param serverInstance
    */
   async save(serverInstance: ServerInstance): Promise<ServerInstance> {
-    return this.serverInstanceRepository.upsert(serverInstance);
+    this.serverInstanceRepository.getEntityManager().persist(serverInstance);
+
+    await this.serverInstanceRepository.getEntityManager().flush();
+
+    return serverInstance;
   }
 }

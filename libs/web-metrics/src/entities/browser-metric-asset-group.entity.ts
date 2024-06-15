@@ -27,6 +27,8 @@ export const assetGroups: Record<string, string[]> = {
   [AssetGroup.Other]: [],
 };
 
+export const assetGroupKeys = Object.keys(assetGroups) as AssetGroup[];
+
 @Entity()
 export class BrowserMetricAssetGroup {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })

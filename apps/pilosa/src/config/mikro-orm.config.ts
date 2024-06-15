@@ -4,7 +4,13 @@ import { ConfigService } from '@nestjs/config';
 import { DatabaseConfig } from './configuration';
 import path from 'path';
 import { Migrator, JSMigrationGenerator } from '@mikro-orm/migrations';
-import { defineConfig, PostgreSqlDriver } from '@mikro-orm/postgresql';
+import {
+  AbstractNamingStrategy,
+  defineConfig,
+  EntityCaseNamingStrategy,
+  PostgreSqlDriver,
+  UnderscoreNamingStrategy,
+} from '@mikro-orm/postgresql';
 
 // console.log(process.env);
 //
@@ -41,13 +47,38 @@ import { defineConfig, PostgreSqlDriver } from '@mikro-orm/postgresql';
 //   };
 // });
 
+export class CustomNamingStrategy extends UnderscoreNamingStrategy {
+  classToTableName(entityName: string): string {
+    return super.classToTableName(entityName);
+  }
+  joinColumnName(propertyName: string) {
+    return propertyName;
+  }
+  joinKeyColumnName(
+    entityName: string,
+    referencedColumnName: string,
+    composite = false,
+  ) {
+    const name = entityName.substr(0, 1).toLowerCase() + entityName.substr(1);
+    if (composite && referencedColumnName) {
+      return name + '_' + referencedColumnName;
+    }
+    return name;
+  }
+  propertyToColumnName(propertyName: string) {
+    return propertyName;
+  }
+}
+
 export default defineConfig({
   entities: ['dist/**/*.entity.js'],
   extensions: [Migrator],
   dbName: 'pilosa',
   driver: PostgreSqlDriver,
+  namingStrategy: CustomNamingStrategy,
   migrations: {
     path: 'src/migrations',
+    disableForeignKeys: true,
     snapshot: false,
     emit: 'js',
   },

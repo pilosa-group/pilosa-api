@@ -32,8 +32,6 @@ export class MonitoringService {
     const cloudProviderAccount =
       await this.cloudProviderAccountService.findOneLatestImported();
 
-    console.log({ cloudProviderAccount });
-
     if (cloudProviderAccount) {
       console.log('importing metrics for account', cloudProviderAccount.id);
 

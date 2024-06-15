@@ -19,7 +19,7 @@ export class CloudProviderAccount {
   @Property()
   createdAt = new Date();
 
-  @Property({ onUpdate: () => new Date() })
+  @Property({ onUpdate: () => new Date(), nullable: true })
   updatedAt?: Date;
 
   @Enum(() => CloudProvider)

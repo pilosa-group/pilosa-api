@@ -38,6 +38,7 @@ import { IndexController } from './controllers/index.controller';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Migrator } from '@mikro-orm/migrations';
+import { CustomNamingStrategy } from './config/mikro-orm.config';
 
 const srcRoot = path.join(process.cwd(), 'src');
 const distSource = path.join(process.cwd(), 'dist');
@@ -87,6 +88,7 @@ const distSource = path.join(process.cwd(), 'dist');
             pathTs: path.join(srcRoot, './db/'),
           },
           extensions: [Migrator],
+          namingStrategy: CustomNamingStrategy,
           driver: PostgreSqlDriver,
           host,
           port,
