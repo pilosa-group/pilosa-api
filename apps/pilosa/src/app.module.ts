@@ -2,7 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProjectModule } from '@app/project';
 import { validationSchema } from './config/validation.schema';
-import configuration, { DatabaseConfig } from './config/configuration';
+import configuration, {
+  AppConfig,
+  DatabaseConfig,
+  ENV_DEVELOPMENT,
+} from './config/configuration';
 import { WebSnippetModule } from './web-snippet/web-snippet.module';
 import { CloudAwsModule } from '@app/cloud-aws';
 import { CloudModule } from '@app/cloud';
@@ -13,8 +17,6 @@ import { AuthModule } from '@app/auth';
 import { UserModule } from '@app/user';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as path from 'path';
 import { MetricsModule } from '@app/metrics';
 import { SyntheticScanModule } from '@app/synthetic-scan';
@@ -44,12 +46,6 @@ const distSource = path.join(process.cwd(), 'dist');
       load: [configuration],
       validationSchema,
     }),
-    // GraphQLModule.forRoot<ApolloDriverConfig>({
-    //   driver: ApolloDriver,
-    //   autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
-    //   allowBatchedHttpRequests: true,
-    //   sortSchema: true,
-    // }),
     MikroOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -63,10 +59,12 @@ const distSource = path.join(process.cwd(), 'dist');
           ssl,
         } = configService.get<DatabaseConfig>('database');
 
+        const { env } = configService.get<AppConfig>('app');
+
         return {
           entitiesTs: [path.join(srcRoot, './**/*.entity.ts')],
           autoLoadEntities: true,
-          debug: true,
+          debug: env === ENV_DEVELOPMENT,
           migrations: {
             path: path.join(distSource, './apps/pilosa/apps/pilosa/src/db/'),
             pathTs: path.join(srcRoot, './db/'),
