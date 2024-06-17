@@ -1,11 +1,12 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
-import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 
 @Entity()
 export class ServerMetric {
-  @PrimaryKey({
-    unique: false,
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  id: string;
+
+  @Property({
     type: 'timestamptz',
     defaultRaw: 'CURRENT_TIMESTAMP',
   })

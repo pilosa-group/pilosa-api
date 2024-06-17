@@ -2,4 +2,5 @@ import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-do
 
 export class CreateBrowserMetricPathDto {
   domain: BrowserMetricDomain;
+  path: string;
 }

@@ -2,6 +2,8 @@ import { Property, Entity, ManyToOne, PrimaryKey, Enum } from '@mikro-orm/core';
 import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path.entity';
 import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-domain.entity';
 import { BrowserMetricPathStats } from '@app/web-metrics/entities/browser-metric-path-stats.entity';
+import { Exclude } from 'class-transformer';
+import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.service';
 
 export enum AssetGroup {
   Images = 'images',
@@ -33,6 +35,12 @@ export const assetGroupKeys = Object.keys(assetGroups) as AssetGroup[];
 export class BrowserMetricAssetGroup {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
+
+  @Property({
+    type: 'timestamptz',
+    defaultRaw: 'CURRENT_TIMESTAMP',
+  })
+  createdAt!: Date;
 
   @Enum(() => AssetGroup)
   name!: AssetGroup;

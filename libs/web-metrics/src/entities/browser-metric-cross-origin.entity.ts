@@ -6,6 +6,12 @@ export class BrowserMetricCrossOrigin {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
+  @Property({
+    type: 'timestamptz',
+    defaultRaw: 'CURRENT_TIMESTAMP',
+  })
+  createdAt!: Date;
+
   @Property()
   domain!: string;
 

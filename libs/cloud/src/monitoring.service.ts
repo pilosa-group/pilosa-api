@@ -20,7 +20,7 @@ export class MonitoringService {
     private readonly serverMetricService: ServerMetricService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   @CreateRequestContext()
   async run() {
     if (this.isRunning) {

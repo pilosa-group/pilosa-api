@@ -8,8 +8,10 @@ export enum ColorScheme {
 
 @Entity()
 export class BrowserMetric {
-  @PrimaryKey({
-    unique: false,
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  id: string;
+
+  @Property({
     type: 'timestamptz',
     defaultRaw: 'CURRENT_TIMESTAMP',
   })

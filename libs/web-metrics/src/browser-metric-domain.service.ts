@@ -23,10 +23,10 @@ export class BrowserMetricDomainService {
     return this.browserMetricDomainRepository.upsert(browserMetricDomain);
   }
 
-  async findOrCreateOneByDomain(domain: string): Promise<BrowserMetricDomain> {
+  async findOrCreateOneByDomain(fqdn: string): Promise<BrowserMetricDomain> {
     const existingEntity = await this.browserMetricDomainRepository.findOne(
       {
-        domain,
+        fqdn,
       },
       {
         cache: 1000,
@@ -37,8 +37,8 @@ export class BrowserMetricDomainService {
       return existingEntity;
     }
 
-    const entity = new BrowserMetricDomain();
-    wrap(entity).assign({ domain, isGreenHost: false });
+    const entity = new BrowserMetricDomain(fqdn);
+    wrap(entity).assign({ fqdn, isGreenHost: false });
 
     this.browserMetricDomainRepository.getEntityManager().persist(entity);
     await this.browserMetricDomainRepository.getEntityManager().flush();

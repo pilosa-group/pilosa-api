@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import type { Request, Response } from 'playwright';
 import { chromium } from 'playwright';
 import { co2 } from '@tgwf/co2';
@@ -6,12 +6,9 @@ import { calculateTotalSize } from './utils/calculateTotalSize';
 import { isCdn } from './utils/isCdn';
 import { isCacheable } from './utils/isCacheable';
 import { findRequestByContentType } from './utils/findRequestByContentType';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path.entity';
 import { findRequestByDomain } from '@app/synthetic-scan/utils/findRequestByDomain';
 import {
-  AssetGroup,
   assetGroupKeys,
   assetGroups,
   BrowserMetricAssetGroup,
@@ -20,7 +17,8 @@ import { GreenHostingService } from '@app/synthetic-scan/green-hosting.service';
 import { BrowserMetricDomainService } from '@app/web-metrics/browser-metric-domain.service';
 import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.service';
 import { BrowserMetricPathStats } from '@app/web-metrics/entities/browser-metric-path-stats.entity';
-import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-domain.entity';
+import { isCompressed } from '@app/synthetic-scan/utils/isCompressed';
+import { formatBytes } from '@app/synthetic-scan/utils/formatBytes';
 
 export type NetworkRequest = {
   url: string;
@@ -31,8 +29,8 @@ export type NetworkRequest = {
 export type FileTypeResult = {
   count: number;
   totalBytes: number;
-  // totalBytesFormatted: string;
-  // estimatedCo2: number;
+  totalBytesFormatted: string;
+  estimatedCo2: number;
 };
 
 type Hosting = {
@@ -109,33 +107,47 @@ const co2Emission = new co2({});
 
 async function toFileTypeResult(
   networkRequests: NetworkRequest[],
-  // greenHost: boolean,
+  greenHost: boolean,
 ): Promise<FileTypeResult> {
   const totalBytes = await calculateTotalSize(networkRequests);
 
   return {
     count: networkRequests.length,
     totalBytes,
-    // totalBytesFormatted: formatBytes(totalBytes),
-    // estimatedCo2: co2Emission.perByte(totalBytes, greenHost),
+    totalBytesFormatted: formatBytes(totalBytes),
+    estimatedCo2: co2Emission.perByte(totalBytes, greenHost),
   };
 }
 
 @Injectable()
 export class SyntheticScanService {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private greenHostingService: GreenHostingService,
     private browserMetricsDomainService: BrowserMetricDomainService,
     private browserMetricsPathService: BrowserMetricPathService,
   ) {}
 
-  async run(url: string): Promise<BrowserMetricDomain> {
-    const cachedResult = await this.cacheManager.get<BrowserMetricDomain>(url);
+  async run(url: string): Promise<any> {
+    const urlObject = new URL(url);
 
-    if (cachedResult) {
-      console.log('from cache', url);
-      // return cachedResult;
+    const topDomain =
+      await this.browserMetricsDomainService.findOrCreateOneByDomain(
+        urlObject.hostname,
+      );
+
+    let path: BrowserMetricPath = undefined;
+
+    if (topDomain) {
+      path = await this.browserMetricsPathService.findOneByDomainPath(
+        topDomain,
+        urlObject.pathname,
+      );
+
+      if (path) {
+        // await path.stats.loadItems();
+        // console.log(wrap(path).toJSON());
+        // return wrap(path).serialize();
+      }
     }
 
     const browser = await chromium.launch({
@@ -181,7 +193,6 @@ export class SyntheticScanService {
 
     const networkIdleTime = (Date.now() - startTime) / 1000;
 
-    // Call the function to scroll down the page smoothly until the end
     await scrollPageToEnd(page);
 
     // unique network requests (based on url)
@@ -191,41 +202,28 @@ export class SyntheticScanService {
       ).values(),
     );
 
-    const urlObject = new URL(url);
-
-    const topDomain =
-      await this.browserMetricsDomainService.findOrCreateOneByDomain(
-        urlObject.hostname,
-      );
-
     topDomain.isGreenHost = await this.greenHostingService.isGreenHost(
       urlObject.hostname,
     );
 
     await this.browserMetricsDomainService.save(topDomain);
 
-    let path = await this.browserMetricsPathService.findOneByDomainPath(
-      topDomain,
-      urlObject.pathname,
-    );
-
     if (!path) {
-      path = new BrowserMetricPath();
+      path = new BrowserMetricPath(topDomain, urlObject.pathname);
       path.domain = topDomain;
 
       topDomain.paths.add(path);
     }
 
+    path.title = await page.title();
+
     const pathStats = new BrowserMetricPathStats();
 
-    path.title = await page.title();
-    path.path = urlObject.pathname;
     pathStats.domReadyTime = domReadyTime;
     pathStats.loadTime = loadTime;
     pathStats.networkIdleTime = networkIdleTime;
-    path.stats.add(pathStats);
 
-    await this.browserMetricsPathService.save(path);
+    path.stats.add(pathStats);
 
     const domains = Array.from(
       new Set(
@@ -261,9 +259,21 @@ export class SyntheticScanService {
           const assetGroup = new BrowserMetricAssetGroup();
           assetGroup.domain = subDomain;
           assetGroup.numberOfRequests = matchingAssetRequests.length;
-          assetGroup.bytesUncompressed = await calculateTotalSize(
+          const totalBytesTransferred = await calculateTotalSize(
             matchingAssetRequests,
           );
+          const percentageCompressed =
+            (matchingAssetRequests.filter(isCompressed).length /
+              matchingAssetRequests.length) *
+            100;
+
+          assetGroup.bytesUncompressed = Math.round(
+            (totalBytesTransferred / 100) * percentageCompressed,
+          );
+          assetGroup.bytesCompressed = Math.round(
+            totalBytesTransferred - assetGroup.bytesUncompressed,
+          );
+
           assetGroup.name = assetGroupName;
 
           assetGroup.cdnPercentage =
@@ -282,116 +292,76 @@ export class SyntheticScanService {
 
     await this.browserMetricsPathService.save(path);
 
-    console.log(JSON.stringify(topDomain, null, 2));
+    const totalBytes = await calculateTotalSize(networkRequests);
 
-    return topDomain;
+    // keep compatible with old response (for quick scan UI)
+    const result: any = {
+      total: {
+        domain: null,
+        pageTitle: path.title,
+        hosting: [
+          {
+            domain: topDomain.fqdn,
+            green: topDomain.isGreenHost,
+          },
+        ],
+        // requests: networkRequests,
+        // requests: [],
+        numberOfRequests: networkRequests.length,
+        time: {
+          domReady: domReadyTime,
+          load: loadTime,
+          networkIdle: networkIdleTime,
+        },
+        totalBytes: await calculateTotalSize(networkRequests),
+        totalBytesFormatted: formatBytes(totalBytes),
+        estimatedCo2: co2Emission.perVisit(totalBytes, topDomain.isGreenHost),
+        cdnPercentage:
+          (networkRequests.filter(isCdn).length / networkRequests.length) * 100,
+        compressedPercentage:
+          (networkRequests.filter(isCompressed).length /
+            networkRequests.length) *
+          100,
+        cachePercentage:
+          (networkRequests.filter(isCacheable).length /
+            networkRequests.length) *
+          100,
+        fileTypes: {
+          images: await toFileTypeResult(
+            networkRequests.filter(findRequestByContentType(['image/'])),
+            topDomain.isGreenHost,
+          ),
+          scripts: await toFileTypeResult(
+            networkRequests.filter(findRequestByContentType(['javascript'])),
+            topDomain.isGreenHost,
+          ),
+          stylesheets: await toFileTypeResult(
+            networkRequests.filter(findRequestByContentType(['text/css'])),
+            topDomain.isGreenHost,
+          ),
+          json: await toFileTypeResult(
+            networkRequests.filter(findRequestByContentType(['json'])),
+            topDomain.isGreenHost,
+          ),
+          fonts: await toFileTypeResult(
+            networkRequests.filter(findRequestByContentType(['font'])),
+            topDomain.isGreenHost,
+          ),
+          video: await toFileTypeResult(
+            networkRequests.filter(findRequestByContentType(['video'])),
+            topDomain.isGreenHost,
+          ),
+          audio: await toFileTypeResult(
+            networkRequests.filter(findRequestByContentType(['audio'])),
+            topDomain.isGreenHost,
+          ),
+        },
+      },
+      domains: [],
+    };
 
-    // const pageTitle = await page.title();
-    //
-    // // const domainsWithGreenCheck = await Promise.all(domainRequests.map(async (domain) => {
-    // //   const cacheKey = `green-hosting-${domain}`;
-    // //   let green = await this.cacheManager.get<boolean>(cacheKey);
-    // //
-    // //   console.log({domain , fromCache: green})
-    // //
-    // //   if(green === null || green === undefined) {
-    // //      const green = await hosting.check(domain) as boolean
-    // //
-    // //     // await this.cacheManager.set(cacheKey, green, 60 * 60);
-    // //   }
-    // //   console.log({domain,green})
-    // //
-    // //   return {
-    // //     domain,
-    // //     green,
-    // //   };
-    // // }));
-    // //
-    // // console.log(domainsWithGreenCheck);
-    //
-    // // const greenHostingResult = await hosting.check(domainRequests);
-    //
-    // const totalBytes = await calculateTotalSize(networkRequests);
-    // const mainTopDomain = getTopDomain(url);
-    // //
-    // // const mainDomainWithGreenCheck = domainsWithGreenCheck.find(({ domain }: any) => domain === mainTopDomain);
-    // // const green = mainDomainWithGreenCheck.green;
-    //
-    // console.log(mainTopDomain);
-    //
-    // const green = (await hosting.check(mainTopDomain)) as boolean;
-    //
-    // logger(`Calculating total results`);
-    //
-    // const result: any = {
-    //   total: {
-    //     domain: null,
-    //     pageTitle,
-    //     hosting: [
-    //       {
-    //         domain: mainTopDomain,
-    //         green,
-    //       },
-    //     ],
-    //     // requests: networkRequests,
-    //     // requests: [],
-    //     numberOfRequests: networkRequests.length,
-    //     time: {
-    //       domReady: domReadyTime,
-    //       load: loadTime,
-    //       networkIdle: networkIdleTime,
-    //     },
-    //     totalBytes: totalBytes,
-    //     totalBytesFormatted: formatBytes(totalBytes),
-    //     estimatedCo2: co2Emission.perVisit(totalBytes, green),
-    //     cdnPercentage:
-    //       (networkRequests.filter(isCdn).length / networkRequests.length) * 100,
-    //     compressedPercentage:
-    //       (networkRequests.filter(isCompressed).length /
-    //         networkRequests.length) *
-    //       100,
-    //     cachePercentage:
-    //       (networkRequests.filter(isCacheable).length /
-    //         networkRequests.length) *
-    //       100,
-    //     fileTypes: {
-    //       images: await toFileTypeResult(
-    //         networkRequests.filter(findRequestByContentType('image/')),
-    //         green,
-    //       ),
-    //       scripts: await toFileTypeResult(
-    //         networkRequests.filter(findRequestByContentType('javascript')),
-    //         green,
-    //       ),
-    //       stylesheets: await toFileTypeResult(
-    //         networkRequests.filter(findRequestByContentType('text/css')),
-    //         green,
-    //       ),
-    //       json: await toFileTypeResult(
-    //         networkRequests.filter(findRequestByContentType('json')),
-    //         green,
-    //       ),
-    //       fonts: await toFileTypeResult(
-    //         networkRequests.filter(findRequestByContentType('font')),
-    //         green,
-    //       ),
-    //       video: await toFileTypeResult(
-    //         networkRequests.filter(findRequestByContentType('video')),
-    //         green,
-    //       ),
-    //       audio: await toFileTypeResult(
-    //         networkRequests.filter(findRequestByContentType('audio')),
-    //         green,
-    //       ),
-    //     },
-    //   },
-    //   domains: domainRequests,
-    // };
-    //
-    // void browser.close();
-    //
-    // await this.cacheManager.set(url, result, 60 * 60 * 10);
-    //
-    // return result;
+    void browser.close();
+
+    return result;
   }
 }

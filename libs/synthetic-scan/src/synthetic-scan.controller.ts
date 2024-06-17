@@ -1,27 +1,29 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { Public } from '@app/auth/decorators/public.decorator';
 import {
-  SyntheticScanService,
-  VisitResult,
-} from '@app/synthetic-scan/synthetic-scan.service';
-import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-domain.entity';
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
+import { Public } from '@app/auth/decorators/public.decorator';
+import { SyntheticScanService } from '@app/synthetic-scan/synthetic-scan.service';
 
 type ScanPayload = {
   url: string;
 };
 
 @Controller('synthetic-scan')
+@UseInterceptors(ClassSerializerInterceptor)
 export class SyntheticScanController {
   constructor(private syntheticScanService: SyntheticScanService) {}
 
   @Post()
   @Public()
-  scan(@Body() { url }: ScanPayload): Promise<BrowserMetricDomain> {
+  scan(@Body() { url }: ScanPayload): Promise<any> {
     try {
       return this.syntheticScanService.run(url);
     } catch (error) {
-      console.error(error);
-      throw new Error('Unable to scan URL');
+      throw new Error(`Unable to scan URL ${url}`);
     }
   }
 }

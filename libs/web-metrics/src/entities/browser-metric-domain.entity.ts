@@ -10,11 +10,14 @@ import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path
 
 @Entity()
 export class BrowserMetricDomain {
-  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
-  id: string;
-
   @PrimaryKey({ type: 'string', unique: true })
-  domain!: string;
+  fqdn: string;
+
+  @Property({
+    type: 'timestamptz',
+    defaultRaw: 'CURRENT_TIMESTAMP',
+  })
+  createdAt!: Date;
 
   @Property({ type: 'boolean' })
   isGreenHost!: boolean;
@@ -22,7 +25,13 @@ export class BrowserMetricDomain {
   @OneToMany(
     () => BrowserMetricPath,
     (path: BrowserMetricPath) => path.domain,
-    { cascade: [Cascade.PERSIST, Cascade.REMOVE] },
+    {
+      cascade: [Cascade.PERSIST, Cascade.REMOVE],
+    },
   )
   paths = new Collection<BrowserMetricPath>(this);
+
+  constructor(fqdn: string) {
+    this.fqdn = fqdn;
+  }
 }

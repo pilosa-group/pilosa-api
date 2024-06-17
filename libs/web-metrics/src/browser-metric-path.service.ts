@@ -15,10 +15,7 @@ export class BrowserMetricPathService {
   async create(
     pathDto: CreateBrowserMetricPathDto,
   ): Promise<BrowserMetricPath> {
-    const path = new BrowserMetricPath();
-    wrap(path).assign(pathDto);
-
-    return path;
+    return new BrowserMetricPath(pathDto.domain, pathDto.path);
   }
 
   async save(browserMetricPath: BrowserMetricPath): Promise<BrowserMetricPath> {

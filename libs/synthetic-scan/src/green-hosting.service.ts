@@ -10,7 +10,7 @@ export class GreenHostingService {
   async isGreenHost(domain: string): Promise<boolean> {
     const cachedResult = await this.cacheManager.get<boolean>(domain);
 
-    if (cachedResult) {
+    if (cachedResult !== undefined) {
       return cachedResult;
     }
 
