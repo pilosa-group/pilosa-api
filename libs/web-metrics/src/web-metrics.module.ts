@@ -8,12 +8,12 @@ import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { BrowserMetricsController } from '@app/web-metrics/browser-metrics.controller';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 // import { FrontendAppResolver } from '@app/web-metrics/graphql/frontend-app.resolver';
-import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-domain.entity';
-import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path.entity';
-import { BrowserMetricAssetGroup } from '@app/web-metrics/entities/browser-metric-asset-group.entity';
+import { Domain } from '@app/web-metrics/entities/domain.entity';
+import { Path } from '@app/web-metrics/entities/path.entity';
+import { AssetGroupStatistics } from '@app/web-metrics/entities/asset-group-statistics.entity';
 import { BrowserMetricDomainService } from '@app/web-metrics/browser-metric-domain.service';
 import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.service';
-import { BrowserMetricPathStats } from '@app/web-metrics/entities/browser-metric-path-stats.entity';
+import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
 
 @Module({
   controllers: [BeaconController, BrowserMetricsController],
@@ -28,10 +28,10 @@ import { BrowserMetricPathStats } from '@app/web-metrics/entities/browser-metric
     ConfigModule,
     MikroOrmModule.forFeature([
       BrowserMetric,
-      BrowserMetricAssetGroup,
-      BrowserMetricDomain,
-      BrowserMetricPath,
-      BrowserMetricPathStats,
+      AssetGroupStatistics,
+      Domain,
+      Path,
+      PathStatistics,
       FrontendApp,
     ]),
   ],

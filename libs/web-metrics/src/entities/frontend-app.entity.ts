@@ -9,7 +9,7 @@ import {
 } from '@mikro-orm/core';
 import { BrowserMetric } from './browser-metric.entity';
 import { Project } from '@app/project/entities/project.entity';
-import { BrowserMetricCrossOrigin } from '@app/web-metrics/entities/browser-metric-cross-origin.entity';
+import { CrossOrigin } from '@app/web-metrics/entities/cross-origin.entity';
 
 @Entity()
 export class FrontendApp {
@@ -43,11 +43,11 @@ export class FrontendApp {
   metrics = new Collection<BrowserMetric>(this);
 
   @OneToMany(
-    () => BrowserMetricCrossOrigin,
-    (crossOrigin: BrowserMetricCrossOrigin) => crossOrigin.frontendApp,
+    () => CrossOrigin,
+    (crossOrigin: CrossOrigin) => crossOrigin.frontendApp,
     {
       cascade: [Cascade.PERSIST, Cascade.REMOVE],
     },
   )
-  crossOrigins = new Collection<BrowserMetricCrossOrigin>(this);
+  crossOrigins = new Collection<CrossOrigin>(this);
 }

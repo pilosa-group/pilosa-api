@@ -1,7 +1,7 @@
 import { Property, Entity, ManyToOne, PrimaryKey, Enum } from '@mikro-orm/core';
-import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path.entity';
-import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-domain.entity';
-import { BrowserMetricPathStats } from '@app/web-metrics/entities/browser-metric-path-stats.entity';
+import { Path } from '@app/web-metrics/entities/path.entity';
+import { Domain } from '@app/web-metrics/entities/domain.entity';
+import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
 import { Exclude } from 'class-transformer';
 import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.service';
 
@@ -32,7 +32,7 @@ export const assetGroups: Record<string, string[]> = {
 export const assetGroupKeys = Object.keys(assetGroups) as AssetGroup[];
 
 @Entity()
-export class BrowserMetricAssetGroup {
+export class AssetGroupStatistics {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
@@ -61,12 +61,12 @@ export class BrowserMetricAssetGroup {
   numberOfRequests: number = 0;
 
   @ManyToOne({
-    entity: () => BrowserMetricPathStats,
+    entity: () => PathStatistics,
   })
-  pathStats!: BrowserMetricPathStats;
+  pathStats!: PathStatistics;
 
   @ManyToOne({
-    entity: () => BrowserMetricDomain,
+    entity: () => Domain,
   })
-  domain!: BrowserMetricDomain;
+  domain!: Domain;
 }

@@ -1,4 +1,4 @@
-export class CreateBrowserMetricDomainDto {
+export class CreateDomainDto {
   domain: string;
   isGreenHost?: boolean;
 }

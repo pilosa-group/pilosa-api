@@ -6,10 +6,10 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path.entity';
+import { Path } from '@app/web-metrics/entities/path.entity';
 
 @Entity()
-export class BrowserMetricDomain {
+export class Domain {
   @PrimaryKey({ type: 'string', unique: true })
   fqdn: string;
 
@@ -22,14 +22,10 @@ export class BrowserMetricDomain {
   @Property({ type: 'boolean' })
   isGreenHost!: boolean;
 
-  @OneToMany(
-    () => BrowserMetricPath,
-    (path: BrowserMetricPath) => path.domain,
-    {
-      cascade: [Cascade.PERSIST, Cascade.REMOVE],
-    },
-  )
-  paths = new Collection<BrowserMetricPath>(this);
+  @OneToMany(() => Path, (path: Path) => path.domain, {
+    cascade: [Cascade.PERSIST, Cascade.REMOVE],
+  })
+  paths = new Collection<Path>(this);
 
   constructor(fqdn: string) {
     this.fqdn = fqdn;

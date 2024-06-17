@@ -1,24 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path.entity';
-import { CreateBrowserMetricPathDto } from '@app/web-metrics/dto/create-browser-metric-path.dto';
-import { BrowserMetricDomain } from '@app/web-metrics/entities/browser-metric-domain.entity';
+import { Path } from '@app/web-metrics/entities/path.entity';
+import { CreatePathDto } from '@app/web-metrics/dto/create-path.dto';
+import { Domain } from '@app/web-metrics/entities/domain.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, wrap } from '@mikro-orm/core';
 
 @Injectable()
 export class BrowserMetricPathService {
   constructor(
-    @InjectRepository(BrowserMetricPath)
-    private browserMetricPathRepository: EntityRepository<BrowserMetricPath>,
+    @InjectRepository(Path)
+    private browserMetricPathRepository: EntityRepository<Path>,
   ) {}
 
-  async create(
-    pathDto: CreateBrowserMetricPathDto,
-  ): Promise<BrowserMetricPath> {
-    return new BrowserMetricPath(pathDto.domain, pathDto.path);
+  async create(pathDto: CreatePathDto): Promise<Path> {
+    return new Path(pathDto.domain, pathDto.path);
   }
 
-  async save(browserMetricPath: BrowserMetricPath): Promise<BrowserMetricPath> {
+  async save(browserMetricPath: Path): Promise<Path> {
     const path = this.browserMetricPathRepository.create(browserMetricPath);
 
     await this.browserMetricPathRepository
@@ -28,10 +26,7 @@ export class BrowserMetricPathService {
     return path;
   }
 
-  async findOneByDomainPath(
-    domain: BrowserMetricDomain,
-    path: string,
-  ): Promise<BrowserMetricPath> {
+  async findOneByDomainPath(domain: Domain, path: string): Promise<Path> {
     return this.browserMetricPathRepository.findOne(
       {
         domain,

@@ -6,17 +6,17 @@ import { calculateTotalSize } from './utils/calculateTotalSize';
 import { isCdn } from './utils/isCdn';
 import { isCacheable } from './utils/isCacheable';
 import { findRequestByContentType } from './utils/findRequestByContentType';
-import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path.entity';
+import { Path } from '@app/web-metrics/entities/path.entity';
 import { findRequestByDomain } from '@app/synthetic-scan/utils/findRequestByDomain';
 import {
   assetGroupKeys,
   assetGroups,
-  BrowserMetricAssetGroup,
-} from '@app/web-metrics/entities/browser-metric-asset-group.entity';
+  AssetGroupStatistics,
+} from '@app/web-metrics/entities/asset-group-statistics.entity';
 import { GreenHostingService } from '@app/synthetic-scan/green-hosting.service';
 import { BrowserMetricDomainService } from '@app/web-metrics/browser-metric-domain.service';
 import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.service';
-import { BrowserMetricPathStats } from '@app/web-metrics/entities/browser-metric-path-stats.entity';
+import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
 import { isCompressed } from '@app/synthetic-scan/utils/isCompressed';
 import { formatBytes } from '@app/synthetic-scan/utils/formatBytes';
 
@@ -135,7 +135,7 @@ export class SyntheticScanService {
         urlObject.hostname,
       );
 
-    let path: BrowserMetricPath = undefined;
+    let path: Path = undefined;
 
     if (topDomain) {
       path = await this.browserMetricsPathService.findOneByDomainPath(
@@ -209,7 +209,7 @@ export class SyntheticScanService {
     await this.browserMetricsDomainService.save(topDomain);
 
     if (!path) {
-      path = new BrowserMetricPath(topDomain, urlObject.pathname);
+      path = new Path(topDomain, urlObject.pathname);
       path.domain = topDomain;
 
       topDomain.paths.add(path);
@@ -217,7 +217,7 @@ export class SyntheticScanService {
 
     path.title = await page.title();
 
-    const pathStats = new BrowserMetricPathStats();
+    const pathStats = new PathStatistics();
 
     pathStats.domReadyTime = domReadyTime;
     pathStats.loadTime = loadTime;
@@ -256,7 +256,7 @@ export class SyntheticScanService {
         );
 
         if (matchingAssetRequests.length > 0) {
-          const assetGroup = new BrowserMetricAssetGroup();
+          const assetGroup = new AssetGroupStatistics();
           assetGroup.domain = subDomain;
           assetGroup.numberOfRequests = matchingAssetRequests.length;
           const totalBytesTransferred = await calculateTotalSize(

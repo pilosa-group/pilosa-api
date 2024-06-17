@@ -7,11 +7,11 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { BrowserMetricAssetGroup } from '@app/web-metrics/entities/browser-metric-asset-group.entity';
-import { BrowserMetricPath } from '@app/web-metrics/entities/browser-metric-path.entity';
+import { AssetGroupStatistics } from '@app/web-metrics/entities/asset-group-statistics.entity';
+import { Path } from '@app/web-metrics/entities/path.entity';
 
 @Entity()
-export class BrowserMetricPathStats {
+export class PathStatistics {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
@@ -31,16 +31,16 @@ export class BrowserMetricPathStats {
   networkIdleTime!: number;
 
   @OneToMany(
-    () => BrowserMetricAssetGroup,
-    (assetGroup: BrowserMetricAssetGroup) => assetGroup.pathStats,
+    () => AssetGroupStatistics,
+    (assetGroup: AssetGroupStatistics) => assetGroup.pathStats,
     {
       cascade: [Cascade.PERSIST, Cascade.REMOVE],
     },
   )
-  assetGroups = new Collection<BrowserMetricAssetGroup>(this);
+  assetGroups = new Collection<AssetGroupStatistics>(this);
 
   @ManyToOne({
-    entity: () => BrowserMetricPath,
+    entity: () => Path,
   })
-  path!: BrowserMetricPath;
+  path!: Path;
 }
