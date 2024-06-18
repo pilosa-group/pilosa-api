@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { BeaconController } from '@app/web-metrics/beacon.controller';
 import { FrontendAppService } from '@app/web-metrics/frontend-app.service';
@@ -13,6 +13,8 @@ import { AssetGroupStatistics } from '@app/web-metrics/entities/asset-group-stat
 import { BrowserMetricDomainService } from '@app/web-metrics/browser-metric-domain.service';
 import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.service';
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
+import { PageScannerService } from '@app/web-metrics/page-scanner.service';
+import { SyntheticScanModule } from '@app/synthetic-scan';
 
 @Module({
   controllers: [BeaconController, BrowserMetricsController],
@@ -21,6 +23,7 @@ import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity
     BrowserMetricPathService,
     BrowserMetricService,
     FrontendAppService,
+    PageScannerService,
   ],
   imports: [
     ConfigModule,
@@ -32,6 +35,7 @@ import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity
       PathStatistics,
       FrontendApp,
     ]),
+    forwardRef(() => SyntheticScanModule),
   ],
   exports: [
     BrowserMetricDomainService,
