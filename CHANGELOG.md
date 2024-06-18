@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/pilosa-group/pilosa-api/compare/v1.7.0...v1.8.0) (2024-06-18)
+
+
+### Features
+
+* run synthetic scan for visited pages ([9075683](https://github.com/pilosa-group/pilosa-api/commit/9075683e58910965c3fa800b01c90cd49b633cbf))
+
 # [1.7.0](https://github.com/pilosa-group/pilosa-api/compare/v1.6.0...v1.7.0) (2024-06-12)
 
 
