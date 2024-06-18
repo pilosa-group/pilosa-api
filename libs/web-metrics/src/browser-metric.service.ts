@@ -35,18 +35,18 @@ export class BrowserMetricService {
     const [result] = await this.browserMetricRepository
       .getEntityManager()
       .getConnection()
-      .execute<[{ domain: string; clean_path: string }]>(
-        `SELECT bm.domain, SUBSTRING(bm.path, 1, COALESCE(NULLIF(POSITION('?' IN bm.path), 0) - 1, LENGTH(bm.path))) AS clean_path, count(bm) as visits
+      .execute<[{ domain: string; path: string }]>(
+        `SELECT bm.domain, path, count(bm) as visits,COUNT(DISTINCT ps.id)
          FROM browser_metric bm
                   LEFT JOIN path_statistics ps ON ps.path_domain = bm.domain AND ps.path_path = bm.path
 
          WHERE bm."firstLoad" = true
-         GROUP BY bm.domain, clean_path
+         GROUP BY bm.domain, path
          HAVING COUNT(DISTINCT ps.id) = 0 AND COUNT(bm) > 200
          ORDER BY visits DESC`,
       );
 
-    return `https://${result.domain}${result.clean_path}`;
+    return `https://${result.domain}${result.path}`;
   }
 
   // async findAllByFrontendApp(
