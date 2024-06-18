@@ -12,7 +12,12 @@ export class FrontendAppService {
   ) {}
 
   async findOneById(id: FrontendApp['id']): Promise<FrontendApp> {
-    return this.frontendAppRepository.findOne({ id });
+    return this.frontendAppRepository.findOne(
+      { id },
+      {
+        cache: 60 * 5, // 5 minutes
+      },
+    );
   }
 
   async findAllByProject(project: Project): Promise<FrontendApp[]> {
