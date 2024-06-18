@@ -15,7 +15,7 @@ export class PageScannerService {
     private readonly syntheticScanService: SyntheticScanService,
   ) {}
 
-  @Cron(CronExpression.EVERY_SECOND)
+  @Cron(CronExpression.EVERY_MINUTE)
   @CreateRequestContext()
   async run() {
     if (this.isRunning) {
