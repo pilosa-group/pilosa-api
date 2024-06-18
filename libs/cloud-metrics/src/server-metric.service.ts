@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ServerMetric } from './entities/server-metric.entity';
 import { MetricResult } from '@app/cloud/cloud-provider-metrics.interface';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
-import { MetricPeriodValue } from '@app/cloud/enum/metric-period.enum';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 

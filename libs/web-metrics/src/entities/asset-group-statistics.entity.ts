@@ -1,9 +1,6 @@
 import { Property, Entity, ManyToOne, PrimaryKey, Enum } from '@mikro-orm/core';
-import { Path } from '@app/web-metrics/entities/path.entity';
 import { Domain } from '@app/web-metrics/entities/domain.entity';
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
-import { Exclude } from 'class-transformer';
-import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.service';
 
 export enum AssetGroup {
   Images = 'images',

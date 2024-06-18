@@ -7,7 +7,6 @@ import { BrowserMetric } from '@app/web-metrics/entities/browser-metric.entity';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { BrowserMetricsController } from '@app/web-metrics/browser-metrics.controller';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-// import { FrontendAppResolver } from '@app/web-metrics/graphql/frontend-app.resolver';
 import { Domain } from '@app/web-metrics/entities/domain.entity';
 import { Path } from '@app/web-metrics/entities/path.entity';
 import { AssetGroupStatistics } from '@app/web-metrics/entities/asset-group-statistics.entity';
@@ -21,7 +20,6 @@ import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity
     BrowserMetricDomainService,
     BrowserMetricPathService,
     BrowserMetricService,
-    // FrontendAppResolver,
     FrontendAppService,
   ],
   imports: [

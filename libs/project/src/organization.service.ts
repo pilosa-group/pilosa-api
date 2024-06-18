@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Organization } from '@app/project/entities/organization.entity';
-import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/core';
 

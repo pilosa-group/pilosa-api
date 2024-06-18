@@ -3,7 +3,7 @@ import { Path } from '@app/web-metrics/entities/path.entity';
 import { CreatePathDto } from '@app/web-metrics/dto/create-path.dto';
 import { Domain } from '@app/web-metrics/entities/domain.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository, wrap } from '@mikro-orm/core';
+import { EntityRepository } from '@mikro-orm/core';
 
 @Injectable()
 export class BrowserMetricPathService {

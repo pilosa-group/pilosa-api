@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { BrowserMetricService } from '@app/web-metrics/browser-metric.service';
 
 @Controller('metrics/browser')
