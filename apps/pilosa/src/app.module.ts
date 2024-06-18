@@ -25,7 +25,7 @@ import { IndexController } from './controllers/index.controller';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Migrator } from '@mikro-orm/migrations';
-import { CustomNamingStrategy } from './config/mikro-orm.config';
+import { CustomNamingStrategy } from './config/custom-naming.strategy';
 
 const srcRoot = path.join(process.cwd(), 'src');
 const distSource = path.join(process.cwd(), 'dist');

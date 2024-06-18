@@ -19,10 +19,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/pilosa/test/jest-e2e.json",
-    "mikroorm": "npm run mikro-orm",
-    "migration:generate": "npm run build && npm run typeorm -- migration:generate apps/pilosa/src/db/migrations",
-    "migration:run": "npm run build && npm run typeorm -- migration:run",
-    "migration:show": "npm run build && npm run typeorm -- migration:show",
+    "migration:create": "npm run build && npx mikro-orm migration:create --config dist/apps/pilosa/apps/pilosa/src/config/mikro-orm.config.js",
+    "migration:run": "npm run build && npx mikro-orm migration:up --config dist/apps/pilosa/apps/pilosa/src/config/mikro-orm.config.js",
     "prepare": "husky install"
   },
   "dependencies": {
