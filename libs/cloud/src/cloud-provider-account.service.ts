@@ -1,36 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { Project } from '@app/project/entities/project.entity';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityRepository } from '@mikro-orm/postgresql';
 
 @Injectable()
 export class CloudProviderAccountService {
   constructor(
     @InjectRepository(CloudProviderAccount)
-    private cloudProviderAccountRepository: Repository<CloudProviderAccount>,
+    private cloudProviderAccountRepository: EntityRepository<CloudProviderAccount>,
   ) {}
 
   async findOneLatestImported(): Promise<CloudProviderAccount | null> {
     return this.cloudProviderAccountRepository
-      .createQueryBuilder('cpa')
-      .where('cpa.lastImportedAt < :lastImportedAt', {
-        lastImportedAt: new Date(new Date().getTime() - 5 * 60 * 1000),
+      .createQueryBuilder()
+      .where({
+        lastImportedAt: {
+          $lt: new Date(new Date().getTime() - 5 * 60 * 1000),
+        },
       })
-      .orderBy('cpa.lastImportedAt', 'ASC')
-      .getOne();
+      .orderBy({
+        lastImportedAt: 'ASC',
+      })
+      .getSingleResult();
   }
 
   async save(
     cloudProviderAccount: CloudProviderAccount,
   ): Promise<CloudProviderAccount> {
-    return this.cloudProviderAccountRepository.save(cloudProviderAccount);
+    return this.cloudProviderAccountRepository.upsert(cloudProviderAccount);
   }
 
   async findAllByProject(project: Project): Promise<CloudProviderAccount[]> {
-    return this.cloudProviderAccountRepository
-      .createQueryBuilder('cpa')
-      .where('cpa.projectId = :projectId', { projectId: project.id })
-      .getMany();
+    return this.cloudProviderAccountRepository.find({
+      project,
+    });
   }
 }

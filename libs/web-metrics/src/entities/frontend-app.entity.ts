@@ -1,57 +1,53 @@
 import {
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
-  DeleteDateColumn,
-  JoinColumn,
   OneToMany,
   ManyToOne,
-} from 'typeorm';
+  PrimaryKey,
+  Property,
+  Collection,
+  Cascade,
+} from '@mikro-orm/core';
 import { BrowserMetric } from './browser-metric.entity';
 import { Project } from '@app/project/entities/project.entity';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { GraphQLString } from 'graphql/type';
-import { BrowserMetricCrossOrigin } from '@app/web-metrics/entities/browser-metric-cross-origin.entity';
+import { CrossOrigin } from '@app/web-metrics/entities/cross-origin.entity';
 
 @Entity()
-@ObjectType()
 export class FrontendApp {
-  @PrimaryGeneratedColumn('uuid')
-  @Field(() => ID)
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Property()
+  createdAt = new Date();
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @Property({ onUpdate: () => new Date(), nullable: true })
+  updatedAt?: Date;
 
-  @DeleteDateColumn()
-  deletedAt: Date;
+  @Property()
+  name!: string;
 
-  @Column()
-  @Field()
-  name: string;
+  @Property()
+  urls!: string[];
 
-  @Column('simple-array')
-  @Field(() => [GraphQLString])
-  urls: string[];
-
-  @ManyToOne(() => Project, (project: Project) => project.frontendApps)
-  @JoinColumn()
-  @Field(() => Project)
+  @ManyToOne({
+    entity: () => Project,
+  })
   project: Project;
 
-  @OneToMany(() => BrowserMetric, (metric: BrowserMetric) => metric.frontendApp)
-  @Field(() => [BrowserMetric], { nullable: 'items' })
-  metrics: BrowserMetric[];
+  @OneToMany(
+    () => BrowserMetric,
+    (metric: BrowserMetric) => metric.frontendApp,
+    {
+      cascade: [Cascade.PERSIST, Cascade.REMOVE],
+    },
+  )
+  metrics = new Collection<BrowserMetric>(this);
 
   @OneToMany(
-    () => BrowserMetricCrossOrigin,
-    (crossOrigin: BrowserMetricCrossOrigin) => crossOrigin.frontendApp,
+    () => CrossOrigin,
+    (crossOrigin: CrossOrigin) => crossOrigin.frontendApp,
+    {
+      cascade: [Cascade.PERSIST, Cascade.REMOVE],
+    },
   )
-  @Field(() => [BrowserMetric], { nullable: 'items' })
-  crossOrigins: BrowserMetricCrossOrigin[];
+  crossOrigins = new Collection<CrossOrigin>(this);
 }

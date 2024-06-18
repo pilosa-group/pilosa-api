@@ -1,63 +1,48 @@
 import {
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
-  DeleteDateColumn,
   OneToMany,
-  JoinColumn,
   ManyToOne,
-} from 'typeorm';
+  PrimaryKey,
+  Property,
+  Collection,
+} from '@mikro-orm/core';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
-import { Organization } from '@app/project/entities/organization.entity';
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Organization } from '@app/project/entities/organization.entity';
 
 @Entity()
-@ObjectType()
 export class Project {
-  @PrimaryGeneratedColumn('uuid')
-  @Field(() => ID)
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Property()
+  createdAt = new Date();
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @Property({ onUpdate: () => new Date(), nullable: true })
+  updatedAt?: Date;
 
-  @DeleteDateColumn()
-  deletedAt: Date;
+  @Property()
+  name!: string;
 
-  @Column()
-  @Field()
-  name: string;
-
-  @ManyToOne(
-    () => Organization,
-    (organization: Organization) => organization.projects,
-  )
-  @JoinColumn()
-  organization: Project;
+  @ManyToOne({
+    entity: () => Organization,
+  })
+  organization!: Organization;
 
   @OneToMany(() => UserProjectRole, (projectToUser) => projectToUser.project)
-  @Field(() => [UserProjectRole], { nullable: 'items' })
-  public userRoles: UserProjectRole[];
+  userRoles = new Collection<UserProjectRole>(this);
 
   @OneToMany(
     () => CloudProviderAccount,
     (cloudProviderAccount: CloudProviderAccount) =>
       cloudProviderAccount.project,
   )
-  @Field(() => [CloudProviderAccount], { nullable: 'items' })
-  cloudProviderAccounts: CloudProviderAccount[];
+  cloudProviderAccounts = new Collection<CloudProviderAccount>(this);
 
   @OneToMany(
     () => FrontendApp,
     (frontendApp: FrontendApp) => frontendApp.project,
   )
-  @Field(() => [FrontendApp], { nullable: 'items' })
-  frontendApps: FrontendApp[];
+  frontendApps = new Collection<FrontendApp>(this);
 }

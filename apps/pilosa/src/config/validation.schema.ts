@@ -20,7 +20,7 @@ export const validationSchema = Joi.object({
   CLERK_ISSUER_URL: Joi.string().required(),
 
   // Sentry
-  SENTRY_DSN: Joi.string().required(),
+  SENTRY_DSN: Joi.string().optional(),
   SENTRY_TRACES_SAMPLE_RATE: Joi.number().default(1.0),
   SENTRY_PROFILES_SAMPLE_RATE: Joi.number().default(1.0),
 });

@@ -1,44 +1,33 @@
 import {
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
+  Collection,
   Entity,
-  PrimaryGeneratedColumn,
-  DeleteDateColumn,
   OneToMany,
-} from 'typeorm';
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { Project } from '@app/project/entities/project.entity';
 import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 @Entity()
-@ObjectType()
 export class Organization {
-  @PrimaryGeneratedColumn('uuid')
-  @Field(() => ID)
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Property()
+  createdAt = new Date();
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @Property({ onUpdate: () => new Date(), nullable: true })
+  updatedAt?: Date;
 
-  @DeleteDateColumn()
-  deletedAt: Date;
-
-  @Column()
-  @Field()
+  @Property()
   name: string;
 
   @OneToMany(() => Project, (project: Project) => project.organization)
-  @Field(() => [Project], { nullable: 'items' })
-  projects: Project[];
+  projects = new Collection<Project>(this);
 
   @OneToMany(
     () => UserOrganizationRole,
     (organizationToUser) => organizationToUser.organization,
   )
-  @Field(() => [UserOrganizationRole], { nullable: 'items' })
-  public userRoles: UserOrganizationRole[];
+  userRoles = new Collection<UserOrganizationRole>(this);
 }
