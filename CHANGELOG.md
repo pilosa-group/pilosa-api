@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/pilosa-group/pilosa-api/compare/v1.8.1...v1.8.2) (2024-06-18)
+
+
+### Bug Fixes
+
+* just select the most visited pages ([6347cb7](https://github.com/pilosa-group/pilosa-api/commit/6347cb776cf5f2e1c9c15efdb585094185f70879))
+
 ## [1.8.1](https://github.com/pilosa-group/pilosa-api/compare/v1.8.0...v1.8.1) (2024-06-18)
 
 
