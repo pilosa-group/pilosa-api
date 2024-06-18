@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/pilosa-group/pilosa-api/compare/v1.8.0...v1.8.1) (2024-06-18)
+
+
+### Performance Improvements
+
+* slow down number of scans ([af52d2b](https://github.com/pilosa-group/pilosa-api/commit/af52d2b60d7417601e314881edb760894cee7935))
+
 # [1.8.0](https://github.com/pilosa-group/pilosa-api/compare/v1.7.0...v1.8.0) (2024-06-18)
 
 
