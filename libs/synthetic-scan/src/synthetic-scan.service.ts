@@ -119,6 +119,14 @@ async function toFileTypeResult(
   };
 }
 
+type SyntheticScanOptions = {
+  scrollToEnd?: boolean;
+};
+
+const defaultOptions: SyntheticScanOptions = {
+  scrollToEnd: true,
+};
+
 @Injectable()
 export class SyntheticScanService {
   constructor(
@@ -127,7 +135,10 @@ export class SyntheticScanService {
     private browserMetricsPathService: BrowserMetricPathService,
   ) {}
 
-  async run(url: string): Promise<any> {
+  async run(
+    url: string,
+    { scrollToEnd }: SyntheticScanOptions = defaultOptions,
+  ): Promise<any> {
     const urlObject = new URL(url);
 
     const topDomain =
@@ -193,7 +204,9 @@ export class SyntheticScanService {
 
     const networkIdleTime = (Date.now() - startTime) / 1000;
 
-    await scrollPageToEnd(page);
+    if (scrollToEnd) {
+      await scrollPageToEnd(page);
+    }
 
     // unique network requests (based on url)
     networkRequests = Array.from(

@@ -3,7 +3,7 @@ import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
 import { FrontendApp } from './entities/frontend-app.entity';
 import { BrowserMetric } from './entities/browser-metric.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository, wrap } from '@mikro-orm/core';
+import { EntityRepository, wrap } from '@mikro-orm/postgresql';
 
 @Injectable()
 export class BrowserMetricService {
@@ -29,6 +29,26 @@ export class BrowserMetricService {
     await this.browserMetricRepository.getEntityManager().flush();
 
     return browserMetric;
+  }
+
+  async findUnscannedPaths(): Promise<string> {
+    const [result] = await this.browserMetricRepository
+      .getEntityManager()
+      .getConnection()
+      .execute<[{ domain: string; path: string }]>(
+        `SELECT bm.domain,
+                SUBSTRING(bm.path, 1, COALESCE(NULLIF(POSITION('?' IN bm.path), 0) - 1, LENGTH(bm.path))) as path,
+                count(bm) as visits
+         FROM browser_metric bm
+                  LEFT JOIN path_statistics ps ON ps.path_domain = bm.domain AND ps.path_path = bm.path
+
+         WHERE bm."firstLoad" = true
+         GROUP BY bm.domain, SUBSTRING(bm.path, 1, COALESCE(NULLIF(POSITION('?' IN bm.path), 0) - 1, LENGTH(bm.path)))
+         HAVING COUNT(DISTINCT ps.id) = 0
+         ORDER BY visits DESC`,
+      );
+
+    return `https://${result.domain}${result.path}`;
   }
 
   // async findAllByFrontendApp(

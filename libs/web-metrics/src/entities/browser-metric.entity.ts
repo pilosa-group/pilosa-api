@@ -1,5 +1,14 @@
-import { Property, Entity, ManyToOne, Enum, PrimaryKey } from '@mikro-orm/core';
+import {
+  Property,
+  Entity,
+  ManyToOne,
+  Enum,
+  PrimaryKey,
+  ManyToMany,
+  Collection,
+} from '@mikro-orm/core';
 import { FrontendApp } from './frontend-app.entity';
+import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
 
 export enum ColorScheme {
   Dark = 'dark',
@@ -63,4 +72,9 @@ export class BrowserMetric {
     entity: () => FrontendApp,
   })
   frontendApp!: FrontendApp;
+
+  @ManyToMany({
+    entity: () => PathStatistics,
+  })
+  pathStatistics = new Collection<PathStatistics>(this);
 }
