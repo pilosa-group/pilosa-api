@@ -20,7 +20,7 @@ export const assetGroups: Record<string, string[]> = {
   [AssetGroup.Scripts]: ['javascript'],
   [AssetGroup.Json]: ['json'],
   [AssetGroup.Fonts]: ['font'],
-  [AssetGroup.Video]: ['video'],
+  [AssetGroup.Video]: ['video', 'application/vnd.yt-ump'],
   [AssetGroup.Audio]: ['audio'],
   [AssetGroup.Text]: ['text'],
   [AssetGroup.Other]: [],
