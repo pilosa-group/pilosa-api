@@ -1,3 +1,10 @@
+## [1.8.4](https://github.com/pilosa-group/pilosa-api/compare/v1.8.3...v1.8.4) (2024-06-19)
+
+
+### Bug Fixes
+
+* fix result ([c2cd16c](https://github.com/pilosa-group/pilosa-api/commit/c2cd16c87ff2bf060fa189a0cb729e1c0a10e847))
+
 ## [1.8.3](https://github.com/pilosa-group/pilosa-api/compare/v1.8.2...v1.8.3) (2024-06-19)
 
 
