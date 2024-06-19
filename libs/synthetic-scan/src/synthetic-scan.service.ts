@@ -361,7 +361,9 @@ export class SyntheticScanService {
             topDomain.isGreenHost,
           ),
           video: await toFileTypeResult(
-            networkRequests.filter(findRequestByContentType(['video'])),
+            networkRequests.filter(
+              findRequestByContentType(['video', 'application/vnd.yt-ump']),
+            ),
             topDomain.isGreenHost,
           ),
           audio: await toFileTypeResult(

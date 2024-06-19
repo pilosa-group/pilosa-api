@@ -36,12 +36,12 @@ export class BrowserMetricService {
       .getEntityManager()
       .getConnection()
       .execute<[{ domain: string; path: string }]>(
-        `SELECT bm.domain, path, count(bm) as visits,COUNT(DISTINCT ps.id)
+        `SELECT bm.domain, SUBSTRING(bm.path, 1, COALESCE(NULLIF(POSITION('?' IN bm.path), 0) - 1, LENGTH(bm.path))) AS clean_path, count(bm) as visits,COUNT(DISTINCT ps.id)
          FROM browser_metric bm
-                  LEFT JOIN path_statistics ps ON ps.path_domain = bm.domain AND ps.path_path = bm.path
+                  LEFT JOIN path_statistics ps ON ps.path_domain = bm.domain AND ps.path_path = SUBSTRING(bm.path, 1, COALESCE(NULLIF(POSITION('?' IN bm.path), 0) - 1, LENGTH(bm.path)))
 
          WHERE bm."firstLoad" = true
-         GROUP BY bm.domain, path
+         GROUP BY bm.domain, clean_path
          HAVING COUNT(DISTINCT ps.id) = 0 AND COUNT(bm) > 200
          ORDER BY visits DESC`,
       );
