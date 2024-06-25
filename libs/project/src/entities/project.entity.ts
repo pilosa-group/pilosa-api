@@ -27,6 +27,7 @@ export class Project {
 
   @ManyToOne({
     entity: () => Organization,
+    deleteRule: 'cascade',
   })
   organization!: Organization;
 

@@ -35,6 +35,7 @@ export class ServerInstance {
 
   @ManyToOne({
     entity: () => CloudProviderAccount,
+    deleteRule: 'cascade',
   })
   cloudProviderAccount!: CloudProviderAccount;
 

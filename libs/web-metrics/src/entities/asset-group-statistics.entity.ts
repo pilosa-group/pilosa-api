@@ -59,11 +59,13 @@ export class AssetGroupStatistics {
 
   @ManyToOne({
     entity: () => PathStatistics,
+    deleteRule: 'cascade',
   })
   pathStats!: PathStatistics;
 
   @ManyToOne({
     entity: () => Domain,
+    deleteRule: 'cascade',
   })
   domain!: Domain;
 }

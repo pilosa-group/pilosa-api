@@ -41,6 +41,7 @@ export class PathStatistics {
 
   @ManyToOne({
     entity: () => Path,
+    deleteRule: 'cascade',
   })
   path!: Path;
 }

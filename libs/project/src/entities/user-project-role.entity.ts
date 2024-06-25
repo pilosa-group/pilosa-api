@@ -18,11 +18,13 @@ export class UserProjectRole {
 
   @ManyToOne({
     entity: () => Project,
+    deleteRule: 'cascade',
   })
   public project: Project;
 
   @ManyToOne({
     entity: () => User,
+    deleteRule: 'cascade',
   })
   public user: User;
 }
