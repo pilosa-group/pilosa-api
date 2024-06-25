@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProjectModule } from '@app/project';
 import { validationSchema } from './config/validation.schema';
@@ -15,7 +15,7 @@ import { CloudMetricsModule } from '@app/cloud-metrics';
 import { HealthModule } from '@app/health';
 import { AuthModule } from '@app/auth';
 import { UserModule } from '@app/user';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import * as path from 'path';
 import { MetricsModule } from '@app/metrics';
@@ -36,6 +36,10 @@ const distSource = path.join(process.cwd(), 'dist');
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
     },
   ],
   imports: [

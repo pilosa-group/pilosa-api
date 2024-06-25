@@ -9,8 +9,10 @@ import {
 } from '@mikro-orm/core';
 import { AssetGroupStatistics } from '@app/web-metrics/entities/asset-group-statistics.entity';
 import { Path } from '@app/web-metrics/entities/path.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
+@Exclude()
 export class PathStatistics {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;

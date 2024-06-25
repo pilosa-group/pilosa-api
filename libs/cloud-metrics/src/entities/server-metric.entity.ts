@@ -1,7 +1,9 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
+@Exclude()
 export class ServerMetric {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;

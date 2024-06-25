@@ -10,8 +10,10 @@ import {
 import { BrowserMetric } from './browser-metric.entity';
 import { Project } from '@app/project/entities/project.entity';
 import { CrossOrigin } from '@app/web-metrics/entities/cross-origin.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
+@Exclude()
 export class FrontendApp {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
