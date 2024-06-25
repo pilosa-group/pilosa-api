@@ -55,7 +55,6 @@ type CompressedBytes = NumberOfBytes;
 type UncompressedBytes = NumberOfBytes;
 
 type CombinedPayload = {
-  l?: PageLoaded;
   f?: FirstPageLoad; // @deprecated
   m: 'd' | 'l';
   b: [CompressedBytes, UncompressedBytes];
@@ -65,6 +64,7 @@ type CombinedPayload = {
         [key: InitiatorType]: {
           [key: FileExtension]: {
             b: [CompressedBytes, UncompressedBytes];
+            l: PageLoaded;
             co: Origin[];
           };
         };
@@ -198,16 +198,19 @@ export class BeaconController {
                 Object.keys(
                   createBrowserMetricDto.d[domain][path][initiatorType],
                 ).forEach(async (extension) => {
-                  const { b: bytes, co: crossOrigins } =
-                    createBrowserMetricDto.d[domain][path][initiatorType][
-                      extension
-                    ];
+                  const {
+                    b: bytes,
+                    l: pageLoaded,
+                    co: crossOrigins,
+                  } = createBrowserMetricDto.d[domain][path][initiatorType][
+                    extension
+                  ];
 
                   const [bytesCompressed, bytesUncompressed] = bytes;
 
                   if (bytesCompressed > 0 || bytesUncompressed > 0) {
                     const metric: CreateBrowserMetricDto = {
-                      pageLoaded: createBrowserMetricDto.l,
+                      pageLoaded,
                       firstLoad: createBrowserMetricDto.f, // @deprecated
                       colorScheme:
                         createBrowserMetricDto.m === 'd'
