@@ -26,8 +26,11 @@ export class BrowserMetric {
   })
   time!: Date;
 
-  @Property()
-  firstLoad!: boolean;
+  @Property({ nullable: true })
+  firstLoad: boolean;
+
+  @Property({ nullable: true })
+  pageLoaded: boolean;
 
   @Enum(() => ColorScheme)
   colorScheme: ColorScheme = ColorScheme.Light;

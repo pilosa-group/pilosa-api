@@ -1,7 +1,8 @@
 import { ColorScheme } from '@app/web-metrics/entities/browser-metric.entity';
 
 export class CreateBrowserMetricDto {
-  firstLoad: boolean;
+  firstLoad: boolean; // @deprecated
+  pageLoaded: boolean;
   colorScheme: ColorScheme;
   bytesCompressed: number;
   bytesUncompressed: number;

@@ -42,10 +42,10 @@ export class AssetGroupStatistics {
   @Enum(() => AssetGroup)
   name!: AssetGroup;
 
-  @Property({ type: 'float' })
+  @Property({ type: 'int' })
   bytesUncompressed: number = 0;
 
-  @Property({ type: 'float' })
+  @Property({ type: 'int' })
   bytesCompressed: number = 0;
 
   @Property({ type: 'float' })
