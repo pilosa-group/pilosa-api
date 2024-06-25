@@ -29,6 +29,7 @@ export class ServerMetric {
 
   @ManyToOne({
     entity: () => ServerInstance,
+    deleteRule: 'cascade',
   })
   serverInstance: ServerInstance;
 }

@@ -14,6 +14,7 @@ import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity
 export class Path {
   @ManyToOne({
     primary: true,
+    deleteRule: 'cascade',
     entity: () => Domain,
   })
   domain: Domain;

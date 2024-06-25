@@ -39,6 +39,7 @@ export class CloudProviderAccount {
 
   @ManyToOne({
     entity: () => Project,
+    deleteRule: 'cascade',
   })
   project!: Project;
 

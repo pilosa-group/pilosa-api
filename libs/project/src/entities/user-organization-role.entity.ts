@@ -18,11 +18,13 @@ export class UserOrganizationRole {
 
   @ManyToOne({
     entity: () => Organization,
+    deleteRule: 'cascade',
   })
   organization!: Organization;
 
   @ManyToOne({
     entity: () => User,
+    deleteRule: 'cascade',
   })
   user: User;
 }

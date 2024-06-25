@@ -73,11 +73,13 @@ export class BrowserMetric {
 
   @ManyToOne({
     entity: () => FrontendApp,
+    deleteRule: 'cascade',
   })
   frontendApp!: FrontendApp;
 
   @ManyToMany({
     entity: () => PathStatistics,
+    deleteRule: 'cascade',
   })
   pathStatistics = new Collection<PathStatistics>(this);
 }

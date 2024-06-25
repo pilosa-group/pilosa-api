@@ -17,6 +17,7 @@ export class CrossOrigin {
 
   @ManyToOne({
     entity: () => FrontendApp,
+    deleteRule: 'cascade',
   })
   frontendApp!: FrontendApp;
 }

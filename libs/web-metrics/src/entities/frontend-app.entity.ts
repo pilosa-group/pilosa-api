@@ -30,6 +30,7 @@ export class FrontendApp {
 
   @ManyToOne({
     entity: () => Project,
+    deleteRule: 'cascade',
   })
   project: Project;
 
