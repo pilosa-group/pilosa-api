@@ -1,5 +1,4 @@
-type FirstPageLoad = boolean;
-type Timestamp = number;
+type PageLoaded = boolean;
 type InitiatorType = string;
 type Domain = string;
 type Path = string;
@@ -27,11 +26,11 @@ type Payload = {
   crossOrigin: string[];
   // extension
   extension: FileExtension;
+  // Whether the document has reached "load" state
+  pageLoaded: PageLoaded;
 };
 
 type CombinedPayload = {
-  f: FirstPageLoad;
-  t: Timestamp;
   b: [CompressedBytes, UncompressedBytes];
   m: Colorscheme;
   d: {
@@ -40,6 +39,7 @@ type CombinedPayload = {
         [key: InitiatorType]: {
           [key: FileExtension]: {
             b: [CompressedBytes, UncompressedBytes];
+            l: PageLoaded;
             co: Origin[];
           };
         };
@@ -77,7 +77,16 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
   };
 
   // whether this was the first page load
-  let firstPageLoad = true;
+  let pageLoaded = false;
+
+  window.addEventListener('load', () => {
+    console.log({ stateLoading: pageLoaded });
+    pageLoaded = true;
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    sendBeacon();
+  });
 
   const colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'd'
@@ -85,9 +94,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
 
   const sendBeacon = (): void => {
     const groupedPayloads: CombinedPayload = {
-      f: firstPageLoad,
       m: colorScheme,
-      t: Date.now(),
       b: [0, 0],
       d: {},
     };
@@ -96,6 +103,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
     const uncompressedKey = 1;
 
     for (const payload of payloads) {
+      const pageLoaded = payload.pageLoaded;
       const domain = payload.domain;
       const path = payload.path;
       const initiatorType = payload.initiatorType;
@@ -123,6 +131,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
       if (!groupedPayloads.d[domain][path][initiatorType][extension]) {
         groupedPayloads.d[domain][path][initiatorType][extension] = {
           b: [0, 0],
+          l: pageLoaded,
           co: [],
         };
       }
@@ -167,12 +176,8 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
 
     // reset for next batch
     payloads = [];
-    firstPageLoad = false;
+    pageLoaded = false;
   };
-
-  document.addEventListener('visibilitychange', () => {
-    sendBeacon();
-  });
 
   // Send the beacon after a certain amount of time
   const sendBeaconDebounced = debounce(
@@ -183,7 +188,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
   const observer = new PerformanceObserver((list) => {
     list.getEntries().map((entry: PerformanceResourceTiming) => {
       const domain = window.location.hostname;
-      const path = window.location.pathname + window.location.search;
+      const path = window.location.pathname;
 
       switch (entry.entryType) {
         case ENTRY_TYPE_RESOURCE: {
@@ -206,6 +211,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
           }
 
           const payload: Payload = {
+            pageLoaded,
             domain,
             path,
             compressed,

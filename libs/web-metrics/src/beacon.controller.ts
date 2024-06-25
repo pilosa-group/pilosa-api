@@ -11,7 +11,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
-
+import * as Sentry from '@sentry/node';
 import { UAParser } from 'ua-parser-js';
 import {
   CLIs,
@@ -43,8 +43,8 @@ function hashValue(value: string) {
 const FRONTEND_APP_ID = 'x-id';
 
 // TODO this is duplicated
-type FirstPageLoad = boolean;
-type Timestamp = number;
+type FirstPageLoad = boolean; // @deprecated
+type PageLoaded = boolean;
 type InitiatorType = string;
 type Domain = string;
 type Path = string;
@@ -55,8 +55,7 @@ type CompressedBytes = NumberOfBytes;
 type UncompressedBytes = NumberOfBytes;
 
 type CombinedPayload = {
-  f: FirstPageLoad;
-  t: Timestamp;
+  f?: FirstPageLoad; // @deprecated
   m: 'd' | 'l';
   b: [CompressedBytes, UncompressedBytes];
   d: {
@@ -65,6 +64,7 @@ type CombinedPayload = {
         [key: InitiatorType]: {
           [key: FileExtension]: {
             b: [CompressedBytes, UncompressedBytes];
+            l: PageLoaded;
             co: Origin[];
           };
         };
@@ -134,119 +134,135 @@ export class BeaconController {
     @Req() req: Request,
     @ClientIp() clientIp: string,
   ) {
-    const frontendAppId = req.headers[FRONTEND_APP_ID] as Project['id'];
+    try {
+      const frontendAppId = req.headers[FRONTEND_APP_ID] as Project['id'];
 
-    if (!frontendAppId || frontendAppId.length < 32) {
-      throw new BadRequestException('Invalid app id');
-    }
+      if (!frontendAppId || frontendAppId.length < 32) {
+        throw new BadRequestException('Invalid app id');
+      }
 
-    const frontendApp =
-      await this.frontendAppService.findOneById(frontendAppId);
+      const frontendApp =
+        await this.frontendAppService.findOneById(frontendAppId);
 
-    if (!frontendApp) {
-      throw new ForbiddenException(`App ${frontendAppId} not found`);
-    }
+      if (!frontendApp) {
+        throw new ForbiddenException(`App ${frontendAppId} not found`);
+      }
 
-    if (!req.headers['referer']) {
-      throw new BadRequestException('Missing referer');
-    }
+      if (!req.headers['referer']) {
+        throw new BadRequestException('Missing referer');
+      }
 
-    const url = new URL(req.headers['referer'] as string);
+      const url = new URL(req.headers['referer'] as string);
 
-    const isAllowed =
-      frontendApp.urls?.includes(url.hostname) ||
-      frontendApp.urls?.includes('*');
+      const isAllowed =
+        frontendApp.urls?.includes(url.hostname) ||
+        frontendApp.urls?.includes('*');
 
-    if (!isAllowed) {
-      throw new ForbiddenException('Invalid domain');
-    }
+      if (!isAllowed) {
+        throw new ForbiddenException(`Invalid domain ${url.hostname}`);
+      }
 
-    const userAgentParser = new UAParser(req.headers['user-agent'] as string, [
-      Crawlers,
-      CLIs,
-      Emails,
-      ExtraDevices,
-      InApps,
-      Fetchers,
-      MediaPlayers,
-      Modules,
-    ]);
-    const userAgent = userAgentParser.getResult();
-    const deviceType = userAgent.device?.type || 'desktop';
-    const device = userAgent.device.model ? userAgent.device.toString() : null;
-    const os = userAgent.os ? userAgent.os.toString() : null;
-    const browser = userAgent.browser.name
-      ? userAgent.browser.toString()
-      : null;
-    const cpu = userAgent.cpu?.architecture ? userAgent.cpu.architecture : null;
+      const userAgentParser = new UAParser(
+        req.headers['user-agent'] as string,
+        [
+          Crawlers,
+          CLIs,
+          Emails,
+          ExtraDevices,
+          InApps,
+          Fetchers,
+          MediaPlayers,
+          Modules,
+        ],
+      );
+      const userAgent = userAgentParser.getResult();
+      const deviceType = userAgent.device?.type || 'desktop';
+      const device = userAgent.device.model
+        ? userAgent.device.toString()
+        : null;
+      const os = userAgent.os ? userAgent.os.toString() : null;
+      const browser = userAgent.browser.name
+        ? userAgent.browser.toString()
+        : null;
+      const cpu = userAgent.cpu?.architecture
+        ? userAgent.cpu.architecture
+        : null;
 
-    const visitor = hashValue(`${clientIp}${userAgent}`);
+      const visitor = hashValue(`${clientIp}${userAgent}`);
 
-    Object.keys(createBrowserMetricDto.d).forEach((domain) => {
-      Object.keys(createBrowserMetricDto.d[domain]).forEach((path) => {
-        Object.keys(createBrowserMetricDto.d[domain][path]).forEach(
-          (initiatorType) => {
-            if (isValidInitiatorType(initiatorType)) {
-              Object.keys(
-                createBrowserMetricDto.d[domain][path][initiatorType],
-              ).forEach(async (extension) => {
-                const { b: bytes, co: crossOrigins } =
-                  createBrowserMetricDto.d[domain][path][initiatorType][
+      Object.keys(createBrowserMetricDto.d).forEach((domain) => {
+        Object.keys(createBrowserMetricDto.d[domain]).forEach((path) => {
+          Object.keys(createBrowserMetricDto.d[domain][path]).forEach(
+            (initiatorType) => {
+              if (isValidInitiatorType(initiatorType)) {
+                Object.keys(
+                  createBrowserMetricDto.d[domain][path][initiatorType],
+                ).forEach(async (extension) => {
+                  const {
+                    b: bytes,
+                    l: pageLoaded,
+                    co: crossOrigins,
+                  } = createBrowserMetricDto.d[domain][path][initiatorType][
                     extension
                   ];
 
-                const [bytesCompressed, bytesUncompressed] = bytes;
+                  const [bytesCompressed, bytesUncompressed] = bytes;
 
-                if (bytesCompressed > 0 || bytesUncompressed > 0) {
-                  const metric: CreateBrowserMetricDto = {
-                    firstLoad: createBrowserMetricDto.f,
-                    colorScheme:
-                      createBrowserMetricDto.m === 'd'
-                        ? ColorScheme.Dark
-                        : ColorScheme.Light,
-                    domain,
-                    path,
-                    initiatorType,
-                    extension: nullableExtensions.includes(extension)
-                      ? null
-                      : extension,
-                    bytesCompressed,
-                    bytesUncompressed,
-                    cpu,
-                    browser,
-                    deviceType,
-                    device,
-                    os,
-                    visitor,
-                  };
+                  if (bytesCompressed > 0 || bytesUncompressed > 0) {
+                    const metric: CreateBrowserMetricDto = {
+                      pageLoaded,
+                      firstLoad: createBrowserMetricDto.f, // @deprecated
+                      colorScheme:
+                        createBrowserMetricDto.m === 'd'
+                          ? ColorScheme.Dark
+                          : ColorScheme.Light,
+                      domain,
+                      path,
+                      initiatorType,
+                      extension: nullableExtensions.includes(extension)
+                        ? null
+                        : extension,
+                      bytesCompressed,
+                      bytesUncompressed,
+                      cpu,
+                      browser,
+                      deviceType,
+                      device,
+                      os,
+                      visitor,
+                    };
 
-                  // Cached page when EXACTLY 300 bytes?
-                  if (
-                    bytesCompressed === 0 &&
-                    bytesUncompressed === 300 &&
-                    initiatorType === 'fetch'
-                  ) {
-                    return;
+                    // Cached page when EXACTLY 300 bytes?
+                    if (
+                      bytesCompressed === 0 &&
+                      bytesUncompressed === 300 &&
+                      initiatorType === 'fetch'
+                    ) {
+                      return;
+                    }
+
+                    const browserMetric =
+                      await this.browserMetricService.create(
+                        metric,
+                        frontendApp,
+                      );
+
+                    void this.browserMetricService.save(browserMetric);
                   }
 
-                  const browserMetric = await this.browserMetricService.create(
-                    metric,
-                    frontendApp,
-                  );
-
-                  void this.browserMetricService.save(browserMetric);
-                }
-
-                if (crossOrigins.length) {
-                  // TODO store this in backend, so we can tell the client to add these to the CORS policy
-                  // console.log(initiatorType, extension, crossOrigins);
-                }
-              });
-            }
-          },
-        );
+                  if (crossOrigins.length) {
+                    // TODO store this in backend, so we can tell the client to add these to the CORS policy
+                    // console.log(initiatorType, extension, crossOrigins);
+                  }
+                });
+              }
+            },
+          );
+        });
       });
-    });
+    } catch (error) {
+      Sentry.captureException(error);
+    }
 
     return null;
   }
