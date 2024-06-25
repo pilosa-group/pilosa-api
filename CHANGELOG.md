@@ -1,3 +1,18 @@
+# [1.9.0](https://github.com/pilosa-group/pilosa-api/compare/v1.8.4...v1.9.0) (2024-06-25)
+
+
+### Bug Fixes
+
+* don't break cron when scanning fails ([a1644e1](https://github.com/pilosa-group/pilosa-api/commit/a1644e16f54dbb8604f0643eef5bb89ab7123e20))
+* process pageLoaded per payload ([037fc4a](https://github.com/pilosa-group/pilosa-api/commit/037fc4a72fbb6498c36ccebb75bff59009f9b088))
+
+
+### Features
+
+* cache frontend app fetch for 1 minute ([28df126](https://github.com/pilosa-group/pilosa-api/commit/28df12675389ebc88e5dcdf83b9b80e27aea832b))
+* don't include query params ([b022e1c](https://github.com/pilosa-group/pilosa-api/commit/b022e1c2f2c2606ab7a015b357bf676557e45383))
+* store pageload + change a few properties from float to int ([bdabaa6](https://github.com/pilosa-group/pilosa-api/commit/bdabaa62cc9c49fa1190610504648638698589a8))
+
 ## [1.8.4](https://github.com/pilosa-group/pilosa-api/compare/v1.8.3...v1.8.4) (2024-06-19)
 
 
