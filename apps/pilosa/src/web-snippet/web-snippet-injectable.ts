@@ -188,7 +188,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
   const observer = new PerformanceObserver((list) => {
     list.getEntries().map((entry: PerformanceResourceTiming) => {
       const domain = window.location.hostname;
-      const path = window.location.pathname + window.location.search;
+      const path = window.location.pathname;
 
       switch (entry.entryType) {
         case ENTRY_TYPE_RESOURCE: {
