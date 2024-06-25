@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/pilosa-group/pilosa-api/compare/v1.9.0...v1.9.1) (2024-06-25)
+
+
+### Bug Fixes
+
+* add delete rule for ManyToOne relations ([4da9554](https://github.com/pilosa-group/pilosa-api/commit/4da9554c75563c100f0fa6c9882bbc29bc76e150))
+
 # [1.9.0](https://github.com/pilosa-group/pilosa-api/compare/v1.8.4...v1.9.0) (2024-06-25)
 
 
