@@ -15,7 +15,7 @@ export class FrontendAppService {
     return this.frontendAppRepository.findOne(
       { id },
       {
-        cache: 60 * 5, // 5 minutes
+        cache: 60 * 1000, // 1 minute
       },
     );
   }
