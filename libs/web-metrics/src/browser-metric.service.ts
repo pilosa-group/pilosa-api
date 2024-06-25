@@ -4,6 +4,15 @@ import { FrontendApp } from './entities/frontend-app.entity';
 import { BrowserMetric } from './entities/browser-metric.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, wrap } from '@mikro-orm/postgresql';
+import { MetricPeriod } from '@app/cloud/enum/metric-period.enum';
+import * as bytes from 'bytes';
+
+export interface PeriodMetric {
+  period: Date;
+  count: number;
+  bytes: number;
+  bytesFormatted: string;
+}
 
 @Injectable()
 export class BrowserMetricService {
@@ -35,43 +44,55 @@ export class BrowserMetricService {
     const [result] = await this.browserMetricRepository
       .getEntityManager()
       .getConnection()
-      .execute<[{ domain: string; clean_path: string }]>(
-        `SELECT bm.domain, SUBSTRING(bm.path, 1, COALESCE(NULLIF(POSITION('?' IN bm.path), 0) - 1, LENGTH(bm.path))) AS clean_path, count(bm) as visits,COUNT(DISTINCT ps.id)
+      .execute<[{ domain: string; path: string }]>(
+        `SELECT bm.domain, path, count(bm) as visits, COUNT(DISTINCT ps.id)
          FROM browser_metric bm
-                  LEFT JOIN path_statistics ps ON ps.path_domain = bm.domain AND ps.path_path = SUBSTRING(bm.path, 1, COALESCE(NULLIF(POSITION('?' IN bm.path), 0) - 1, LENGTH(bm.path)))
+                  LEFT JOIN path_statistics ps ON ps.path_domain = bm.domain AND ps.path_path = path
 
          WHERE bm."firstLoad" = true
-         GROUP BY bm.domain, clean_path
-         HAVING COUNT(DISTINCT ps.id) = 0 AND COUNT(bm) > 200
+         GROUP BY bm.domain, path
+         HAVING COUNT(DISTINCT ps.id) = 0
+            AND COUNT(bm) > 150
          ORDER BY visits DESC`,
       );
 
-    return `https://${result.domain}${result.clean_path}`;
+    return `https://${result.domain}${result.path}`;
   }
 
-  // async findAllByFrontendApp(
-  //   frontendApp: FrontendApp,
-  // ): Promise<BrowserMetric[]> {
-  //   return this.browserMetricRepository
-  //     .createQueryBuilder('bm')
-  //     .where('bm.frontendAppId = :frontendAppId', {
-  //       frontendAppId: frontendApp.id,
-  //     })
-  //     .getMany();
-  // }
-  //
-  // async getMetricsByPeriod(): Promise<ServerMetric[]> {
-  //   return this.browserMetricRepository.manager
-  //     .query(`SELECT time_bucket('1 minutes', time) AS bucket,
-  //
-  //    COUNT(*),
-  //    AVG(bytes) AS bytes,
-  //      AVG("bytesCached") AS bytesCached,
-  //      AVG("accuracy") AS accuracy
-  //
-  //    FROM browser_metric
-  //
-  //    GROUP BY bucket
-  //    ORDER BY bucket DESC`);
-  // }
+  async findByFrontendApp(
+    frontendApp: FrontendApp['id'],
+    {
+      period = MetricPeriod.DAY,
+      limit = 100,
+      offset = 0,
+    }: { period: MetricPeriod; limit?: number; offset?: number },
+  ): Promise<PeriodMetric[]> {
+    const metrics = await this.browserMetricRepository
+      .getEntityManager()
+      .getConnection()
+      .execute<Omit<PeriodMetric, 'bytesFormatted'>[]>(
+        `SELECT time_bucket(?, time) AS period,
+
+                COUNT(*),
+                SUM("bytesCompressed") + SUM("bytesUncompressed") AS bytes
+
+         FROM browser_metric
+
+         WHERE "frontendApp" = ?
+         GROUP BY period
+         ORDER BY period DESC
+         LIMIT ? OFFSET ?
+        `,
+        [period, frontendApp, limit, offset] as any,
+      );
+
+    console.log(metrics[0].bytes);
+
+    return metrics.map((metric: any) => ({
+      period: metric.period,
+      count: metric.count,
+      bytes: metric.bytes,
+      bytesFormatted: bytes(metric.bytes),
+    }));
+  }
 }
