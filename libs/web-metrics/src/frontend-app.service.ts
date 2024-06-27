@@ -20,7 +20,9 @@ export class FrontendAppService {
     );
   }
 
-  async findAllByProject(project: Project): Promise<FrontendApp[]> {
+  async findByProject(
+    project: Project | Project['id'],
+  ): Promise<FrontendApp[]> {
     return this.frontendAppRepository.find({
       project,
     });

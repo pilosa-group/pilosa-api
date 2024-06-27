@@ -10,12 +10,13 @@ import {
 import { BrowserMetric } from './browser-metric.entity';
 import { Project } from '@app/project/entities/project.entity';
 import { CrossOrigin } from '@app/web-metrics/entities/cross-origin.entity';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 @Entity()
 @Exclude()
 export class FrontendApp {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  @Expose()
   id: string;
 
   @Property()
@@ -25,9 +26,11 @@ export class FrontendApp {
   updatedAt?: Date;
 
   @Property()
+  @Expose()
   name!: string;
 
   @Property()
+  @Expose()
   urls!: string[];
 
   @ManyToOne({

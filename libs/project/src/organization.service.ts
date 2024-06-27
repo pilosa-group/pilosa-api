@@ -10,6 +10,14 @@ export class OrganizationService {
     private organizationRepository: EntityRepository<Organization>,
   ) {}
 
+  async findAll(): Promise<Organization[]> {
+    return this.organizationRepository.findAll();
+  }
+
+  async findOne(id: string): Promise<Organization | null> {
+    return this.organizationRepository.findOne({ id });
+  }
+
   // async findByUserRole(
   //   userOrganizationRole: UserOrganizationRole,
   // ): Promise<Organization> {

@@ -15,9 +15,14 @@ import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.s
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
 import { PageScannerService } from '@app/web-metrics/page-scanner.service';
 import { SyntheticScanModule } from '@app/synthetic-scan';
+import { FrontendAppsController } from '@app/web-metrics/controllers/frontend-apps.controller';
 
 @Module({
-  controllers: [BeaconController, BrowserMetricsController],
+  controllers: [
+    BeaconController,
+    BrowserMetricsController,
+    FrontendAppsController,
+  ],
   providers: [
     BrowserMetricDomainService,
     BrowserMetricPathService,

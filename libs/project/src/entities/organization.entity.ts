@@ -7,12 +7,13 @@ import {
 } from '@mikro-orm/core';
 import { Project } from '@app/project/entities/project.entity';
 import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 @Entity()
 @Exclude()
 export class Organization {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  @Expose()
   id: string;
 
   @Property()
@@ -22,6 +23,7 @@ export class Organization {
   updatedAt?: Date;
 
   @Property()
+  @Expose()
   name: string;
 
   @OneToMany(() => Project, (project: Project) => project.organization)

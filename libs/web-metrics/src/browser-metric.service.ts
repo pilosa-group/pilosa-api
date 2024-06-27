@@ -4,18 +4,19 @@ import { FrontendApp } from './entities/frontend-app.entity';
 import { BrowserMetric } from './entities/browser-metric.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, wrap } from '@mikro-orm/postgresql';
-import { MetricPeriod } from '@app/cloud/enum/metric-period.enum';
+import {
+  MetricPeriod,
+  MetricPeriodValue,
+} from '@app/cloud/enum/metric-period.enum';
 import * as bytes from 'bytes';
-
-export interface PeriodMetric {
-  period: Date;
-  count: number;
-  bytes: number;
-  bytesFormatted: string;
-}
+import { PaginatorResult } from '@app/web-metrics/browser-metrics.controller';
+import { CarbonEmissionMetric } from '@app/web-metrics/dto/carbon-emission-metric.dto';
+import { co2 } from '@tgwf/co2';
 
 @Injectable()
 export class BrowserMetricService {
+  private co2Emission = new co2({ results: 'segment' });
+
   constructor(
     @InjectRepository(BrowserMetric)
     private browserMetricRepository: EntityRepository<BrowserMetric>,
@@ -66,33 +67,34 @@ export class BrowserMetricService {
       limit = 100,
       offset = 0,
     }: { period: MetricPeriod; limit?: number; offset?: number },
-  ): Promise<PeriodMetric[]> {
-    const metrics = await this.browserMetricRepository
+  ): Promise<PaginatorResult<CarbonEmissionMetric>> {
+    const query = `SELECT time_bucket(?, time)                              as period,
+           SUM("bytesCompressed") + SUM("bytesUncompressed") as bytes
+    FROM browser_metric
+    WHERE "frontendApp" = ?
+    GROUP BY period
+    ORDER BY period ASC`;
+
+    const result = await this.browserMetricRepository
       .getEntityManager()
       .getConnection()
-      .execute<Omit<PeriodMetric, 'bytesFormatted'>[]>(
-        `SELECT time_bucket(?, time) AS period,
+      .execute(query, [period, frontendApp]);
 
-                COUNT(*),
-                SUM("bytesCompressed") + SUM("bytesUncompressed") AS bytes
-
-         FROM browser_metric
-
-         WHERE "frontendApp" = ?
-         GROUP BY period
-         ORDER BY period DESC
-         LIMIT ? OFFSET ?
-        `,
-        [period, frontendApp, limit, offset] as any,
-      );
-
-    console.log(metrics[0].bytes);
-
-    return metrics.map((metric: any) => ({
-      period: metric.period,
-      count: metric.count,
-      bytes: metric.bytes,
-      bytesFormatted: bytes(metric.bytes),
-    }));
+    return {
+      items: result.map(
+        (metric) =>
+          new CarbonEmissionMetric({
+            period: metric.period as unknown as MetricPeriodValue,
+            co2: this.co2Emission.perByte(metric.bytes, true),
+            bytes: metric.bytes,
+            bytesFormatted: bytes.format(metric.bytes, { unitSeparator: ' ' }),
+          }),
+      ),
+      pagination: {
+        limit,
+        offset,
+        total: result.length,
+      },
+    };
   }
 }

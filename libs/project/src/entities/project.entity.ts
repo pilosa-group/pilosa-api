@@ -10,12 +10,13 @@ import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 import { Organization } from '@app/project/entities/organization.entity';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 @Entity()
 @Exclude()
 export class Project {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  @Expose()
   id: string;
 
   @Property()
@@ -25,6 +26,7 @@ export class Project {
   updatedAt?: Date;
 
   @Property()
+  @Expose()
   name!: string;
 
   @ManyToOne({

@@ -10,8 +10,11 @@ import { WebMetricsModule } from '@app/web-metrics';
 import { CloudModule } from '@app/cloud';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Organization } from '@app/project/entities/organization.entity';
+import { OrganizationsController } from '@app/project/controllers/organizations.controller';
+import { ProjectsController } from '@app/project/controllers/projects.controller';
 
 @Module({
+  controllers: [OrganizationsController, ProjectsController],
   providers: [
     UserProjectRoleService,
     UserOrganizationRoleService,
