@@ -26,12 +26,13 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Migrator } from '@mikro-orm/migrations';
 import { CustomNamingStrategy } from './config/custom-naming.strategy';
+import { RobotsController } from './controllers/robots.controller';
 
 const srcRoot = path.join(process.cwd(), 'src');
 const distSource = path.join(process.cwd(), 'dist');
 
 @Module({
-  controllers: [IndexController],
+  controllers: [IndexController, RobotsController],
   providers: [
     {
       provide: APP_GUARD,
