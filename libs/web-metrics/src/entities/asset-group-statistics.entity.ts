@@ -1,7 +1,6 @@
 import { Property, Entity, ManyToOne, PrimaryKey, Enum } from '@mikro-orm/core';
 import { Domain } from '@app/web-metrics/entities/domain.entity';
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
-import { Exclude } from 'class-transformer';
 
 export enum AssetGroup {
   Images = 'images',
@@ -30,7 +29,6 @@ export const assetGroups: Record<string, string[]> = {
 export const assetGroupKeys = Object.keys(assetGroups) as AssetGroup[];
 
 @Entity()
-@Exclude()
 export class AssetGroupStatistics {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;

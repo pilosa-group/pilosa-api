@@ -7,10 +7,9 @@ import {
 } from '@mikro-orm/core';
 import { Project } from '@app/project/entities/project.entity';
 import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
-import { Exclude, Expose } from 'class-transformer';
+import { Expose } from 'class-transformer';
 
 @Entity()
-@Exclude()
 export class Organization {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   @Expose()

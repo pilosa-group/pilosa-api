@@ -9,10 +9,8 @@ import {
 import { CloudProviderAccount } from './cloud-provider-account.entity';
 import { InstanceTag } from '../cloud-provider-instance-list.interface';
 import { ServerMetric } from '@app/cloud-metrics/entities/server-metric.entity';
-import { Exclude } from 'class-transformer';
 
 @Entity()
-@Exclude()
 export class ServerInstance {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;

@@ -7,10 +7,8 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { Path } from '@app/web-metrics/entities/path.entity';
-import { Exclude } from 'class-transformer';
 
 @Entity()
-@Exclude()
 export class Domain {
   @PrimaryKey({ type: 'string', unique: true })
   fqdn: string;

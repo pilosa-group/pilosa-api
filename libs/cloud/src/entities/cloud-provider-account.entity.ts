@@ -10,10 +10,8 @@ import {
 import { ServerInstance } from './service-instance.entity';
 import { Project } from '@app/project/entities/project.entity';
 import { CloudProvider } from '@app/cloud/enum/cloud-provider.enum';
-import { Exclude } from 'class-transformer';
 
 @Entity()
-@Exclude()
 export class CloudProviderAccount {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;

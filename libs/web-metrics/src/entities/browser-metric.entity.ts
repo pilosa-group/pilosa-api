@@ -9,7 +9,7 @@ import {
 } from '@mikro-orm/core';
 import { FrontendApp } from './frontend-app.entity';
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
-import { Exclude, Expose } from 'class-transformer';
+import { Expose } from 'class-transformer';
 
 export enum ColorScheme {
   Dark = 'dark',
@@ -17,7 +17,6 @@ export enum ColorScheme {
 }
 
 @Entity()
-@Exclude()
 export class BrowserMetric {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;

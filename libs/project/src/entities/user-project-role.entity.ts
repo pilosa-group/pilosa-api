@@ -7,10 +7,8 @@ import {
 } from '@mikro-orm/core';
 import { Project } from '@app/project/entities/project.entity';
 import { User } from '@app/user/entities/user.entity';
-import { Exclude } from 'class-transformer';
 
 @Entity({ tableName: 'project_to_user' })
-@Exclude()
 export class UserProjectRole {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;

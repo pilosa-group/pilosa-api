@@ -9,10 +9,8 @@ import {
 } from '@mikro-orm/core';
 import { Domain } from '@app/web-metrics/entities/domain.entity';
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
-import { Exclude } from 'class-transformer';
 
 @Entity()
-@Exclude()
 export class Path {
   @ManyToOne({
     primary: true,

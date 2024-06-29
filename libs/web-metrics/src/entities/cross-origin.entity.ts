@@ -1,9 +1,7 @@
 import { PrimaryKey, Entity, ManyToOne, Property } from '@mikro-orm/core';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
-import { Exclude } from 'class-transformer';
 
 @Entity()
-@Exclude()
 export class CrossOrigin {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
