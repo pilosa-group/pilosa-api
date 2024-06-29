@@ -12,6 +12,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Organization } from '@app/project/entities/organization.entity';
 import { OrganizationsController } from '@app/project/controllers/organizations.controller';
 import { ProjectsController } from '@app/project/controllers/projects.controller';
+import { ApiModule } from '@app/api';
 
 @Module({
   controllers: [OrganizationsController, ProjectsController],
@@ -29,6 +30,7 @@ import { ProjectsController } from '@app/project/controllers/projects.controller
   imports: [
     WebMetricsModule,
     CloudModule,
+    ApiModule,
     MikroOrmModule.forFeature([
       Project,
       Organization,

@@ -5,9 +5,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Public } from '@app/auth/decorators/public.decorator';
 import { Response } from 'express';
+import { ApiExcludeController } from '@nestjs/swagger';
 
 const readFile = util.promisify(fs.readFile);
 
+@ApiExcludeController()
 @Controller('sloth.js')
 export class WebSnippetController {
   @Get()

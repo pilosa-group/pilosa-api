@@ -1,33 +1,34 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { OrganizationService } from '@app/project/organization.service';
 import { Organization } from '@app/project/entities/organization.entity';
-import {
-  PaginatorInput,
-  PaginatorResult,
-} from '@app/web-metrics/browser-metrics.controller';
+import { PaginatorService } from '@app/api';
+import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
+import { PaginatorDto } from '@app/api/paginator.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('Organizations')
 @Controller('organizations')
 export class OrganizationsController {
-  constructor(private organizationService: OrganizationService) {}
+  constructor(
+    private organizationService: OrganizationService,
+    private paginatorService: PaginatorService,
+  ) {}
 
   @Get('/')
   async getAllOrganizations(
-    @Query() { limit = 100, offset = 0 }: PaginatorInput,
-  ): Promise<PaginatorResult<Organization>> {
-    const organizations = await this.organizationService.findAll();
-
-    return {
-      items: organizations,
-      pagination: {
-        total: organizations.length,
-        limit,
-        offset,
-      },
-    };
+    @Query() paginatorOptions: PaginatorOptionsDto,
+  ): Promise<PaginatorDto<Organization>> {
+    return this.paginatorService.findAll<Organization>(
+      Organization.name,
+      paginatorOptions,
+    );
   }
 
   @Get('/:id')
-  async getOrganization(@Param('id') id: string): Promise<Organization> {
+  async getOrganization(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Organization> {
     return this.organizationService.findOne(id);
   }
 }

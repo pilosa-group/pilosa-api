@@ -16,6 +16,7 @@ import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity
 import { PageScannerService } from '@app/web-metrics/page-scanner.service';
 import { SyntheticScanModule } from '@app/synthetic-scan';
 import { FrontendAppsController } from '@app/web-metrics/controllers/frontend-apps.controller';
+import { ApiModule } from '@app/api';
 
 @Module({
   controllers: [
@@ -32,6 +33,7 @@ import { FrontendAppsController } from '@app/web-metrics/controllers/frontend-ap
   ],
   imports: [
     ConfigModule,
+    ApiModule,
     MikroOrmModule.forFeature([
       BrowserMetric,
       AssetGroupStatistics,

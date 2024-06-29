@@ -1,6 +1,8 @@
 import { Controller, Get, HttpStatus, Redirect } from '@nestjs/common';
 import { Public } from '@app/auth/decorators/public.decorator';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller({
   version: '',
 })

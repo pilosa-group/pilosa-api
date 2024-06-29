@@ -32,6 +32,7 @@ import { Public } from '@app/auth/decorators/public.decorator';
 import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
 import * as crypto from 'crypto';
 import { ColorScheme } from '@app/web-metrics/entities/browser-metric.entity';
+import { ApiTags } from '@nestjs/swagger';
 
 function hashValue(value: string) {
   const salt = new Date().toISOString().split('T')[0];
@@ -101,6 +102,7 @@ const isValidInitiatorType = (initiatorType: string): boolean =>
   ].includes(initiatorType);
 
 @Controller('beacon')
+@ApiTags('Beacon')
 export class BeaconController {
   constructor(
     private frontendAppService: FrontendAppService,

@@ -1,11 +1,13 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { Public } from '@app/auth/decorators/public.decorator';
 import { SyntheticScanService } from '@app/synthetic-scan/synthetic-scan.service';
+import { ApiTags } from '@nestjs/swagger';
 
 type ScanPayload = {
   url: string;
 };
 
+@ApiTags('Quick Scan')
 @Controller('synthetic-scan')
 export class SyntheticScanController {
   constructor(private syntheticScanService: SyntheticScanService) {}

@@ -15,7 +15,7 @@ import { CloudMetricsModule } from '@app/cloud-metrics';
 import { HealthModule } from '@app/health';
 import { AuthModule } from '@app/auth';
 import { UserModule } from '@app/user';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import * as path from 'path';
 import { MetricsModule } from '@app/metrics';
@@ -39,7 +39,12 @@ const distSource = path.join(process.cwd(), 'dist');
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: ClassSerializerInterceptor,
+      inject: [Reflector],
+      useFactory: (reflector: Reflector) =>
+        new ClassSerializerInterceptor(reflector, {
+          strategy: 'excludeAll',
+          excludeExtraneousValues: true,
+        }),
     },
   ],
   imports: [

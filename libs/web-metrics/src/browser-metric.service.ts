@@ -9,9 +9,9 @@ import {
   MetricPeriodValue,
 } from '@app/cloud/enum/metric-period.enum';
 import * as bytes from 'bytes';
-import { PaginatorResult } from '@app/web-metrics/browser-metrics.controller';
 import { CarbonEmissionMetric } from '@app/web-metrics/dto/carbon-emission-metric.dto';
 import { co2 } from '@tgwf/co2';
+import { PaginatorDto } from '@app/api/paginator.dto';
 
 @Injectable()
 export class BrowserMetricService {
@@ -67,34 +67,35 @@ export class BrowserMetricService {
       limit = 100,
       offset = 0,
     }: { period: MetricPeriod; limit?: number; offset?: number },
-  ): Promise<PaginatorResult<CarbonEmissionMetric>> {
+  ): Promise<PaginatorDto<CarbonEmissionMetric>> {
     const query = `SELECT time_bucket(?, time)                              as period,
            SUM("bytesCompressed") + SUM("bytesUncompressed") as bytes
     FROM browser_metric
     WHERE "frontendApp" = ?
     GROUP BY period
-    ORDER BY period ASC`;
+    ORDER BY period ASC
+     LIMIT ? OFFSET ?
+    `;
 
     const result = await this.browserMetricRepository
       .getEntityManager()
       .getConnection()
-      .execute(query, [period, frontendApp]);
+      .execute(query, [period, frontendApp, limit, offset]);
 
-    return {
-      items: result.map(
-        (metric) =>
-          new CarbonEmissionMetric({
-            period: metric.period as unknown as MetricPeriodValue,
-            co2: this.co2Emission.perByte(metric.bytes, true),
-            bytes: metric.bytes,
-            bytesFormatted: bytes.format(metric.bytes, { unitSeparator: ' ' }),
-          }),
-      ),
-      pagination: {
+    return new PaginatorDto<CarbonEmissionMetric>(
+      result.map((metric) => {
+        return new CarbonEmissionMetric({
+          period: metric.period as unknown as MetricPeriodValue,
+          co2: (this.co2Emission.perByte(metric.bytes) as any).total,
+          bytes: metric.bytes,
+          bytesFormatted: bytes.format(metric.bytes, { unitSeparator: ' ' }),
+        });
+      }),
+      {
         limit,
         offset,
         total: result.length,
       },
-    };
+    );
   }
 }
