@@ -15,9 +15,15 @@ import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.s
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
 import { PageScannerService } from '@app/web-metrics/page-scanner.service';
 import { SyntheticScanModule } from '@app/synthetic-scan';
+import { FrontendAppsController } from '@app/web-metrics/controllers/frontend-apps.controller';
+import { ApiModule } from '@app/api';
 
 @Module({
-  controllers: [BeaconController, BrowserMetricsController],
+  controllers: [
+    BeaconController,
+    BrowserMetricsController,
+    FrontendAppsController,
+  ],
   providers: [
     BrowserMetricDomainService,
     BrowserMetricPathService,
@@ -27,6 +33,7 @@ import { SyntheticScanModule } from '@app/synthetic-scan';
   ],
   imports: [
     ConfigModule,
+    ApiModule,
     MikroOrmModule.forFeature([
       BrowserMetric,
       AssetGroupStatistics,

@@ -9,6 +9,7 @@ import {
 } from '@mikro-orm/core';
 import { FrontendApp } from './frontend-app.entity';
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
+import { Expose } from 'class-transformer';
 
 export enum ColorScheme {
   Dark = 'dark',
@@ -24,6 +25,7 @@ export class BrowserMetric {
     type: 'timestamptz',
     defaultRaw: 'CURRENT_TIMESTAMP',
   })
+  @Expose()
   time!: Date;
 
   @Property({ nullable: true })

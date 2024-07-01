@@ -1,17 +1,15 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 import { ServerInstanceService } from './server-instance.service';
-import { Project } from '@app/project/entities/project.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-type GetAllParams = {
-  projectId: Project['id'];
-};
-
+@ApiBearerAuth()
+@ApiTags('Infrastructure')
 @Controller('servers/:projectId')
 export class ServersController {
   constructor(private serverInstance: ServerInstanceService) {}
 
   @Get()
-  async getAll(@Param() { projectId }: GetAllParams) {
+  async getAll(@Param('organizationId', ParseUUIDPipe) projectId: string) {
     return this.serverInstance.findAllByProject(projectId);
   }
 }

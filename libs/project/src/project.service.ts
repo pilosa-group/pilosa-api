@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Project } from '@app/project/entities/project.entity';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
+import { Organization } from '@app/project/entities/organization.entity';
 
 @Injectable()
 export class ProjectService {
@@ -9,6 +10,16 @@ export class ProjectService {
     @InjectRepository(Project)
     private projectRepository: EntityRepository<Project>,
   ) {}
+
+  findAll(organization: Organization | Organization['id']): Promise<Project[]> {
+    return this.projectRepository.find({
+      organization,
+    });
+  }
+
+  findOne(id: string): Promise<Project | null> {
+    return this.projectRepository.findOne({ id });
+  }
 
   // async findByUserRole(userProjectRole: UserProjectRole): Promise<Project> {
   //   return this.projectRepository.findOne(

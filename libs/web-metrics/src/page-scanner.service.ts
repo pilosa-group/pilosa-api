@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { CreateRequestContext } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/core';
@@ -8,6 +8,8 @@ import * as Sentry from '@sentry/node';
 
 @Injectable()
 export class PageScannerService {
+  private readonly logger = new Logger(PageScannerService.name);
+
   private isRunning = false;
 
   constructor(
@@ -27,7 +29,7 @@ export class PageScannerService {
 
     const url = await this.browserMetricService.findUnscannedPaths();
 
-    console.log('scanning', url);
+    this.logger.log('Scanning', { url });
 
     try {
       await this.syntheticScanService.run(url, {

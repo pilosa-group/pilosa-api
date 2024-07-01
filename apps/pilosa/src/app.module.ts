@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProjectModule } from '@app/project';
 import { validationSchema } from './config/validation.schema';
@@ -15,7 +15,7 @@ import { CloudMetricsModule } from '@app/cloud-metrics';
 import { HealthModule } from '@app/health';
 import { AuthModule } from '@app/auth';
 import { UserModule } from '@app/user';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard';
 import * as path from 'path';
 import { MetricsModule } from '@app/metrics';
@@ -26,16 +26,26 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Migrator } from '@mikro-orm/migrations';
 import { CustomNamingStrategy } from './config/custom-naming.strategy';
+import { RobotsController } from './controllers/robots.controller';
 
 const srcRoot = path.join(process.cwd(), 'src');
 const distSource = path.join(process.cwd(), 'dist');
 
 @Module({
-  controllers: [IndexController],
+  controllers: [IndexController, RobotsController],
   providers: [
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      inject: [Reflector],
+      useFactory: (reflector: Reflector) =>
+        new ClassSerializerInterceptor(reflector, {
+          strategy: 'excludeAll',
+          excludeExtraneousValues: true,
+        }),
     },
   ],
   imports: [

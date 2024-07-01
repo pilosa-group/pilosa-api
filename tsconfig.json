@@ -83,6 +83,12 @@
       ],
       "@app/synthetic-scan/*": [
         "libs/synthetic-scan/src/*"
+      ],
+      "@app/api": [
+        "libs/api/src"
+      ],
+      "@app/api/*": [
+        "libs/api/src/*"
       ]
     }
   }
