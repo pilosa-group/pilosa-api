@@ -19,6 +19,9 @@ import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.s
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
 import { isCompressed } from '@app/synthetic-scan/utils/isCompressed';
 import { formatBytes } from '@app/synthetic-scan/utils/formatBytes';
+import { plainToInstance } from 'class-transformer';
+import { ScanResultV1Dto } from '@app/synthetic-scan/dto/scan-result-v1.dto';
+import { scrollPageToEnd } from '@app/synthetic-scan/utils/playwright';
 
 export type NetworkRequest = {
   url: string;
@@ -33,15 +36,14 @@ export type FileTypeResult = {
   estimatedCo2: number;
 };
 
-type Hosting = {
-  domain: string;
-  green: boolean;
-};
-
-export type DomainResult = {
+export type ResultV1 = {
   domain: string | null;
-  requests: NetworkRequest[];
-  hosting: Hosting[];
+  pageTitle: string;
+  numberOfRequests: number;
+  hosting: Array<{
+    domain: string;
+    green: boolean;
+  }>;
   time?: {
     domReady: number;
     load: number;
@@ -53,55 +55,12 @@ export type DomainResult = {
   cdnPercentage: number;
   compressedPercentage: number;
   cachePercentage: number;
-  fileTypes: {
-    images?: FileTypeResult;
-    scripts?: FileTypeResult;
-    stylesheets?: FileTypeResult;
-    json?: FileTypeResult;
-    fonts?: FileTypeResult;
-    video?: FileTypeResult;
-    audio?: FileTypeResult;
-    other?: FileTypeResult;
-  };
-};
-
-export type VisitResult = {
-  total?: DomainResult;
-  domains?: DomainResult[];
-};
-
-export type Result = {
-  firstVisit?: VisitResult;
-  secondVisit?: VisitResult;
+  fileTypes: Record<string, FileTypeResult>;
 };
 
 const ignoreDomains = ['localhost'];
 
 const logger = console.log;
-
-const scrollPageToEnd = async (page) => {
-  const scrollStep = 250; // Scroll down by 250 pixels
-
-  while (true) {
-    await page.evaluate((scrollStep) => {
-      window.scrollBy(0, scrollStep);
-    }, scrollStep);
-
-    await page.waitForTimeout(50);
-
-    const totalScroll = await page.evaluate(() => {
-      return Math.ceil(document.body.scrollHeight - window.innerHeight);
-    });
-
-    const currentScroll = await page.evaluate(() => {
-      return Math.ceil(window.scrollY);
-    });
-
-    if (currentScroll >= totalScroll) {
-      break;
-    }
-  }
-};
 
 const co2Emission = new co2({});
 
@@ -138,7 +97,7 @@ export class SyntheticScanService {
   async run(
     url: string,
     { scrollToEnd }: SyntheticScanOptions = defaultOptions,
-  ): Promise<any> {
+  ): Promise<ScanResultV1Dto> {
     const urlObject = new URL(url);
 
     const topDomain =
@@ -308,72 +267,65 @@ export class SyntheticScanService {
     const totalBytes = await calculateTotalSize(networkRequests);
 
     // keep compatible with old response (for quick scan UI)
-    const result: any = {
-      total: {
-        domain: null,
-        pageTitle: path.title,
-        hosting: [
-          {
-            domain: topDomain.fqdn,
-            green: topDomain.isGreenHost,
-          },
-        ],
-        // requests: networkRequests,
-        // requests: [],
-        numberOfRequests: networkRequests.length,
-        time: {
-          domReady: domReadyTime,
-          load: loadTime,
-          networkIdle: networkIdleTime,
+    const result = plainToInstance<ScanResultV1Dto, ResultV1>(ScanResultV1Dto, {
+      domain: null,
+      pageTitle: path.title,
+      hosting: [
+        {
+          domain: topDomain.fqdn,
+          green: topDomain.isGreenHost,
         },
-        totalBytes: await calculateTotalSize(networkRequests),
-        totalBytesFormatted: formatBytes(totalBytes),
-        estimatedCo2: co2Emission.perVisit(totalBytes, topDomain.isGreenHost),
-        cdnPercentage:
-          (networkRequests.filter(isCdn).length / networkRequests.length) * 100,
-        compressedPercentage:
-          (networkRequests.filter(isCompressed).length /
-            networkRequests.length) *
-          100,
-        cachePercentage:
-          (networkRequests.filter(isCacheable).length /
-            networkRequests.length) *
-          100,
-        fileTypes: {
-          images: await toFileTypeResult(
-            networkRequests.filter(findRequestByContentType(['image/'])),
-            topDomain.isGreenHost,
-          ),
-          scripts: await toFileTypeResult(
-            networkRequests.filter(findRequestByContentType(['javascript'])),
-            topDomain.isGreenHost,
-          ),
-          stylesheets: await toFileTypeResult(
-            networkRequests.filter(findRequestByContentType(['text/css'])),
-            topDomain.isGreenHost,
-          ),
-          json: await toFileTypeResult(
-            networkRequests.filter(findRequestByContentType(['json'])),
-            topDomain.isGreenHost,
-          ),
-          fonts: await toFileTypeResult(
-            networkRequests.filter(findRequestByContentType(['font'])),
-            topDomain.isGreenHost,
-          ),
-          video: await toFileTypeResult(
-            networkRequests.filter(
-              findRequestByContentType(['video', 'application/vnd.yt-ump']),
-            ),
-            topDomain.isGreenHost,
-          ),
-          audio: await toFileTypeResult(
-            networkRequests.filter(findRequestByContentType(['audio'])),
-            topDomain.isGreenHost,
-          ),
-        },
+      ],
+      numberOfRequests: networkRequests.length,
+      time: {
+        domReady: domReadyTime,
+        load: loadTime,
+        networkIdle: networkIdleTime,
       },
-      domains: [],
-    };
+      totalBytes: await calculateTotalSize(networkRequests),
+      totalBytesFormatted: formatBytes(totalBytes),
+      estimatedCo2: co2Emission.perVisit(totalBytes, topDomain.isGreenHost),
+      cdnPercentage:
+        (networkRequests.filter(isCdn).length / networkRequests.length) * 100,
+      compressedPercentage:
+        (networkRequests.filter(isCompressed).length / networkRequests.length) *
+        100,
+      cachePercentage:
+        (networkRequests.filter(isCacheable).length / networkRequests.length) *
+        100,
+      fileTypes: {
+        images: await toFileTypeResult(
+          networkRequests.filter(findRequestByContentType(['image/'])),
+          topDomain.isGreenHost,
+        ),
+        scripts: await toFileTypeResult(
+          networkRequests.filter(findRequestByContentType(['javascript'])),
+          topDomain.isGreenHost,
+        ),
+        stylesheets: await toFileTypeResult(
+          networkRequests.filter(findRequestByContentType(['text/css'])),
+          topDomain.isGreenHost,
+        ),
+        json: await toFileTypeResult(
+          networkRequests.filter(findRequestByContentType(['json'])),
+          topDomain.isGreenHost,
+        ),
+        fonts: await toFileTypeResult(
+          networkRequests.filter(findRequestByContentType(['font'])),
+          topDomain.isGreenHost,
+        ),
+        video: await toFileTypeResult(
+          networkRequests.filter(
+            findRequestByContentType(['video', 'application/vnd.yt-ump']),
+          ),
+          topDomain.isGreenHost,
+        ),
+        audio: await toFileTypeResult(
+          networkRequests.filter(findRequestByContentType(['audio'])),
+          topDomain.isGreenHost,
+        ),
+      },
+    });
 
     void browser.close();
 
