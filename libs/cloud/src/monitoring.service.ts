@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ServerInstanceService } from './server-instance.service';
 import { AwsCredentials } from './cloud-provider-instance-list.interface';
 import { CloudProviderAccountService } from './cloud-provider-account.service';
@@ -12,6 +12,8 @@ import { MikroORM } from '@mikro-orm/core';
 @Injectable()
 export class MonitoringService {
   private isRunning = false;
+
+  private readonly logger = new Logger(MonitoringService.name);
 
   constructor(
     private readonly orm: MikroORM,
@@ -33,7 +35,7 @@ export class MonitoringService {
       await this.cloudProviderAccountService.findOneLatestImported();
 
     if (cloudProviderAccount) {
-      console.log('importing metrics for account', cloudProviderAccount.id);
+      this.logger.log('Importing metrics for account', cloudProviderAccount.id);
 
       const awsCredentials: AwsCredentials = {
         accessKeyId: cloudProviderAccount.accessKeyId,

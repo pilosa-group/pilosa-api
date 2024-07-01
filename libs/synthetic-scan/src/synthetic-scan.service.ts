@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import type { Request, Response } from 'playwright';
 import { chromium } from 'playwright';
 import { co2 } from '@tgwf/co2';
@@ -60,8 +60,6 @@ export type ResultV1 = {
 
 const ignoreDomains = ['localhost'];
 
-const logger = console.log;
-
 const co2Emission = new co2({});
 
 async function toFileTypeResult(
@@ -88,6 +86,8 @@ const defaultOptions: SyntheticScanOptions = {
 
 @Injectable()
 export class SyntheticScanService {
+  private readonly logger = new Logger(SyntheticScanService.name);
+
   constructor(
     private greenHostingService: GreenHostingService,
     private browserMetricsDomainService: BrowserMetricDomainService,
@@ -98,6 +98,8 @@ export class SyntheticScanService {
     url: string,
     { scrollToEnd }: SyntheticScanOptions = defaultOptions,
   ): Promise<ScanResultV1Dto> {
+    this.logger.log(`Running quick scan for ${url}`);
+
     const urlObject = new URL(url);
 
     const topDomain =
@@ -154,8 +156,6 @@ export class SyntheticScanService {
     page.on('load', handleLoad);
 
     const startTime = Date.now();
-
-    logger(`Visiting ${url}`);
 
     await page.goto(url);
 
