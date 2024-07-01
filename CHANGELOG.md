@@ -1,3 +1,21 @@
+# [1.10.0](https://github.com/pilosa-group/pilosa-api/compare/v1.9.1...v1.10.0) (2024-07-01)
+
+
+### Bug Fixes
+
+* cleanup quick scan result based on (v1) dto ([efb291c](https://github.com/pilosa-group/pilosa-api/commit/efb291cb3eec989a2f75418015a17d4730f087ab))
+
+
+### Features
+
+* add basic endpoints for organizations, projects, frontend apps and its metric ([55f6fac](https://github.com/pilosa-group/pilosa-api/commit/55f6facb2c961618eaeec7db8abfe73c6ec4e5d9))
+* add endpoint for browser metrics based on frontend app id ([94cb823](https://github.com/pilosa-group/pilosa-api/commit/94cb823dffaa4f3c295a92d7fea441d6c4052f89))
+* add global serializer and exclude all entities by default ([a4927cf](https://github.com/pilosa-group/pilosa-api/commit/a4927cfa140abfa275c25bc8eb9bcfe8a33d14ce))
+* add paginator service, some class (query/params) validations and swagger document ([81ec352](https://github.com/pilosa-group/pilosa-api/commit/81ec3520dd593eac1b76f39b9e41587859b8d5c7))
+* add robots.txt ([da947d6](https://github.com/pilosa-group/pilosa-api/commit/da947d699326abe2606c40d7e22ab5b3c5432c1b))
+* disable swagger on non-development ([62bb88d](https://github.com/pilosa-group/pilosa-api/commit/62bb88d2d6329749c267d13db3005505001fa9dd))
+* replace console.log with Nestjs logger ([1af2649](https://github.com/pilosa-group/pilosa-api/commit/1af2649c2a83870e7d9a9d033371dd12cb609ae5))
+
 ## [1.9.1](https://github.com/pilosa-group/pilosa-api/compare/v1.9.0...v1.9.1) (2024-06-25)
 
 
