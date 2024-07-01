@@ -29,7 +29,7 @@ export class PageScannerService {
 
     const url = await this.browserMetricService.findUnscannedPaths();
 
-    this.logger.log('Scanning', { url });
+    this.logger.log(`Scanning ${url}`);
 
     try {
       await this.syntheticScanService.run(url, {
