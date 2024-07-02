@@ -80,7 +80,6 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
   let pageLoaded = false;
 
   window.addEventListener('load', () => {
-    console.log({ stateLoading: pageLoaded });
     pageLoaded = true;
   });
 
