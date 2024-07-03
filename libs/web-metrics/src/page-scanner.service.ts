@@ -34,6 +34,11 @@ export class PageScannerService {
       return;
     }
 
+    if (!url) {
+      this.isRunning = false;
+      return;
+    }
+
     this.logger.log(`Scanning ${url}`);
 
     try {

@@ -10,6 +10,7 @@ type Light = 'l';
 type Colorscheme = Dark | Light;
 type CompressedBytes = NumberOfBytes;
 type UncompressedBytes = NumberOfBytes;
+type Viewport = [number, number];
 
 type Payload = {
   // The domain of the resource
@@ -33,6 +34,7 @@ type Payload = {
 type CombinedPayload = {
   b: [CompressedBytes, UncompressedBytes];
   m: Colorscheme;
+  v: Viewport;
   d: {
     [key: Domain]: {
       [key: Path]: {
@@ -94,6 +96,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
   const sendBeacon = (): void => {
     const groupedPayloads: CombinedPayload = {
       m: colorScheme,
+      v: [window.innerWidth, window.innerHeight],
       b: [0, 0],
       d: {},
     };
