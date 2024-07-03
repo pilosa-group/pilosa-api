@@ -13,6 +13,11 @@ export const validationSchema = Joi.object({
   DB_DATABASE: Joi.string().required(),
   DB_SSL: Joi.number().required(),
 
+  // API
+  API_BASE_URL: Joi.string()
+    .required()
+    .description('Public base URL of the API'),
+
   // WebSnippet
   SNIPPET_BEACON_API_URL: Joi.string().required(),
 

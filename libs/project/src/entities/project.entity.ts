@@ -11,11 +11,13 @@ import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account
 import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 import { Organization } from '@app/project/entities/organization.entity';
 import { Expose } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Project {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   @Expose()
+  @ApiProperty({ type: 'string', format: 'uuid' })
   id: string;
 
   @Property()
@@ -26,6 +28,7 @@ export class Project {
 
   @Property()
   @Expose()
+  @ApiProperty()
   name!: string;
 
   @ManyToOne({
