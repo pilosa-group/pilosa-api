@@ -6,6 +6,7 @@ import {
   Header,
   HttpCode,
   HttpStatus,
+  Logger,
   Options,
   Post,
   Req,
@@ -104,6 +105,8 @@ const isValidInitiatorType = (initiatorType: string): boolean =>
 @Controller('beacon')
 @ApiTags('Beacon')
 export class BeaconController {
+  private readonly logger = new Logger(BeaconController.name);
+
   constructor(
     private frontendAppService: FrontendAppService,
     private browserMetricService: BrowserMetricService,
@@ -246,7 +249,7 @@ export class BeaconController {
                     const browserMetric =
                       await this.browserMetricService.create(
                         metric,
-                        frontendApp,
+                        frontendApp.id,
                       );
 
                     void this.browserMetricService.save(browserMetric);
@@ -263,6 +266,7 @@ export class BeaconController {
         });
       });
     } catch (error) {
+      this.logger.error(error);
       Sentry.captureException(error);
     }
 

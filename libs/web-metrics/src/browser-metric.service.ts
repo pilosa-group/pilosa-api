@@ -24,7 +24,7 @@ export class BrowserMetricService {
 
   async create(
     browserMetricDto: CreateBrowserMetricDto,
-    frontendApp: FrontendApp,
+    frontendApp: FrontendApp['id'],
   ): Promise<BrowserMetric> {
     const metric = new BrowserMetric();
     wrap(metric).assign(browserMetricDto);
@@ -41,21 +41,25 @@ export class BrowserMetricService {
     return browserMetric;
   }
 
-  async findUnscannedPaths(): Promise<string> {
+  async findLatestUnscannedUrl(): Promise<string | null> {
     const [result] = await this.browserMetricRepository
       .getEntityManager()
       .getConnection()
       .execute<[{ domain: string; path: string }]>(
-        `SELECT bm.domain, path, count(bm) as visits, COUNT(DISTINCT ps.id)
+        `SELECT bm.domain, bm.path, count(bm) as visits, COUNT(DISTINCT ps.id)
          FROM browser_metric bm
                   LEFT JOIN path_statistics ps ON ps.path_domain = bm.domain AND ps.path_path = path
 
          WHERE bm."firstLoad" = true
-         GROUP BY bm.domain, path
+         GROUP BY bm.domain, bm.path
          HAVING COUNT(DISTINCT ps.id) = 0
             AND COUNT(bm) > 150
          ORDER BY visits DESC`,
       );
+
+    if (!result) {
+      return null;
+    }
 
     return `https://${result.domain}${result.path}`;
   }

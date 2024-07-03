@@ -7,7 +7,6 @@ import {
   Collection,
   Cascade,
 } from '@mikro-orm/core';
-import { BrowserMetric } from './browser-metric.entity';
 import { Project } from '@app/project/entities/project.entity';
 import { CrossOrigin } from '@app/web-metrics/entities/cross-origin.entity';
 import { Expose } from 'class-transformer';
@@ -37,15 +36,6 @@ export class FrontendApp {
     deleteRule: 'cascade',
   })
   project: Project;
-
-  @OneToMany(
-    () => BrowserMetric,
-    (metric: BrowserMetric) => metric.frontendApp,
-    {
-      cascade: [Cascade.PERSIST, Cascade.REMOVE],
-    },
-  )
-  metrics = new Collection<BrowserMetric>(this);
 
   @OneToMany(
     () => CrossOrigin,
