@@ -29,6 +29,11 @@ export class PageScannerService {
 
     const url = await this.browserMetricService.findUnscannedPaths();
 
+    if (!url) {
+      this.isRunning = false;
+      return;
+    }
+
     this.logger.log(`Scanning ${url}`);
 
     try {
