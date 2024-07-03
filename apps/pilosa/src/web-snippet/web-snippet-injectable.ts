@@ -178,7 +178,6 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
 
     // reset for next batch
     payloads = [];
-    pageLoaded = false;
   };
 
   // Send the beacon after a certain amount of time
