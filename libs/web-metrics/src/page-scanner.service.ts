@@ -27,7 +27,7 @@ export class PageScannerService {
 
     this.isRunning = true;
 
-    const url = await this.browserMetricService.findUnscannedPaths();
+    const url = await this.browserMetricService.findLatestUnscannedUrl();
 
     if (!url) {
       this.isRunning = false;

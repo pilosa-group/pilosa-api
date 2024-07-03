@@ -41,7 +41,7 @@ export class BrowserMetricService {
     return browserMetric;
   }
 
-  async findUnscannedPaths(): Promise<string | null> {
+  async findLatestUnscannedUrl(): Promise<string | null> {
     const [result] = await this.browserMetricRepository
       .getEntityManager()
       .getConnection()
