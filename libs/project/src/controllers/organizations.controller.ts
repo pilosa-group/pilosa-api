@@ -6,6 +6,7 @@ import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
 import { PaginatorDto } from '@app/api/paginator.dto';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { OrganizationDto } from '@app/project/dto/organization.dto';
+import { TransformerService } from '@app/api/transformer.service';
 
 @ApiBearerAuth()
 @ApiTags('Organizations')
@@ -14,6 +15,7 @@ export class OrganizationsController {
   constructor(
     private organizationService: OrganizationService,
     private paginatorService: PaginatorService,
+    private transformerService: TransformerService,
   ) {}
 
   @Get('/')
@@ -39,7 +41,10 @@ export class OrganizationsController {
   })
   async getOrganization(
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<Organization> {
-    return this.organizationService.findOne(id);
+  ): Promise<OrganizationDto> {
+    return this.transformerService.entityToDto<Organization, OrganizationDto>(
+      await this.organizationService.findOne(id),
+      OrganizationDto,
+    );
   }
 }

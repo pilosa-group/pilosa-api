@@ -8,6 +8,7 @@ import { PaginatorDto } from '@app/api/paginator.dto';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
 import { ProjectDto } from '@app/project/dto/project.dto';
+import { TransformerService } from '@app/api/transformer.service';
 
 @ApiBearerAuth()
 @ApiTags('Organizations')
@@ -16,13 +17,14 @@ export class ProjectsController {
   constructor(
     private projectService: ProjectService,
     private paginatorService: PaginatorService,
+    private transformerService: TransformerService,
   ) {}
 
   @Get('organizations/:organizationId/projects')
   @ApiResponse({
     status: 200,
     description: 'Get all projects',
-    type: PaginatorDto<Project>,
+    type: PaginatorDto<ProjectDto>,
   })
   async getAllProjects(
     @Param('organizationId', ParseUUIDPipe) organization: string,
@@ -41,17 +43,22 @@ export class ProjectsController {
   @ApiResponse({
     status: 200,
     description: 'Get a project',
-    type: Project,
+    type: ProjectDto,
   })
-  async getProject(@Param('id', ParseUUIDPipe) id: string): Promise<Project> {
-    return this.projectService.findOne(id);
+  async getProject(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ProjectDto> {
+    return this.transformerService.entityToDto<Project, ProjectDto>(
+      await this.projectService.findOne(id),
+      ProjectDto,
+    );
   }
 
   @Get('projects/:projectId/frontend-apps')
   @ApiResponse({
     status: 200,
     description: 'Get all frontend apps for a project',
-    type: PaginatorDto<FrontendApp>,
+    type: PaginatorDto<FrontendAppDto>,
   })
   async getFrontendApps(
     @Param('projectId', ParseUUIDPipe) projectId: string,
