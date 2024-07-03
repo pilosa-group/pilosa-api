@@ -1,3 +1,16 @@
+# [1.11.0](https://github.com/pilosa-group/pilosa-api/compare/v1.10.0...v1.11.0) (2024-07-03)
+
+
+### Bug Fixes
+
+* don't run scan if there is nothing to scan ([a5fa241](https://github.com/pilosa-group/pilosa-api/commit/a5fa2416302c3a407c9fb7eaede0851a926a8df8))
+* remove pageLoaded from reset list ([8ea7fb2](https://github.com/pilosa-group/pilosa-api/commit/8ea7fb275bfcde78c4b29c944f93766ecc2ec835))
+
+
+### Features
+
+* store viewport size ([408d8fe](https://github.com/pilosa-group/pilosa-api/commit/408d8fe9bd665df1bb84e0578d711fa9c2516848))
+
 # [1.10.0](https://github.com/pilosa-group/pilosa-api/compare/v1.9.1...v1.10.0) (2024-07-01)
 
 
