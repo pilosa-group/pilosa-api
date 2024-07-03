@@ -56,6 +56,12 @@ export class BrowserMetric {
   @Property({ nullable: true, type: 'text' })
   visitor?: string;
 
+  @Property({ nullable: true, type: 'int' })
+  viewportWidth?: number;
+
+  @Property({ nullable: true, type: 'int' })
+  viewportHeight?: number;
+
   @Property({ nullable: true, type: 'text' })
   deviceType?: string;
 

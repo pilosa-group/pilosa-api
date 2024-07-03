@@ -34,6 +34,8 @@ import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
 import * as crypto from 'crypto';
 import { ColorScheme } from '@app/web-metrics/entities/browser-metric.entity';
 import { ApiTags } from '@nestjs/swagger';
+import { getViewportValue } from '@app/web-metrics/utils/getViewPortValue';
+import { isValidInitiatorType } from '@app/web-metrics/utils/isValidInitiatorType';
 
 function hashValue(value: string) {
   const salt = new Date().toISOString().split('T')[0];
@@ -55,11 +57,13 @@ type NumberOfBytes = number;
 type FileExtension = string;
 type CompressedBytes = NumberOfBytes;
 type UncompressedBytes = NumberOfBytes;
+export type Viewport = [number, number];
 
 type CombinedPayload = {
   f?: FirstPageLoad; // @deprecated
   m: 'd' | 'l';
   b: [CompressedBytes, UncompressedBytes];
+  v: Viewport;
   d: {
     [key: Domain]: {
       [key: Path]: {
@@ -76,31 +80,6 @@ type CombinedPayload = {
 };
 
 const nullableExtensions = ['__none__', '_'];
-
-const isValidInitiatorType = (initiatorType: string): boolean =>
-  [
-    'audio',
-    'beacon',
-    'body',
-    'css',
-    'early-hint',
-    'embed',
-    'fetch',
-    'frame',
-    'iframe',
-    'icon',
-    'image',
-    'img',
-    'input',
-    'link',
-    'navigation',
-    'object',
-    'ping',
-    'script',
-    'track',
-    'video',
-    'xmlhttprequest',
-  ].includes(initiatorType);
 
 @Controller('beacon')
 @ApiTags('Beacon')
@@ -216,6 +195,14 @@ export class BeaconController {
                   if (bytesCompressed > 0 || bytesUncompressed > 0) {
                     const metric: CreateBrowserMetricDto = {
                       pageLoaded,
+                      viewportWidth: getViewportValue(
+                        createBrowserMetricDto.v,
+                        'width',
+                      ),
+                      viewportHeight: getViewportValue(
+                        createBrowserMetricDto.v,
+                        'height',
+                      ),
                       firstLoad: createBrowserMetricDto.f, // @deprecated
                       colorScheme:
                         createBrowserMetricDto.m === 'd'

@@ -11,6 +11,8 @@ export class CreateBrowserMetricDto {
   domain: string;
   path: string;
   visitor: string;
+  viewportWidth: number;
+  viewportHeight: number;
   deviceType: string;
   device: string;
   os: string;
