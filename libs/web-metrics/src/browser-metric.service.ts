@@ -51,11 +51,15 @@ export class BrowserMetricService {
                   LEFT JOIN path_statistics ps ON ps.path_domain = bm.domain AND ps.path_path = path
 
          WHERE bm."firstLoad" = true
-         GROUP BY bm.domain, path
+         GROUP BY bm.domain, bm.path
          HAVING COUNT(DISTINCT ps.id) = 0
             AND COUNT(bm) > 150
          ORDER BY visits DESC`,
       );
+
+    if (!result) {
+      return null;
+    }
 
     return `https://${result.domain}${result.path}`;
   }
