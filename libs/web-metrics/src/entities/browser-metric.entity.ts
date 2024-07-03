@@ -1,14 +1,10 @@
 import {
   Property,
   Entity,
-  ManyToOne,
   Enum,
   PrimaryKey,
-  ManyToMany,
-  Collection,
+  PrimaryKeyProp,
 } from '@mikro-orm/core';
-import { FrontendApp } from './frontend-app.entity';
-import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
 import { Expose } from 'class-transformer';
 
 export enum ColorScheme {
@@ -21,12 +17,14 @@ export class BrowserMetric {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id: string;
 
-  @Property({
+  @PrimaryKey({
     type: 'timestamptz',
     defaultRaw: 'CURRENT_TIMESTAMP',
   })
   @Expose()
   time!: Date;
+
+  [PrimaryKeyProp]?: ['id', 'time'];
 
   @Property({ nullable: true })
   firstLoad: boolean;
@@ -37,16 +35,16 @@ export class BrowserMetric {
   @Enum(() => ColorScheme)
   colorScheme: ColorScheme = ColorScheme.Light;
 
-  @Property()
+  @Property({ type: 'text' })
   domain!: string;
 
   @Property({ type: 'text' })
   path!: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'text' })
   initiatorType?: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'text' })
   extension?: string;
 
   @Property({ type: 'float' })
@@ -55,33 +53,31 @@ export class BrowserMetric {
   @Property({ type: 'float' })
   bytesUncompressed!: number;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'text' })
   visitor?: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'text' })
   deviceType?: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'text' })
   device?: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'text' })
   os?: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'text' })
   browser?: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'text' })
   cpu?: string;
 
-  @ManyToOne({
-    entity: () => FrontendApp,
-    deleteRule: 'cascade',
-  })
-  frontendApp!: FrontendApp;
-
-  @ManyToMany({
-    entity: () => PathStatistics,
-    deleteRule: 'cascade',
-  })
-  pathStatistics = new Collection<PathStatistics>(this);
+  /**
+   * This can not be a foreign key because the server metrics
+   * table is a TimescaleDB hypertable and foreign keys are not
+   * supported.
+   *
+   * It should also improve performance.
+   */
+  @Property({ type: 'uuid', index: true })
+  frontendApp!: string;
 }

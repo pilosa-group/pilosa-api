@@ -17,7 +17,7 @@ export class ServerMetricService {
     serverInstance: ServerInstance,
   ): Promise<ServerMetric> {
     return this.serverMetricRepository.create({
-      serverInstance: serverInstance,
+      serverInstance: serverInstance['id'],
       time: metricResult.datetime,
       cpu: metricResult.cpu,
       networkIn: metricResult.networkIn,
@@ -31,9 +31,7 @@ export class ServerMetricService {
     const metric = await this.serverMetricRepository
       .createQueryBuilder()
       .where({
-        serverInstance: {
-          id: serverInstance.id,
-        },
+        serverInstance: serverInstance.id,
       })
       .orderBy({
         time: 'DESC',
@@ -61,9 +59,7 @@ export class ServerMetricService {
     return this.serverMetricRepository
       .createQueryBuilder()
       .where({
-        serverInstance: {
-          id: serverInstance.id,
-        },
+        serverInstance: serverInstance.id,
       })
       .getResult();
   }

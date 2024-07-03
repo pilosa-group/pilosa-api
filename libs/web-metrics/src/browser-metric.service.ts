@@ -24,7 +24,7 @@ export class BrowserMetricService {
 
   async create(
     browserMetricDto: CreateBrowserMetricDto,
-    frontendApp: FrontendApp,
+    frontendApp: FrontendApp['id'],
   ): Promise<BrowserMetric> {
     const metric = new BrowserMetric();
     wrap(metric).assign(browserMetricDto);
