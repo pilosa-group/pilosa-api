@@ -13,12 +13,7 @@ const readFile = util.promisify(fs.readFile);
  * These parts are removed from the minified snippet to make it even smaller,
  * unfortunately, esbuild does not have a way to remove these parts during the build process.
  */
-const partsToRemove = [
-  '"use strict";',
-  'var v=(e,n)=>()=>(n||e((n={exports:{}}).exports,n),n.exports);',
-  'var A=v(S=>{Object.defineProperty(S,"__esModule",{value:!0});',
-  '});A();',
-];
+const partsToRemove = ['"use strict";'];
 
 @ApiExcludeController()
 @Controller('sloth.js')

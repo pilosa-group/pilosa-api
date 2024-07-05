@@ -41,6 +41,7 @@ const w = window;
 const d = document;
 const noop = () => {};
 const CLIENT_ID = d.currentScript.getAttribute('data-client-id');
+const isNumber = (value: any): value is number => typeof value === 'number';
 
 /**
  * Debounce function
@@ -187,7 +188,9 @@ const observer = new PerformanceObserver((list) => {
 
         // Check if the resource is compressed
         const compressed =
-          decodedBodySize && decodedBodySize !== encodedBodySize;
+          isNumber(decodedBodySize) &&
+          isNumber(encodedBodySize) &&
+          decodedBodySize !== encodedBodySize;
 
         let extension = '_';
         if (pathname.includes('.')) {
