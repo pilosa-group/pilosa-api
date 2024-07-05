@@ -178,6 +178,10 @@ const observer = new PerformanceObserver((list) => {
 
     switch (entryType) {
       case ENTRY_TYPE_RESOURCE: {
+        if ([decodedBodySize, transferSize].some((value) => value === null)) {
+          return;
+        }
+
         const cached = transferSize === 0 && decodedBodySize > 0;
 
         if (cached) {
