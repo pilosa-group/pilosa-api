@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/pilosa-group/pilosa-api/compare/v1.12.0...v1.13.0) (2024-07-05)
+
+
+### Features
+
+* make sloth smaller and increase beacon debounce time to 2s ([7d13386](https://github.com/pilosa-group/pilosa-api/commit/7d1338629dde1226d0a4f4e2fa59509da3c1c362))
+
 # [1.12.0](https://github.com/pilosa-group/pilosa-api/compare/v1.11.0...v1.12.0) (2024-07-05)
 
 
