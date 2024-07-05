@@ -36,6 +36,7 @@ import {
   ApiExcludeEndpoint,
   ApiHeader,
   ApiOperation,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { isValidInitiatorType } from '@app/web-metrics/utils/isValidInitiatorType';
@@ -100,6 +101,9 @@ export class BeaconController {
     summary: 'Create browser metric',
     operationId: 'createBrowserMetric',
   })
+  @ApiResponse({ status: HttpStatus.ACCEPTED, description: 'Accepted' })
+  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
   async create(
     @Body() payload: BeaconPayloadDto,
     @RequestHeaders()

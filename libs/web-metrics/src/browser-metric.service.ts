@@ -9,7 +9,7 @@ import {
   MetricPeriodValue,
 } from '@app/cloud/enum/metric-period.enum';
 import * as bytes from 'bytes';
-import { CarbonEmissionMetric } from '@app/web-metrics/dto/carbon-emission-metric.dto';
+import { CarbonEmissionMetricDto } from '@app/web-metrics/dto/carbon-emission-metric.dto';
 import { co2 } from '@tgwf/co2';
 import { PaginatorDto } from '@app/api/paginator.dto';
 
@@ -71,7 +71,7 @@ export class BrowserMetricService {
       limit = 100,
       offset = 0,
     }: { period: MetricPeriod; limit?: number; offset?: number },
-  ): Promise<PaginatorDto<CarbonEmissionMetric>> {
+  ): Promise<PaginatorDto<CarbonEmissionMetricDto>> {
     const query = `SELECT time_bucket(?, time)                              as period,
            SUM("bytesCompressed") + SUM("bytesUncompressed") as bytes
     FROM browser_metric
@@ -86,9 +86,9 @@ export class BrowserMetricService {
       .getConnection()
       .execute(query, [period, frontendApp, limit, offset]);
 
-    return new PaginatorDto<CarbonEmissionMetric>(
+    return new PaginatorDto<CarbonEmissionMetricDto>(
       result.map((metric) => {
-        return new CarbonEmissionMetric({
+        return new CarbonEmissionMetricDto({
           period: metric.period as unknown as MetricPeriodValue,
           co2: (this.co2Emission.perByte(metric.bytes) as any).total,
           bytes: metric.bytes,

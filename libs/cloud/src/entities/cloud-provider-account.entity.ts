@@ -7,7 +7,7 @@ import {
   Enum,
   Collection,
 } from '@mikro-orm/core';
-import { ServerInstance } from './service-instance.entity';
+import { ServerInstance } from './server-instance.entity';
 import { Project } from '@app/project/entities/project.entity';
 import { CloudProvider } from '@app/cloud/enum/cloud-provider.enum';
 
