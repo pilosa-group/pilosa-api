@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/pilosa-group/pilosa-api/compare/v1.13.0...v1.13.1) (2024-07-05)
+
+
+### Bug Fixes
+
+* **sloth:** check if decoded and encoded size are a number ([85b6c7f](https://github.com/pilosa-group/pilosa-api/commit/85b6c7f185e5c8d7a818966568995982f987c474))
+
 # [1.13.0](https://github.com/pilosa-group/pilosa-api/compare/v1.12.0...v1.13.0) (2024-07-05)
 
 
