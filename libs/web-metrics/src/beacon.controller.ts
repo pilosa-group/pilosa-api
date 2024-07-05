@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
@@ -28,14 +27,24 @@ import {
 import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
 import { FrontendAppService } from './frontend-app.service';
 import { BrowserMetricService } from './browser-metric.service';
-import { Project } from '@app/project/entities/project.entity';
 import { Public } from '@app/auth/decorators/public.decorator';
 import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
 import * as crypto from 'crypto';
 import { ColorScheme } from '@app/web-metrics/entities/browser-metric.entity';
-import { ApiTags } from '@nestjs/swagger';
-import { getViewportValue } from '@app/web-metrics/utils/getViewPortValue';
+import {
+  ApiBody,
+  ApiExcludeEndpoint,
+  ApiHeader,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { isValidInitiatorType } from '@app/web-metrics/utils/isValidInitiatorType';
+import { BeaconPayloadDto } from '@app/web-metrics/dto/beacon-payload.dto';
+import { RequestHeaders } from '@app/web-metrics/decorators/request-headers.decorator';
+import {
+  BeaconRequestHeadersDto,
+  FRONTEND_APP_ID_HEADER_NAME,
+} from '@app/web-metrics/dto/beacon-request-headers.dto';
 
 function hashValue(value: string) {
   const salt = new Date().toISOString().split('T')[0];
@@ -43,41 +52,6 @@ function hashValue(value: string) {
   hash.update(`${salt}${value}`);
   return hash.digest('hex');
 }
-
-const FRONTEND_APP_ID = 'x-id';
-
-// TODO this is duplicated
-type FirstPageLoad = boolean; // @deprecated
-type PageLoaded = boolean;
-type InitiatorType = string;
-type Domain = string;
-type Path = string;
-type Origin = string;
-type NumberOfBytes = number;
-type FileExtension = string;
-type CompressedBytes = NumberOfBytes;
-type UncompressedBytes = NumberOfBytes;
-export type Viewport = [number, number];
-
-type CombinedPayload = {
-  f?: FirstPageLoad; // @deprecated
-  m: 'd' | 'l';
-  b: [CompressedBytes, UncompressedBytes];
-  v: Viewport;
-  d: {
-    [key: Domain]: {
-      [key: Path]: {
-        [key: InitiatorType]: {
-          [key: FileExtension]: {
-            b: [CompressedBytes, UncompressedBytes];
-            l: PageLoaded;
-            co: Origin[];
-          };
-        };
-      };
-    };
-  };
-};
 
 const nullableExtensions = ['__none__', '_'];
 
@@ -98,8 +72,9 @@ export class BeaconController {
   @Header('Access-Control-Allow-Methods', 'POST')
   @Header(
     'Access-Control-Allow-Headers',
-    [FRONTEND_APP_ID, 'Content-Type'].join(','),
+    [FRONTEND_APP_ID_HEADER_NAME, 'Content-Type'].join(','),
   )
+  @ApiExcludeEndpoint()
   async options() {
     return null;
   }
@@ -111,20 +86,31 @@ export class BeaconController {
   @Header('Access-Control-Allow-Methods', 'POST')
   @Header(
     'Access-Control-Allow-Headers',
-    [FRONTEND_APP_ID, 'Content-Type'].join(','),
+    [FRONTEND_APP_ID_HEADER_NAME, 'Content-Type'].join(','),
   )
+  @ApiBody({
+    type: BeaconPayloadDto,
+  })
+  @ApiHeader({
+    name: FRONTEND_APP_ID_HEADER_NAME,
+    required: true,
+    description: 'App ID required to identify and validate the frontend app',
+  })
+  @ApiOperation({
+    summary: 'Create browser metric',
+    operationId: 'createBrowserMetric',
+  })
   async create(
-    @Body() createBrowserMetricDto: CombinedPayload,
+    @Body() payload: BeaconPayloadDto,
+    @RequestHeaders()
+    {
+      [FRONTEND_APP_ID_HEADER_NAME]: frontendAppId,
+      referer,
+    }: BeaconRequestHeadersDto,
     @Req() req: Request,
     @ClientIp() clientIp: string,
   ) {
     try {
-      const frontendAppId = req.headers[FRONTEND_APP_ID] as Project['id'];
-
-      if (!frontendAppId || frontendAppId.length < 32) {
-        throw new BadRequestException('Invalid app id');
-      }
-
       const frontendApp =
         await this.frontendAppService.findOneById(frontendAppId);
 
@@ -132,11 +118,7 @@ export class BeaconController {
         throw new ForbiddenException(`App ${frontendAppId} not found`);
       }
 
-      if (!req.headers['referer']) {
-        throw new BadRequestException('Missing referer');
-      }
-
-      const url = new URL(req.headers['referer'] as string);
+      const url = new URL(referer);
 
       const isAllowed =
         frontendApp.urls?.includes(url.hostname) ||
@@ -174,38 +156,27 @@ export class BeaconController {
 
       const visitor = hashValue(`${clientIp}${userAgent}`);
 
-      Object.keys(createBrowserMetricDto.d).forEach((domain) => {
-        Object.keys(createBrowserMetricDto.d[domain]).forEach((path) => {
-          Object.keys(createBrowserMetricDto.d[domain][path]).forEach(
-            (initiatorType) => {
-              if (isValidInitiatorType(initiatorType)) {
-                Object.keys(
-                  createBrowserMetricDto.d[domain][path][initiatorType],
-                ).forEach(async (extension) => {
+      Object.keys(payload.d).forEach((domain) => {
+        Object.keys(payload.d[domain]).forEach((path) => {
+          Object.keys(payload.d[domain][path]).forEach((initiatorType) => {
+            if (isValidInitiatorType(initiatorType)) {
+              Object.keys(payload.d[domain][path][initiatorType]).forEach(
+                async (extension) => {
                   const {
                     b: bytes,
                     l: pageLoaded,
                     co: crossOrigins,
-                  } = createBrowserMetricDto.d[domain][path][initiatorType][
-                    extension
-                  ];
+                  } = payload.d[domain][path][initiatorType][extension];
 
                   const [bytesCompressed, bytesUncompressed] = bytes;
 
                   if (bytesCompressed > 0 || bytesUncompressed > 0) {
                     const metric: CreateBrowserMetricDto = {
                       pageLoaded,
-                      viewportWidth: getViewportValue(
-                        createBrowserMetricDto.v,
-                        'width',
-                      ),
-                      viewportHeight: getViewportValue(
-                        createBrowserMetricDto.v,
-                        'height',
-                      ),
-                      firstLoad: createBrowserMetricDto.f, // @deprecated
+                      viewportWidth: payload.v[0],
+                      viewportHeight: payload.v[1],
                       colorScheme:
-                        createBrowserMetricDto.m === 'd'
+                        payload.m === 'd'
                           ? ColorScheme.Dark
                           : ColorScheme.Light,
                       domain,
@@ -246,15 +217,17 @@ export class BeaconController {
                     // TODO store this in backend, so we can tell the client to add these to the CORS policy
                     // console.log(initiatorType, extension, crossOrigins);
                   }
-                });
-              }
-            },
-          );
+                },
+              );
+            }
+          });
         });
       });
     } catch (error) {
       this.logger.error(error);
       Sentry.captureException(error);
+
+      throw error;
     }
 
     return null;

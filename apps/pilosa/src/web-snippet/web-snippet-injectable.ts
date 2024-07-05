@@ -1,16 +1,14 @@
-type PageLoaded = boolean;
-type InitiatorType = string;
-type Domain = string;
-type Path = string;
-type Origin = string;
-type NumberOfBytes = number;
-type FileExtension = string;
-type Dark = 'd';
-type Light = 'l';
-type Colorscheme = Dark | Light;
-type CompressedBytes = NumberOfBytes;
-type UncompressedBytes = NumberOfBytes;
-type Viewport = [number, number];
+import {
+  BeaconPayloadDto,
+  CrossOriginDomain,
+  Domain,
+  FileExtension,
+  InitiatorType,
+  IsCompressed,
+  NumberOfBytes,
+  PageLoaded,
+  Path,
+} from '@app/web-metrics/dto/beacon-payload.dto';
 
 type Payload = {
   // The domain of the resource
@@ -20,37 +18,18 @@ type Payload = {
   // The type of the initiator of the resource
   initiatorType: InitiatorType;
   // Whether the resource is compressed
-  compressed: boolean;
+  compressed: IsCompressed;
   // The current bytes of the resource
   bytes: NumberOfBytes;
   // The cross-origin origins of the resource, when it's a cross-origin request
-  crossOrigin: string[];
+  crossOrigin: CrossOriginDomain[];
   // extension
   extension: FileExtension;
   // Whether the document has reached "load" state
   pageLoaded: PageLoaded;
 };
 
-type CombinedPayload = {
-  b: [CompressedBytes, UncompressedBytes];
-  m: Colorscheme;
-  v: Viewport;
-  d: {
-    [key: Domain]: {
-      [key: Path]: {
-        [key: InitiatorType]: {
-          [key: FileExtension]: {
-            b: [CompressedBytes, UncompressedBytes];
-            l: PageLoaded;
-            co: Origin[];
-          };
-        };
-      };
-    };
-  };
-};
-
-// These vars are injected by the endpoint
+// These vars are injected by the controller
 declare let SNIPPET_API_ENDPOINT: string;
 declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
 
@@ -94,7 +73,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
     : 'l';
 
   const sendBeacon = (): void => {
-    const groupedPayloads: CombinedPayload = {
+    const groupedPayloads: BeaconPayloadDto = {
       m: colorScheme,
       v: [window.innerWidth, window.innerHeight],
       b: [0, 0],

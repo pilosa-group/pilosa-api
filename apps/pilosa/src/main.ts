@@ -10,6 +10,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { initSentry } from './instrument';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ENV_DEVELOPMENT } from './config/configuration';
 
 async function bootstrap() {
   process.env.SENTRY_DSN &&
@@ -47,7 +48,14 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      validateCustomDecorators: true,
+      transform: true,
+      whitelist: true,
+      enableDebugMessages: process.env.NODE_ENV === ENV_DEVELOPMENT,
+    }),
+  );
 
   await app.listen(4000);
 }
