@@ -1,3 +1,17 @@
+# [1.12.0](https://github.com/pilosa-group/pilosa-api/compare/v1.11.0...v1.12.0) (2024-07-05)
+
+
+### Bug Fixes
+
+* remove entity decorators ([5eea37e](https://github.com/pilosa-group/pilosa-api/commit/5eea37e5232e1fb131284e4c6c9f68e530885561))
+
+
+### Features
+
+* add transformer service ([5c9ba80](https://github.com/pilosa-group/pilosa-api/commit/5c9ba800e5873a5f34f47a9b6d02de368482a3cf))
+* added more openapi documentation + return dto instead of entities for in paginators ([2f607c1](https://github.com/pilosa-group/pilosa-api/commit/2f607c152a16e929c7aef73126bcc01628b4af75))
+* cleanup (duplicate) code and add some extra dto validations ([42304d4](https://github.com/pilosa-group/pilosa-api/commit/42304d4dd31ebf6f77620161349ac76955fb08cc))
+
 # [1.11.0](https://github.com/pilosa-group/pilosa-api/compare/v1.10.0...v1.11.0) (2024-07-03)
 
 
