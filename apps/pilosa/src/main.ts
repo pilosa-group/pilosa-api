@@ -37,19 +37,25 @@ async function bootstrap() {
   app.getHttpAdapter().getInstance().set('trust proxy', true);
   app.getHttpAdapter().getInstance().disable('x-powered-by');
 
-  if (process.env.NODE_ENV === ENV_DEVELOPMENT) {
-    const config = new DocumentBuilder()
-      .setTitle('Pilosa')
-      .setDescription('Pilosa API description')
-      .setVersion('1.0')
-      .addBearerAuth()
-      .build();
+  const config = new DocumentBuilder()
+    .setTitle('Pilosa')
+    .setDescription('Pilosa API')
+    .addServer(process.env.API_BASE_URL)
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
 
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, document);
-  }
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      validateCustomDecorators: true,
+      transform: true,
+      whitelist: true,
+      enableDebugMessages: process.env.NODE_ENV === ENV_DEVELOPMENT,
+    }),
+  );
 
   await app.listen(4000);
 }

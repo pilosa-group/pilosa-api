@@ -10,11 +10,13 @@ import {
 import { Project } from '@app/project/entities/project.entity';
 import { CrossOrigin } from '@app/web-metrics/entities/cross-origin.entity';
 import { Expose } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class FrontendApp {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   @Expose()
+  @ApiProperty({ type: 'string', format: 'uuid' })
   id: string;
 
   @Property()
@@ -25,10 +27,12 @@ export class FrontendApp {
 
   @Property()
   @Expose()
+  @ApiProperty()
   name!: string;
 
   @Property()
   @Expose()
+  @ApiProperty({ type: 'string', format: 'domain', isArray: true })
   urls!: string[];
 
   @ManyToOne({

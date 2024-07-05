@@ -3,13 +3,18 @@ import { EntityManager, EntityName } from '@mikro-orm/core';
 import type { FilterQuery } from '@mikro-orm/core/typings';
 import type { FindOptions } from '@mikro-orm/core/drivers/IDatabaseDriver';
 import { PaginatorDto } from '@app/api/paginator.dto';
+import { ClassConstructor } from 'class-transformer';
+import { TransformerService } from '@app/api/transformer.service';
 
 @Injectable()
 export class PaginatorService {
-  constructor(private entityManager: EntityManager) {}
+  constructor(
+    private entityManager: EntityManager,
+    private transformerService: TransformerService,
+  ) {}
 
-  public async findAll<Entity extends object>(
-    entity: EntityName<Entity>,
+  public async findAll<Entity extends object, Dto extends object>(
+    [entity, DtoClass]: [EntityName<Entity>, ClassConstructor<Dto>],
     options: FindOptions<Entity>,
     where?: FilterQuery<Entity>,
   ) {
@@ -20,10 +25,15 @@ export class PaginatorService {
       ...options,
     } as FindOptions<Entity>);
 
-    return new PaginatorDto(items, {
-      total,
-      limit: options.limit,
-      offset: options.offset,
-    });
+    return new PaginatorDto(
+      items.map((entity: Entity) =>
+        this.transformerService.entityToDto<Entity, Dto>(entity, DtoClass),
+      ),
+      {
+        total,
+        limit: options.limit,
+        offset: options.offset,
+      },
+    );
   }
 }

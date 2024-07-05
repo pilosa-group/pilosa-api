@@ -27,6 +27,7 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Migrator } from '@mikro-orm/migrations';
 import { CustomNamingStrategy } from './config/custom-naming.strategy';
 import { RobotsController } from './controllers/robots.controller';
+import { TransformerService } from '@app/api/transformer.service';
 
 const srcRoot = path.join(process.cwd(), 'src');
 const distSource = path.join(process.cwd(), 'dist');
@@ -42,10 +43,10 @@ const distSource = path.join(process.cwd(), 'dist');
       provide: APP_INTERCEPTOR,
       inject: [Reflector],
       useFactory: (reflector: Reflector) =>
-        new ClassSerializerInterceptor(reflector, {
-          strategy: 'excludeAll',
-          excludeExtraneousValues: true,
-        }),
+        new ClassSerializerInterceptor(
+          reflector,
+          TransformerService.defaultOptions,
+        ),
     },
   ],
   imports: [

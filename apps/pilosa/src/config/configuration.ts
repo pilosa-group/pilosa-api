@@ -2,6 +2,10 @@ export type AppConfig = {
   env: string;
 };
 
+export type ApiConfig = {
+  baseUrl: string;
+};
+
 export type WebSnippetConfig = {
   beaconApiUrl: string;
 };
@@ -21,6 +25,7 @@ export type ClerkConfig = {
 
 export type Config = {
   app: AppConfig;
+  api: ApiConfig;
   database: DatabaseConfig;
   webSnippet: WebSnippetConfig;
   clerk: ClerkConfig;
@@ -31,6 +36,9 @@ export const ENV_DEVELOPMENT = 'development';
 export default (): Config => ({
   app: {
     env: process.env.NODE_ENV,
+  },
+  api: {
+    baseUrl: process.env.API_BASE_URL,
   },
   database: {
     host: process.env.DB_HOST,
