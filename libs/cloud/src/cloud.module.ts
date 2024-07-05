@@ -5,9 +5,10 @@ import { CloudProviderAccountService } from './cloud-provider-account.service';
 import { ServersController } from './servers.controller';
 import { CloudMetricsModule } from '@app/cloud-metrics';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
-import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
+import { ServerInstance } from '@app/cloud/entities/server-instance.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { ApiModule } from '@app/api';
 
 @Module({
   controllers: [ServersController],
@@ -18,6 +19,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
   ],
   imports: [
     CloudMetricsModule,
+    ApiModule,
     MikroOrmModule.forFeature([CloudProviderAccount, ServerInstance]),
     ScheduleModule.forRoot(),
   ],

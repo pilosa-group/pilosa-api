@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Instance } from './cloud-provider-instance-list.interface';
 import { Project } from '@app/project/entities/project.entity';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
-import { ServerInstance } from '@app/cloud/entities/service-instance.entity';
+import { ServerInstance } from '@app/cloud/entities/server-instance.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 

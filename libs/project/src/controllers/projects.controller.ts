@@ -5,10 +5,16 @@ import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { PaginatorService } from '@app/api';
 import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
 import { PaginatorDto } from '@app/api/paginator.dto';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
 import { ProjectDto } from '@app/project/dto/project.dto';
 import { TransformerService } from '@app/api/transformer.service';
+import { ApiPaginatedResponse } from '@app/api/openapi/decorators/api-paginated-response.decorator';
 
 @ApiBearerAuth()
 @ApiTags('Organizations')
@@ -21,10 +27,12 @@ export class ProjectsController {
   ) {}
 
   @Get('organizations/:organizationId/projects')
-  @ApiResponse({
-    status: 200,
+  @ApiPaginatedResponse(ProjectDto, {
     description: 'Get all projects',
-    type: PaginatorDto<ProjectDto>,
+  })
+  @ApiOperation({
+    summary: 'Get all projects by organization',
+    operationId: 'getProjects',
   })
   async getAllProjects(
     @Param('organizationId', ParseUUIDPipe) organization: string,
@@ -45,6 +53,10 @@ export class ProjectsController {
     description: 'Get a project',
     type: ProjectDto,
   })
+  @ApiOperation({
+    summary: 'Get a project',
+    operationId: 'getProject',
+  })
   async getProject(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ProjectDto> {
@@ -55,10 +67,12 @@ export class ProjectsController {
   }
 
   @Get('projects/:projectId/frontend-apps')
-  @ApiResponse({
-    status: 200,
+  @ApiPaginatedResponse(FrontendAppDto, {
     description: 'Get all frontend apps for a project',
-    type: PaginatorDto<FrontendAppDto>,
+  })
+  @ApiOperation({
+    summary: 'Get all frontend apps by project',
+    operationId: 'getFrontendApps',
   })
   async getFrontendApps(
     @Param('projectId', ParseUUIDPipe) projectId: string,

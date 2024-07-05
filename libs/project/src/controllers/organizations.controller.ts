@@ -4,9 +4,15 @@ import { Organization } from '@app/project/entities/organization.entity';
 import { PaginatorService } from '@app/api';
 import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
 import { PaginatorDto } from '@app/api/paginator.dto';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { OrganizationDto } from '@app/project/dto/organization.dto';
 import { TransformerService } from '@app/api/transformer.service';
+import { ApiPaginatedResponse } from '@app/api/openapi/decorators/api-paginated-response.decorator';
 
 @ApiBearerAuth()
 @ApiTags('Organizations')
@@ -19,10 +25,12 @@ export class OrganizationsController {
   ) {}
 
   @Get('/')
-  @ApiResponse({
-    status: 200,
+  @ApiPaginatedResponse(OrganizationDto, {
     description: 'Get all organizations',
-    type: PaginatorDto<OrganizationDto>,
+  })
+  @ApiOperation({
+    summary: 'Get all organizations',
+    operationId: 'getOrganizations',
   })
   async getAllOrganizations(
     @Query() paginatorOptions: PaginatorOptionsDto,
@@ -37,7 +45,11 @@ export class OrganizationsController {
   @ApiResponse({
     status: 200,
     description: 'Get an organization',
-    type: Organization,
+    type: OrganizationDto,
+  })
+  @ApiOperation({
+    summary: 'Get an organization',
+    operationId: 'getOrganization',
   })
   async getOrganization(
     @Param('id', ParseUUIDPipe) id: string,
