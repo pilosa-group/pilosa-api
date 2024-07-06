@@ -1,3 +1,4 @@
+import { Path } from '@app/web-metrics/entities/path.entity';
 import {
   Cascade,
   Collection,
@@ -6,18 +7,17 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { Path } from '@app/web-metrics/entities/path.entity';
 
 @Entity()
 export class Domain {
-  @PrimaryKey({ type: 'string', unique: true })
-  fqdn: string;
-
   @Property({
-    type: 'timestamptz',
     defaultRaw: 'CURRENT_TIMESTAMP',
+    type: 'timestamptz',
   })
   createdAt!: Date;
+
+  @PrimaryKey({ type: 'string', unique: true })
+  fqdn: string;
 
   @Property({ type: 'boolean' })
   isGreenHost!: boolean;

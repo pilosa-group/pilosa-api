@@ -1,9 +1,9 @@
 import {
-  Property,
   Entity,
   Enum,
   PrimaryKey,
   PrimaryKeyProp,
+  Property,
 } from '@mikro-orm/core';
 import { Expose } from 'class-transformer';
 
@@ -14,38 +14,10 @@ export enum ColorScheme {
 
 @Entity()
 export class BrowserMetric {
-  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
-  id: string;
-
-  @PrimaryKey({
-    type: 'timestamptz',
-    defaultRaw: 'CURRENT_TIMESTAMP',
-  })
-  @Expose()
-  time!: Date;
-
   [PrimaryKeyProp]?: ['id', 'time'];
 
-  @Property({ nullable: true })
-  firstLoad: boolean;
-
-  @Property({ nullable: true })
-  pageLoaded: boolean;
-
-  @Enum(() => ColorScheme)
-  colorScheme: ColorScheme = ColorScheme.Light;
-
-  @Property({ type: 'text' })
-  domain!: string;
-
-  @Property({ type: 'text' })
-  path!: string;
-
   @Property({ nullable: true, type: 'text' })
-  initiatorType?: string;
-
-  @Property({ nullable: true, type: 'text' })
-  extension?: string;
+  browser?: string;
 
   @Property({ type: 'float' })
   bytesCompressed!: number;
@@ -53,29 +25,26 @@ export class BrowserMetric {
   @Property({ type: 'float' })
   bytesUncompressed!: number;
 
-  @Property({ nullable: true, type: 'text' })
-  visitor?: string;
-
-  @Property({ nullable: true, type: 'int' })
-  viewportWidth?: number;
-
-  @Property({ nullable: true, type: 'int' })
-  viewportHeight?: number;
+  @Enum(() => ColorScheme)
+  colorScheme: ColorScheme = ColorScheme.Light;
 
   @Property({ nullable: true, type: 'text' })
-  deviceType?: string;
+  cpu?: string;
 
   @Property({ nullable: true, type: 'text' })
   device?: string;
 
   @Property({ nullable: true, type: 'text' })
-  os?: string;
+  deviceType?: string;
+
+  @Property({ type: 'text' })
+  domain!: string;
 
   @Property({ nullable: true, type: 'text' })
-  browser?: string;
+  extension?: string;
 
-  @Property({ nullable: true, type: 'text' })
-  cpu?: string;
+  @Property({ nullable: true })
+  firstLoad: boolean;
 
   /**
    * This can not be a foreign key because the server metrics
@@ -84,6 +53,37 @@ export class BrowserMetric {
    *
    * It should also improve performance.
    */
-  @Property({ type: 'uuid', index: true })
+  @Property({ index: true, type: 'uuid' })
   frontendApp!: string;
+
+  @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
+  id: string;
+
+  @Property({ nullable: true, type: 'text' })
+  initiatorType?: string;
+
+  @Property({ nullable: true, type: 'text' })
+  os?: string;
+
+  @Property({ nullable: true })
+  pageLoaded: boolean;
+
+  @Property({ type: 'text' })
+  path!: string;
+
+  @PrimaryKey({
+    defaultRaw: 'CURRENT_TIMESTAMP',
+    type: 'timestamptz',
+  })
+  @Expose()
+  time!: Date;
+
+  @Property({ nullable: true, type: 'int' })
+  viewportHeight?: number;
+
+  @Property({ nullable: true, type: 'int' })
+  viewportWidth?: number;
+
+  @Property({ nullable: true, type: 'text' })
+  visitor?: string;
 }

@@ -1,7 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { WebSnippetController } from './web-snippet.controller';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
+
+import { WebSnippetController } from './web-snippet.controller';
 
 describe('WebSnippetController (e2e)', () => {
   let app: INestApplication;

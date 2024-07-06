@@ -1,13 +1,13 @@
 export enum MetricPeriod {
-  MINUTE = '1 minute',
-  FIVE_MINUTES = '5 minutes',
-  FIFTEEN_MINUTES = '15 minutes',
-  THIRTY_MINUTES = '30 minutes',
-  HOUR = '1 hour',
   DAY = '1 day',
-  WEEK = '1 week',
+  FIFTEEN_MINUTES = '15 minutes',
+  FIVE_MINUTES = '5 minutes',
+  HOUR = '1 hour',
+  MINUTE = '1 minute',
   MONTH = '1 month',
+  THIRTY_MINUTES = '30 minutes',
   THREE_MONTHS = '3 months',
+  WEEK = '1 week',
   YEAR = '1 year',
 }
 

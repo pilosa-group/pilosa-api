@@ -1,20 +1,36 @@
-import { Expose, Type } from 'class-transformer';
-import { HostingV1Dto } from '@app/synthetic-scan/dto/hosting-v1.dto';
 import { FileTypeResultsV1Dto } from '@app/synthetic-scan/dto/file-type-results-v1.dto';
+import { HostingV1Dto } from '@app/synthetic-scan/dto/hosting-v1.dto';
+import { Expose, Type } from 'class-transformer';
 
 export class ScanResultV1Dto {
   @Expose()
-  domain: string | null;
+  cachePercentage: number;
 
   @Expose()
-  pageTitle: string;
+  cdnPercentage: number;
+
+  @Expose()
+  compressedPercentage: number;
+
+  @Expose()
+  domain: null | string;
+
+  @Expose()
+  estimatedCo2: number;
+
+  @Expose()
+  @Type(() => FileTypeResultsV1Dto)
+  fileTypes: FileTypeResultsV1Dto;
+
+  @Expose()
+  @Type(() => HostingV1Dto)
+  hosting: HostingV1Dto[];
 
   @Expose()
   numberOfRequests: number;
 
   @Expose()
-  @Type(() => HostingV1Dto)
-  hosting: HostingV1Dto[];
+  pageTitle: string;
 
   @Expose()
   time?: {
@@ -28,20 +44,4 @@ export class ScanResultV1Dto {
 
   @Expose()
   totalBytesFormatted: string;
-
-  @Expose()
-  estimatedCo2: number;
-
-  @Expose()
-  cdnPercentage: number;
-
-  @Expose()
-  compressedPercentage: number;
-
-  @Expose()
-  cachePercentage: number;
-
-  @Expose()
-  @Type(() => FileTypeResultsV1Dto)
-  fileTypes: FileTypeResultsV1Dto;
 }

@@ -1,3 +1,13 @@
+import { Public } from '@app/auth/decorators/public.decorator';
+import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
+import { RequestHeaders } from '@app/web-metrics/decorators/request-headers.decorator';
+import { BeaconPayloadDto } from '@app/web-metrics/dto/beacon-payload.dto';
+import {
+  BeaconRequestHeadersDto,
+  FRONTEND_APP_ID_HEADER_NAME,
+} from '@app/web-metrics/dto/beacon-request-headers.dto';
+import { ColorScheme } from '@app/web-metrics/entities/browser-metric.entity';
+import { isValidInitiatorType } from '@app/web-metrics/utils/isValidInitiatorType';
 import {
   Body,
   Controller,
@@ -10,8 +20,17 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { Request } from 'express';
+import {
+  ApiBody,
+  ApiExcludeEndpoint,
+  ApiHeader,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import * as Sentry from '@sentry/node';
+import * as crypto from 'crypto';
+import { Request } from 'express';
 import { UAParser } from 'ua-parser-js';
 import {
   CLIs,
@@ -24,28 +43,10 @@ import {
   Modules,
   // @ts-expect-error - missing types
 } from 'ua-parser-js/extensions';
+
+import { BrowserMetricService } from './browser-metric.service';
 import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
 import { FrontendAppService } from './frontend-app.service';
-import { BrowserMetricService } from './browser-metric.service';
-import { Public } from '@app/auth/decorators/public.decorator';
-import { ClientIp } from '@app/web-metrics/decorators/client-ip.decorator';
-import * as crypto from 'crypto';
-import { ColorScheme } from '@app/web-metrics/entities/browser-metric.entity';
-import {
-  ApiBody,
-  ApiExcludeEndpoint,
-  ApiHeader,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { isValidInitiatorType } from '@app/web-metrics/utils/isValidInitiatorType';
-import { BeaconPayloadDto } from '@app/web-metrics/dto/beacon-payload.dto';
-import { RequestHeaders } from '@app/web-metrics/decorators/request-headers.decorator';
-import {
-  BeaconRequestHeadersDto,
-  FRONTEND_APP_ID_HEADER_NAME,
-} from '@app/web-metrics/dto/beacon-request-headers.dto';
 
 function hashValue(value: string) {
   const salt = new Date().toISOString().split('T')[0];
@@ -66,20 +67,6 @@ export class BeaconController {
     private browserMetricService: BrowserMetricService,
   ) {}
 
-  @Options()
-  @Public()
-  @HttpCode(HttpStatus.ACCEPTED)
-  @Header('Access-Control-Allow-Origin', '*')
-  @Header('Access-Control-Allow-Methods', 'POST')
-  @Header(
-    'Access-Control-Allow-Headers',
-    [FRONTEND_APP_ID_HEADER_NAME, 'Content-Type'].join(','),
-  )
-  @ApiExcludeEndpoint()
-  async options() {
-    return null;
-  }
-
   @Post()
   @Public()
   @HttpCode(HttpStatus.ACCEPTED)
@@ -93,17 +80,17 @@ export class BeaconController {
     type: BeaconPayloadDto,
   })
   @ApiHeader({
+    description: 'App ID required to identify and validate the frontend app',
     name: FRONTEND_APP_ID_HEADER_NAME,
     required: true,
-    description: 'App ID required to identify and validate the frontend app',
   })
   @ApiOperation({
-    summary: 'Create browser metric',
     operationId: 'createBrowserMetric',
+    summary: 'Create browser metric',
   })
-  @ApiResponse({ status: HttpStatus.ACCEPTED, description: 'Accepted' })
-  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden' })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({ description: 'Accepted', status: HttpStatus.ACCEPTED })
+  @ApiResponse({ description: 'Forbidden', status: HttpStatus.FORBIDDEN })
+  @ApiResponse({ description: 'Bad Request', status: HttpStatus.BAD_REQUEST })
   async create(
     @Body() payload: BeaconPayloadDto,
     @RequestHeaders()
@@ -168,34 +155,34 @@ export class BeaconController {
                 async (extension) => {
                   const {
                     b: bytes,
-                    l: pageLoaded,
                     co: crossOrigins,
+                    l: pageLoaded,
                   } = payload.d[domain][path][initiatorType][extension];
 
                   const [bytesCompressed, bytesUncompressed] = bytes;
 
                   if (bytesCompressed > 0 || bytesUncompressed > 0) {
                     const metric: CreateBrowserMetricDto = {
-                      pageLoaded,
-                      viewportWidth: payload.v[0],
-                      viewportHeight: payload.v[1],
+                      browser,
+                      bytesCompressed,
+                      bytesUncompressed,
                       colorScheme:
                         payload.m === 'd'
                           ? ColorScheme.Dark
                           : ColorScheme.Light,
+                      cpu,
+                      device,
+                      deviceType,
                       domain,
-                      path,
-                      initiatorType,
                       extension: nullableExtensions.includes(extension)
                         ? null
                         : extension,
-                      bytesCompressed,
-                      bytesUncompressed,
-                      cpu,
-                      browser,
-                      deviceType,
-                      device,
+                      initiatorType,
                       os,
+                      pageLoaded,
+                      path,
+                      viewportHeight: payload.v[1],
+                      viewportWidth: payload.v[0],
                       visitor,
                     };
 
@@ -234,6 +221,20 @@ export class BeaconController {
       throw error;
     }
 
+    return null;
+  }
+
+  @Options()
+  @Public()
+  @HttpCode(HttpStatus.ACCEPTED)
+  @Header('Access-Control-Allow-Origin', '*')
+  @Header('Access-Control-Allow-Methods', 'POST')
+  @Header(
+    'Access-Control-Allow-Headers',
+    [FRONTEND_APP_ID_HEADER_NAME, 'Content-Type'].join(','),
+  )
+  @ApiExcludeEndpoint()
+  async options() {
     return null;
   }
 }

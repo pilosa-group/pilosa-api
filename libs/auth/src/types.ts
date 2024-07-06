@@ -1,13 +1,13 @@
 export type JWTPayload = {
-  sub: string;
   clerk: {
-    id: string;
-    email: string;
     avatar: string;
-    full_name: string;
-    last_name: string;
-    first_name: string;
-    external_id: string;
+    email: string;
     email_verified: boolean;
+    external_id: string;
+    first_name: string;
+    full_name: string;
+    id: string;
+    last_name: string;
   };
+  sub: string;
 };

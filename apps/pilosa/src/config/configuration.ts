@@ -11,12 +11,12 @@ export type WebSnippetConfig = {
 };
 
 export type DatabaseConfig = {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
   database: string;
+  host: string;
+  password: string;
+  port: number;
   ssl: boolean;
+  username: string;
 };
 
 export type ClerkConfig = {
@@ -24,34 +24,34 @@ export type ClerkConfig = {
 };
 
 export type Config = {
-  app: AppConfig;
   api: ApiConfig;
+  app: AppConfig;
+  clerk: ClerkConfig;
   database: DatabaseConfig;
   webSnippet: WebSnippetConfig;
-  clerk: ClerkConfig;
 };
 
 export const ENV_DEVELOPMENT = 'development';
 
 export default (): Config => ({
-  app: {
-    env: process.env.NODE_ENV,
-  },
   api: {
     baseUrl: process.env.API_BASE_URL,
   },
-  database: {
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    ssl: Number(process.env.DB_SSL) === 1,
-  },
-  webSnippet: {
-    beaconApiUrl: process.env.SNIPPET_BEACON_API_URL,
+  app: {
+    env: process.env.NODE_ENV,
   },
   clerk: {
     issuerUrl: process.env.CLERK_ISSUER_URL,
+  },
+  database: {
+    database: process.env.DB_DATABASE,
+    host: process.env.DB_HOST,
+    password: process.env.DB_PASSWORD,
+    port: Number(process.env.DB_PORT),
+    ssl: Number(process.env.DB_SSL) === 1,
+    username: process.env.DB_USERNAME,
+  },
+  webSnippet: {
+    beaconApiUrl: process.env.SNIPPET_BEACON_API_URL,
   },
 });

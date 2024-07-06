@@ -2,31 +2,25 @@ import { Entity, PrimaryKey, PrimaryKeyProp, Property } from '@mikro-orm/core';
 
 @Entity()
 export class ServerMetric {
-  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
-  id: string;
-
-  @PrimaryKey({
-    type: 'timestamptz',
-    defaultRaw: 'CURRENT_TIMESTAMP',
-  })
-  time!: Date;
-
   [PrimaryKeyProp]?: ['id', 'time'];
 
   @Property({ type: 'float' })
   cpu: number = 0;
 
-  @Property({ type: 'float', nullable: true })
-  networkIn?: number;
-
-  @Property({ type: 'float', nullable: true })
-  networkOut?: number;
-
-  @Property({ type: 'float', nullable: true })
+  @Property({ nullable: true, type: 'float' })
   diskReadOps?: number;
 
-  @Property({ type: 'float', nullable: true })
+  @Property({ nullable: true, type: 'float' })
   diskWriteOps?: number;
+
+  @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
+  id: string;
+
+  @Property({ nullable: true, type: 'float' })
+  networkIn?: number;
+
+  @Property({ nullable: true, type: 'float' })
+  networkOut?: number;
 
   /**
    * This can not be a foreign key because the server metrics
@@ -35,6 +29,12 @@ export class ServerMetric {
    *
    * It should also improve performance.
    */
-  @Property({ type: 'uuid', index: true })
+  @Property({ index: true, type: 'uuid' })
   serverInstance!: string;
+
+  @PrimaryKey({
+    defaultRaw: 'CURRENT_TIMESTAMP',
+    type: 'timestamptz',
+  })
+  time!: Date;
 }

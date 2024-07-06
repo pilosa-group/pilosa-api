@@ -1,3 +1,5 @@
+import { Organization } from '@app/project/entities/organization.entity';
+import { User } from '@app/user/entities/user.entity';
 import {
   ArrayType,
   Entity,
@@ -5,26 +7,24 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { Organization } from '@app/project/entities/organization.entity';
-import { User } from '@app/user/entities/user.entity';
 
 @Entity({ tableName: 'organization_to_user' })
 export class UserOrganizationRole {
-  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
   id: string;
+
+  @ManyToOne({
+    deleteRule: 'cascade',
+    entity: () => Organization,
+  })
+  organization!: Organization;
 
   @Property({ type: ArrayType })
   roles: string[];
 
   @ManyToOne({
-    entity: () => Organization,
     deleteRule: 'cascade',
-  })
-  organization!: Organization;
-
-  @ManyToOne({
     entity: () => User,
-    deleteRule: 'cascade',
   })
   user: User;
 }

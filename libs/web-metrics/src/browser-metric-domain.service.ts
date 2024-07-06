@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { Domain } from '@app/web-metrics/entities/domain.entity';
 import { CreateDomainDto } from '@app/web-metrics/dto/create-domain.dto';
+import { Domain } from '@app/web-metrics/entities/domain.entity';
 import { EntityRepository, wrap } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class BrowserMetricDomainService {
@@ -13,10 +13,6 @@ export class BrowserMetricDomainService {
 
   async create(browserMetricDomainDto: CreateDomainDto): Promise<Domain> {
     return this.browserMetricDomainRepository.create(browserMetricDomainDto);
-  }
-
-  async save(browserMetricDomain: Domain): Promise<Domain> {
-    return this.browserMetricDomainRepository.upsert(browserMetricDomain);
   }
 
   async findOrCreateOneByDomain(fqdn: string): Promise<Domain> {
@@ -40,5 +36,9 @@ export class BrowserMetricDomainService {
     await this.browserMetricDomainRepository.getEntityManager().flush();
 
     return entity;
+  }
+
+  async save(browserMetricDomain: Domain): Promise<Domain> {
+    return this.browserMetricDomainRepository.upsert(browserMetricDomain);
   }
 }

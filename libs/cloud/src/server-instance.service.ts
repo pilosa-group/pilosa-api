@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { Instance } from './cloud-provider-instance-list.interface';
-import { Project } from '@app/project/entities/project.entity';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { ServerInstance } from '@app/cloud/entities/server-instance.entity';
+import { Project } from '@app/project/entities/project.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
+import { Injectable } from '@nestjs/common';
+
+import { Instance } from './cloud-provider-instance-list.interface';
 
 @Injectable()
 export class ServerInstanceService {
@@ -12,6 +13,30 @@ export class ServerInstanceService {
     @InjectRepository(ServerInstance)
     private serverInstanceRepository: EntityRepository<ServerInstance>,
   ) {}
+
+  findAllByCloudProviderAccount(
+    cloudProviderAccount: CloudProviderAccount,
+  ): Promise<ServerInstance[]> {
+    return this.serverInstanceRepository
+      .createQueryBuilder()
+      .where({
+        cloudProviderAccount: cloudProviderAccount.id,
+      })
+      .getResult();
+  }
+
+  findAllByProject(projectId: Project['id']): Promise<ServerInstance[]> {
+    return this.serverInstanceRepository
+      .createQueryBuilder()
+      .where({
+        cloudProviderAccount: {
+          project: {
+            id: projectId,
+          },
+        },
+      })
+      .getResult();
+  }
 
   async findOneById(id: string): Promise<ServerInstance> {
     return this.serverInstanceRepository.findOne({ id });
@@ -26,8 +51,8 @@ export class ServerInstanceService {
     cloudProviderAccount: CloudProviderAccount,
   ): Promise<ServerInstance | null> {
     const serverInstance = await this.serverInstanceRepository.findOne({
-      instanceId: instance.id,
       cloudProviderAccount,
+      instanceId: instance.id,
     });
 
     if (serverInstance) {
@@ -45,30 +70,6 @@ export class ServerInstanceService {
     newInstance.tags = instance.tags;
 
     return this.save(newInstance);
-  }
-
-  findAllByProject(projectId: Project['id']): Promise<ServerInstance[]> {
-    return this.serverInstanceRepository
-      .createQueryBuilder()
-      .where({
-        cloudProviderAccount: {
-          project: {
-            id: projectId,
-          },
-        },
-      })
-      .getResult();
-  }
-
-  findAllByCloudProviderAccount(
-    cloudProviderAccount: CloudProviderAccount,
-  ): Promise<ServerInstance[]> {
-    return this.serverInstanceRepository
-      .createQueryBuilder()
-      .where({
-        cloudProviderAccount: cloudProviderAccount.id,
-      })
-      .getResult();
   }
 
   /**

@@ -11,22 +11,22 @@ import {
 } from '@app/web-metrics/dto/beacon-payload.dto';
 
 type Payload = {
-  // The domain of the resource
-  d: Domain;
-  // The path of the resource
-  p: Path;
-  // The type of the initiator of the resource
-  it: InitiatorType;
-  // Whether the resource is compressed
-  c: IsCompressed;
   // The current bytes of the resource
   b: NumberOfBytes;
+  // Whether the resource is compressed
+  c: IsCompressed;
   // The cross-origin origins of the resource, when it's a cross-origin request
   co: CrossOriginDomain[];
+  // The domain of the resource
+  d: Domain;
   // extension
   e: FileExtension;
+  // The type of the initiator of the resource
+  it: InitiatorType;
   // Whether the document has reached "load" state
   l: PageLoaded;
+  // The path of the resource
+  p: Path;
 };
 
 declare let SNIPPET_API_ENDPOINT: string;
@@ -41,7 +41,6 @@ const w = window;
 const d = document;
 const noop = () => {};
 const CLIENT_ID = d.currentScript.getAttribute('data-client-id');
-const isNumber = (value: any): value is number => typeof value === 'number';
 
 /**
  * Debounce function
@@ -73,16 +72,16 @@ const colorScheme = w.matchMedia('(prefers-color-scheme: dark)').matches
   ? 'd'
   : 'l';
 
+const compressedKey = 0;
+const uncompressedKey = 1;
+
 const sendBeacon = (): void => {
   const groupedPayloads: BeaconPayloadDto = {
-    m: colorScheme,
-    v: [w.innerWidth, w.innerHeight],
     b: [0, 0],
     d: {},
+    m: colorScheme,
+    v: [w.innerWidth, w.innerHeight],
   };
-
-  const compressedKey = 0;
-  const uncompressedKey = 1;
 
   for (const payload of payloads) {
     const pageLoaded = payload.l;
@@ -91,7 +90,7 @@ const sendBeacon = (): void => {
     const initiatorType = payload.it;
     const extension = payload.e;
     const compressed = payload.c;
-    const bytes = payload.b;
+    const bytes = Number(payload.b);
     const crossOrigin = payload.co;
 
     // If the domain doesn't exist in the groupedPayloads, add it
@@ -113,8 +112,8 @@ const sendBeacon = (): void => {
     if (!groupedPayloads.d[domain][path][initiatorType][extension]) {
       groupedPayloads.d[domain][path][initiatorType][extension] = {
         b: [0, 0],
-        l: pageLoaded,
         co: [],
+        l: pageLoaded,
       };
     }
 
@@ -146,13 +145,13 @@ const sendBeacon = (): void => {
   if (hasBytes || hasData) {
     // console.log(groupedPayloads);
     fetch(BEACON_API_URL, {
-      keepalive: true,
-      method: 'POST',
+      body: JSON.stringify(groupedPayloads),
       headers: {
         'Content-Type': 'application/json',
         'x-id': CLIENT_ID,
       },
-      body: JSON.stringify(groupedPayloads),
+      keepalive: true,
+      method: 'POST',
     }).catch(noop);
   }
 
@@ -165,36 +164,29 @@ const sendBeaconDebounced = debounce(sendBeacon, BATCH_REPORT_WAIT_TIME_IN_MS);
 
 const observer = new PerformanceObserver((list) => {
   list.getEntries().map((entry: PerformanceResourceTiming) => {
-    const { pathname: path, hostname: domain } = w.location;
+    const { hostname: domain, pathname: path } = w.location;
 
     const {
-      entryType,
-      transferSize,
-      name,
       decodedBodySize,
       encodedBodySize,
+      entryType,
       initiatorType,
+      name,
+      transferSize,
     } = entry;
 
     switch (entryType) {
       case ENTRY_TYPE_RESOURCE: {
-        if ([decodedBodySize, transferSize].some((value) => value === null)) {
-          return;
-        }
-
         const cached = transferSize === 0 && decodedBodySize > 0;
 
         if (cached) {
           return;
         }
 
-        const { pathname, host } = new URL(name);
+        const { host, pathname } = new URL(name);
 
         // Check if the resource is compressed
-        const compressed =
-          isNumber(decodedBodySize) &&
-          isNumber(encodedBodySize) &&
-          decodedBodySize !== encodedBodySize;
+        const compressed = decodedBodySize !== encodedBodySize;
 
         let extension = '_';
         if (pathname.includes('.')) {
@@ -202,14 +194,14 @@ const observer = new PerformanceObserver((list) => {
         }
 
         const payload: Payload = {
-          l: pageLoaded,
-          d: domain,
-          p: path,
-          c: compressed,
-          it: initiatorType,
           b: transferSize,
+          c: compressed,
           co: [],
+          d: domain,
           e: extension,
+          it: initiatorType,
+          l: pageLoaded,
+          p: path,
         };
 
         // Cached page when EXACTLY 300 bytes?
@@ -249,4 +241,4 @@ const observer = new PerformanceObserver((list) => {
   }
 });
 
-observer.observe({ type: ENTRY_TYPE_RESOURCE, buffered: true });
+observer.observe({ buffered: true, type: ENTRY_TYPE_RESOURCE });

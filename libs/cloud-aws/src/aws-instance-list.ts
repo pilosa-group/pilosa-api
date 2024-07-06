@@ -1,19 +1,19 @@
-import { DescribeInstancesCommand, EC2 } from '@aws-sdk/client-ec2';
 import {
+  AwsCredentials,
   CloudProviderInstanceList,
   Instance,
-  AwsCredentials,
 } from '@app/cloud/cloud-provider-instance-list.interface';
+import { DescribeInstancesCommand, EC2 } from '@aws-sdk/client-ec2';
 
 export class AwsInstanceList implements CloudProviderInstanceList {
   async listInstances(credentials: AwsCredentials): Promise<Instance[]> {
     const ec2Client = new EC2({
       apiVersion: '2010-08-01',
-      region: credentials.region,
       credentials: {
         accessKeyId: credentials.accessKeyId,
         secretAccessKey: credentials.secretAccessKey,
       },
+      region: credentials.region,
     });
 
     const result = await ec2Client.send(new DescribeInstancesCommand({}));
@@ -28,15 +28,15 @@ export class AwsInstanceList implements CloudProviderInstanceList {
       if (reservation.Instances) {
         for (const instance of reservation.Instances) {
           instances.push({
+            class: instance.InstanceType as string,
+            id: instance.InstanceId as string,
             provider: 'aws',
-            type: 'vm',
+            state: instance.State?.Name as Instance['state'],
             tags: instance.Tags?.map((tag) => ({
               key: tag.Key as string,
               value: tag.Value as string,
             })),
-            class: instance.InstanceType as string,
-            state: instance.State?.Name as Instance['state'],
-            id: instance.InstanceId as string,
+            type: 'vm',
           });
         }
       }

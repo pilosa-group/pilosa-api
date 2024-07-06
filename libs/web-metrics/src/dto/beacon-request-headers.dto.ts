@@ -1,5 +1,5 @@
-import { IsDefined, IsUrl, IsUUID } from 'class-validator';
 import { Expose } from 'class-transformer';
+import { IsDefined, IsUUID, IsUrl } from 'class-validator';
 
 export const FRONTEND_APP_ID_HEADER_NAME = 'x-id';
 

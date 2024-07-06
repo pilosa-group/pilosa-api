@@ -1,30 +1,30 @@
-import {
-  Entity,
-  Property,
-  ManyToOne,
-  PrimaryKey,
-  ArrayType,
-} from '@mikro-orm/core';
 import { Project } from '@app/project/entities/project.entity';
 import { User } from '@app/user/entities/user.entity';
+import {
+  ArrayType,
+  Entity,
+  ManyToOne,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 
 @Entity({ tableName: 'project_to_user' })
 export class UserProjectRole {
-  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
   id: string;
+
+  @ManyToOne({
+    deleteRule: 'cascade',
+    entity: () => Project,
+  })
+  public project: Project;
 
   @Property({ type: ArrayType })
   roles: string[];
 
   @ManyToOne({
-    entity: () => Project,
     deleteRule: 'cascade',
-  })
-  public project: Project;
-
-  @ManyToOne({
     entity: () => User,
-    deleteRule: 'cascade',
   })
   public user: User;
 }

@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
-import { WebSnippetController } from './web-snippet.controller';
 import { CacheModule } from '@nestjs/cache-manager';
+import { Module } from '@nestjs/common';
+
+import { WebSnippetController } from './web-snippet.controller';
 
 @Module({
-  imports: [CacheModule.register()],
   controllers: [WebSnippetController],
+  imports: [CacheModule.register()],
 })
 export class WebSnippetModule {}

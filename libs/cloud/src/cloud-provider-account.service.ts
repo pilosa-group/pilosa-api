@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { Project } from '@app/project/entities/project.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CloudProviderAccountService {
@@ -10,6 +10,12 @@ export class CloudProviderAccountService {
     @InjectRepository(CloudProviderAccount)
     private cloudProviderAccountRepository: EntityRepository<CloudProviderAccount>,
   ) {}
+
+  async findAllByProject(project: Project): Promise<CloudProviderAccount[]> {
+    return this.cloudProviderAccountRepository.find({
+      project,
+    });
+  }
 
   async findOneLatestImported(): Promise<CloudProviderAccount | null> {
     return this.cloudProviderAccountRepository
@@ -29,11 +35,5 @@ export class CloudProviderAccountService {
     cloudProviderAccount: CloudProviderAccount,
   ): Promise<CloudProviderAccount> {
     return this.cloudProviderAccountRepository.upsert(cloudProviderAccount);
-  }
-
-  async findAllByProject(project: Project): Promise<CloudProviderAccount[]> {
-    return this.cloudProviderAccountRepository.find({
-      project,
-    });
   }
 }

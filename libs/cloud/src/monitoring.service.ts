@@ -1,13 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ServerInstanceService } from './server-instance.service';
-import { AwsCredentials } from './cloud-provider-instance-list.interface';
-import { CloudProviderAccountService } from './cloud-provider-account.service';
 import { AwsGetMetrics } from '@app/cloud-aws/aws-get-metrics';
 import { AwsInstanceList } from '@app/cloud-aws/aws-instance-list';
 import { ServerMetricService } from '@app/cloud-metrics/server-metric.service';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { CreateRequestContext } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/core';
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
+import { CloudProviderAccountService } from './cloud-provider-account.service';
+import { AwsCredentials } from './cloud-provider-instance-list.interface';
+import { ServerInstanceService } from './server-instance.service';
 
 @Injectable()
 export class MonitoringService {
@@ -39,8 +40,8 @@ export class MonitoringService {
 
       const awsCredentials: AwsCredentials = {
         accessKeyId: cloudProviderAccount.accessKeyId,
-        secretAccessKey: cloudProviderAccount.secretAccessKey,
         region: cloudProviderAccount.region,
+        secretAccessKey: cloudProviderAccount.secretAccessKey,
       };
 
       if (awsCredentials) {
@@ -66,8 +67,8 @@ export class MonitoringService {
             awsCredentials,
             instance,
             {
-              startTime,
               endTime,
+              startTime,
             },
           );
 

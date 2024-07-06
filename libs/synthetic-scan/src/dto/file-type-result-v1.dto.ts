@@ -5,11 +5,11 @@ export class FileTypeResultV1Dto {
   count: number;
 
   @Expose()
+  estimatedCo2: number;
+
+  @Expose()
   totalBytes: number;
 
   @Expose()
   totalBytesFormatted: string;
-
-  @Expose()
-  estimatedCo2: number;
 }

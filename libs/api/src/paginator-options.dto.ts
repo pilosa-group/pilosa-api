@@ -7,8 +7,8 @@ export const DEFAULT_LIMIT = 20;
 
 export class PaginatorOptionsDto {
   @ApiPropertyOptional({
-    maximum: MAX_LIMIT,
     default: DEFAULT_LIMIT,
+    maximum: MAX_LIMIT,
   })
   @Type(() => Number)
   @IsInt()

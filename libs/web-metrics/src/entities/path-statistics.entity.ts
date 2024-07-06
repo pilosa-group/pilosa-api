@@ -1,3 +1,5 @@
+import { AssetGroupStatistics } from '@app/web-metrics/entities/asset-group-statistics.entity';
+import { Path } from '@app/web-metrics/entities/path.entity';
 import {
   Cascade,
   Collection,
@@ -7,29 +9,9 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { AssetGroupStatistics } from '@app/web-metrics/entities/asset-group-statistics.entity';
-import { Path } from '@app/web-metrics/entities/path.entity';
 
 @Entity()
 export class PathStatistics {
-  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
-  id: string;
-
-  @Property({
-    type: 'timestamptz',
-    defaultRaw: 'CURRENT_TIMESTAMP',
-  })
-  createdAt!: Date;
-
-  @Property({ type: 'float' })
-  domReadyTime!: number;
-
-  @Property({ type: 'float' })
-  loadTime!: number;
-
-  @Property({ type: 'float' })
-  networkIdleTime!: number;
-
   @OneToMany(
     () => AssetGroupStatistics,
     (assetGroup: AssetGroupStatistics) => assetGroup.pathStats,
@@ -39,9 +21,27 @@ export class PathStatistics {
   )
   assetGroups = new Collection<AssetGroupStatistics>(this);
 
+  @Property({
+    defaultRaw: 'CURRENT_TIMESTAMP',
+    type: 'timestamptz',
+  })
+  createdAt!: Date;
+
+  @Property({ type: 'float' })
+  domReadyTime!: number;
+
+  @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
+  id: string;
+
+  @Property({ type: 'float' })
+  loadTime!: number;
+
+  @Property({ type: 'float' })
+  networkIdleTime!: number;
+
   @ManyToOne({
-    entity: () => Path,
     deleteRule: 'cascade',
+    entity: () => Path,
   })
   path!: Path;
 }

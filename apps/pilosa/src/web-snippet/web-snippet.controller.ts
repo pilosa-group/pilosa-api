@@ -1,11 +1,11 @@
-import { Controller, Get, Header, HttpStatus, Res } from '@nestjs/common';
-import esbuild from 'esbuild';
-import * as util from 'util';
-import * as path from 'path';
-import * as fs from 'fs';
 import { Public } from '@app/auth/decorators/public.decorator';
-import { Response } from 'express';
+import { Controller, Get, Header, HttpStatus, Res } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
+import esbuild from 'esbuild';
+import { Response } from 'express';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as util from 'util';
 
 const readFile = util.promisify(fs.readFile);
 
@@ -30,16 +30,16 @@ export class WebSnippetController {
     );
 
     await esbuild.build({
-      entryPoints: [snippetPath],
-      minify: true,
       allowOverwrite: true,
-      format: 'iife',
-      platform: 'browser',
-      outfile: snippetOut,
       define: {
-        SNIPPET_API_ENDPOINT: `'${process.env.SNIPPET_BEACON_API_URL}'`,
         BATCH_REPORT_WAIT_TIME_IN_MS: '2000',
+        SNIPPET_API_ENDPOINT: `'${process.env.SNIPPET_BEACON_API_URL}'`,
       },
+      entryPoints: [snippetPath],
+      format: 'iife',
+      minify: true,
+      outfile: snippetOut,
+      platform: 'browser',
     });
 
     let snippetContents = await readFile(snippetOut, 'utf8');

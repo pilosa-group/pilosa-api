@@ -1,7 +1,7 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 
 export const RequestHeaders = createParamDecorator(
-  (property: string | number | symbol, ctx: ExecutionContext) => {
+  (property: number | string | symbol, ctx: ExecutionContext) => {
     const headers = ctx.switchToHttp().getRequest().headers;
 
     if (

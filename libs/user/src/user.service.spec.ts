@@ -1,7 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from './user.service';
 import { User } from '@app/user/entities/user.entity';
 import { getRepositoryToken } from '@mikro-orm/nestjs';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { UserService } from './user.service';
 
 const mockUserRepository = {};
 

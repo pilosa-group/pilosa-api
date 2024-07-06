@@ -28,8 +28,8 @@ export type ByteData = {
       [key: InitiatorType]: {
         [key: FileExtension]: {
           b: [CompressedBytes, UncompressedBytes];
-          l: PageLoaded;
           co: CrossOriginDomain[];
+          l: PageLoaded;
         };
       };
     };
@@ -44,8 +44,8 @@ const byteDataExample: ByteData = {
       script: {
         js: {
           b: bytesExample,
-          l: true,
           co: ['https://cross-origin.com'],
+          l: true,
         },
       },
     },
@@ -53,16 +53,12 @@ const byteDataExample: ByteData = {
 };
 
 export class BeaconPayloadDto {
-  @ApiProperty({ type: 'enum', enum: ['d', 'l'], example: 'd' })
-  @IsIn(['d', 'l'])
-  m: ColorScheme;
-
   @ApiProperty({
-    type: 'array',
-    minItems: 2,
-    maxItems: 2,
     allOf: [{ type: 'number' }, { type: 'number' }],
     example: bytesExample,
+    maxItems: 2,
+    minItems: 2,
+    type: 'array',
   })
   @IsInt({ each: true })
   @ArrayMinSize(2)
@@ -70,55 +66,59 @@ export class BeaconPayloadDto {
   b: [CompressedBytes, UncompressedBytes];
 
   @ApiProperty({
-    type: 'array',
-    minItems: 2,
-    maxItems: 2,
+    example: byteDataExample,
+    oneOf: [
+      {
+        additionalProperties: {
+          additionalProperties: {
+            additionalProperties: {
+              properties: {
+                b: {
+                  allOf: [{ type: 'number' }, { type: 'number' }],
+                  example: [7584, 91829],
+                  maxItems: 2,
+                  minItems: 2,
+                  type: 'array',
+                },
+                co: {
+                  items: {
+                    example: ['https://cross-origin.com'],
+                    type: 'string',
+                  },
+                  type: 'array',
+                },
+                l: {
+                  example: true,
+                  type: 'boolean',
+                },
+              },
+              type: 'object',
+            },
+            type: 'object',
+          },
+          type: 'object',
+        },
+        type: 'object',
+      },
+    ],
+    type: 'object',
+  })
+  @IsDefined()
+  d: ByteData;
+
+  @ApiProperty({ enum: ['d', 'l'], example: 'd', type: 'enum' })
+  @IsIn(['d', 'l'])
+  m: ColorScheme;
+
+  @ApiProperty({
     allOf: [{ type: 'number' }, { type: 'number' }],
     example: viewportExample,
+    maxItems: 2,
+    minItems: 2,
+    type: 'array',
   })
   @IsInt({ each: true })
   @ArrayMinSize(2)
   @ArrayMaxSize(2)
   v: Viewport;
-
-  @ApiProperty({
-    type: 'object',
-    oneOf: [
-      {
-        type: 'object',
-        additionalProperties: {
-          type: 'object',
-          additionalProperties: {
-            type: 'object',
-            additionalProperties: {
-              type: 'object',
-              properties: {
-                b: {
-                  type: 'array',
-                  minItems: 2,
-                  maxItems: 2,
-                  allOf: [{ type: 'number' }, { type: 'number' }],
-                  example: [7584, 91829],
-                },
-                l: {
-                  type: 'boolean',
-                  example: true,
-                },
-                co: {
-                  type: 'array',
-                  items: {
-                    type: 'string',
-                    example: ['https://cross-origin.com'],
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    ],
-    example: byteDataExample,
-  })
-  @IsDefined()
-  d: ByteData;
 }

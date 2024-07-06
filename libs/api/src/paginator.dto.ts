@@ -1,11 +1,11 @@
-import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { PaginatorMetaDto } from '@app/api/paginator-meta.dto';
-import { Expose, Type } from 'class-transformer';
+import { ServerInstanceDto } from '@app/cloud/dto/server-instance.dto';
 import { OrganizationDto } from '@app/project/dto/organization.dto';
 import { ProjectDto } from '@app/project/dto/project.dto';
-import { ServerInstanceDto } from '@app/cloud/dto/server-instance.dto';
-import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
 import { CarbonEmissionMetricDto } from '@app/web-metrics/dto/carbon-emission-metric.dto';
+import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
+import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
 
 // export type PaginatorItemDto =
 //   | OrganizationDto
@@ -15,11 +15,6 @@ import { CarbonEmissionMetricDto } from '@app/web-metrics/dto/carbon-emission-me
 //   | CarbonEmissionMetricDto;
 
 export class PaginatorDto<T extends object> {
-  @Type(() => PaginatorMetaDto)
-  @Expose()
-  @ApiProperty({ type: () => PaginatorMetaDto })
-  meta!: PaginatorMetaDto;
-
   @Expose()
   @ApiProperty({
     isArray: true,
@@ -32,6 +27,11 @@ export class PaginatorDto<T extends object> {
     ],
   })
   items!: T[];
+
+  @Type(() => PaginatorMetaDto)
+  @Expose()
+  @ApiProperty({ type: () => PaginatorMetaDto })
+  meta!: PaginatorMetaDto;
 
   constructor(items: T[], meta: PaginatorMetaDto) {
     this.meta = meta;

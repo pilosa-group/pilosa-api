@@ -9,6 +9,6 @@ type SentryConfig = {
 export const initSentry = ({ dsn, tracesSampleRate = 1.0 }: SentryConfig) =>
   Sentry.init({
     dsn,
-    tracesSampleRate,
     integrations: [nodeProfilingIntegration()],
+    tracesSampleRate,
   });
