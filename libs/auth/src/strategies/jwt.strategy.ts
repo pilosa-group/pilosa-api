@@ -1,16 +1,17 @@
+import { JWTPayload } from '@app/auth/types';
+import { User } from '@app/user/entities/user.entity';
+import { UserService } from '@app/user/user.service';
 import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { passportJwtSecret } from 'jwks-rsa';
 import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import { passportJwtSecret } from 'jwks-rsa';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
 import {
   AppConfig,
   ClerkConfig,
   ENV_DEVELOPMENT,
 } from '../../../../apps/pilosa/src/config/configuration';
-import { JWTPayload } from '@app/auth/types';
-import { UserService } from '@app/user/user.service';
-import { User } from '@app/user/entities/user.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -22,16 +23,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const appConfig = configService.get<AppConfig>('app');
 
     super({
+      algorithms: ['RS256'],
+      ignoreExpiration: appConfig.env === ENV_DEVELOPMENT,
+      issuer: clerkConfig.issuerUrl,
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKeyProvider: passportJwtSecret({
         cache: true,
-        rateLimit: true,
         jwksRequestsPerMinute: 5,
         jwksUri: `${clerkConfig.issuerUrl}/.well-known/jwks.json`,
+        rateLimit: true,
       }),
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      issuer: clerkConfig.issuerUrl,
-      ignoreExpiration: appConfig.env === ENV_DEVELOPMENT,
-      algorithms: ['RS256'],
     });
   }
 

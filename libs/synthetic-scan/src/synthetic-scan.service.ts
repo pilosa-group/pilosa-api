@@ -1,49 +1,56 @@
-import { Injectable, Logger } from '@nestjs/common';
 import type { Request, Response } from 'playwright';
-import { chromium } from 'playwright';
-import { co2 } from '@tgwf/co2';
-import { calculateTotalSize } from './utils/calculateTotalSize';
-import { isCdn } from './utils/isCdn';
-import { isCacheable } from './utils/isCacheable';
-import { findRequestByContentType } from './utils/findRequestByContentType';
-import { Path } from '@app/web-metrics/entities/path.entity';
-import { findRequestByDomain } from '@app/synthetic-scan/utils/findRequestByDomain';
-import {
-  assetGroupKeys,
-  assetGroups,
-  AssetGroupStatistics,
-} from '@app/web-metrics/entities/asset-group-statistics.entity';
+
+import { ScanResultV1Dto } from '@app/synthetic-scan/dto/scan-result-v1.dto';
 import { GreenHostingService } from '@app/synthetic-scan/green-hosting.service';
+import { findRequestByDomain } from '@app/synthetic-scan/utils/findRequestByDomain';
+import { formatBytes } from '@app/synthetic-scan/utils/formatBytes';
+import { isCompressed } from '@app/synthetic-scan/utils/isCompressed';
+import { scrollPageToEnd } from '@app/synthetic-scan/utils/playwright';
 import { BrowserMetricDomainService } from '@app/web-metrics/browser-metric-domain.service';
 import { BrowserMetricPathService } from '@app/web-metrics/browser-metric-path.service';
+import {
+  AssetGroupStatistics,
+  assetGroupKeys,
+  assetGroups,
+} from '@app/web-metrics/entities/asset-group-statistics.entity';
+import { Path } from '@app/web-metrics/entities/path.entity';
 import { PathStatistics } from '@app/web-metrics/entities/path-statistics.entity';
-import { isCompressed } from '@app/synthetic-scan/utils/isCompressed';
-import { formatBytes } from '@app/synthetic-scan/utils/formatBytes';
+import { Injectable, Logger } from '@nestjs/common';
+import { co2 } from '@tgwf/co2';
 import { plainToInstance } from 'class-transformer';
-import { ScanResultV1Dto } from '@app/synthetic-scan/dto/scan-result-v1.dto';
-import { scrollPageToEnd } from '@app/synthetic-scan/utils/playwright';
+import { chromium } from 'playwright';
+
+import { calculateTotalSize } from './utils/calculateTotalSize';
+import { findRequestByContentType } from './utils/findRequestByContentType';
+import { isCacheable } from './utils/isCacheable';
+import { isCdn } from './utils/isCdn';
 
 export type NetworkRequest = {
-  url: string;
   request: Request;
   response?: Response;
+  url: string;
 };
 
 export type FileTypeResult = {
   count: number;
+  estimatedCo2: number;
   totalBytes: number;
   totalBytesFormatted: string;
-  estimatedCo2: number;
 };
 
 export type ResultV1 = {
-  domain: string | null;
-  pageTitle: string;
-  numberOfRequests: number;
+  cachePercentage: number;
+  cdnPercentage: number;
+  compressedPercentage: number;
+  domain: null | string;
+  estimatedCo2: number;
+  fileTypes: Record<string, FileTypeResult>;
   hosting: Array<{
     domain: string;
     green: boolean;
   }>;
+  numberOfRequests: number;
+  pageTitle: string;
   time?: {
     domReady: number;
     load: number;
@@ -51,11 +58,6 @@ export type ResultV1 = {
   };
   totalBytes: number;
   totalBytesFormatted: string;
-  estimatedCo2: number;
-  cdnPercentage: number;
-  compressedPercentage: number;
-  cachePercentage: number;
-  fileTypes: Record<string, FileTypeResult>;
 };
 
 const ignoreDomains = ['localhost'];
@@ -70,9 +72,9 @@ async function toFileTypeResult(
 
   return {
     count: networkRequests.length,
+    estimatedCo2: co2Emission.perByte(totalBytes, greenHost),
     totalBytes,
     totalBytesFormatted: formatBytes(totalBytes),
-    estimatedCo2: co2Emission.perByte(totalBytes, greenHost),
   };
 }
 
@@ -137,9 +139,9 @@ export class SyntheticScanService {
 
     async function handleRequest(request: Request) {
       networkRequests.push({
-        url: request.url(),
         request,
         response: await request.response(),
+        url: request.url(),
       });
     }
 
@@ -268,34 +270,31 @@ export class SyntheticScanService {
 
     // keep compatible with old response (for quick scan UI)
     const result = plainToInstance<ScanResultV1Dto, ResultV1>(ScanResultV1Dto, {
-      domain: null,
-      pageTitle: path.title,
-      hosting: [
-        {
-          domain: topDomain.fqdn,
-          green: topDomain.isGreenHost,
-        },
-      ],
-      numberOfRequests: networkRequests.length,
-      time: {
-        domReady: domReadyTime,
-        load: loadTime,
-        networkIdle: networkIdleTime,
-      },
-      totalBytes: await calculateTotalSize(networkRequests),
-      totalBytesFormatted: formatBytes(totalBytes),
-      estimatedCo2: co2Emission.perVisit(totalBytes, topDomain.isGreenHost),
+      cachePercentage:
+        (networkRequests.filter(isCacheable).length / networkRequests.length) *
+        100,
       cdnPercentage:
         (networkRequests.filter(isCdn).length / networkRequests.length) * 100,
       compressedPercentage:
         (networkRequests.filter(isCompressed).length / networkRequests.length) *
         100,
-      cachePercentage:
-        (networkRequests.filter(isCacheable).length / networkRequests.length) *
-        100,
+      domain: null,
+      estimatedCo2: co2Emission.perVisit(totalBytes, topDomain.isGreenHost),
       fileTypes: {
+        audio: await toFileTypeResult(
+          networkRequests.filter(findRequestByContentType(['audio'])),
+          topDomain.isGreenHost,
+        ),
+        fonts: await toFileTypeResult(
+          networkRequests.filter(findRequestByContentType(['font'])),
+          topDomain.isGreenHost,
+        ),
         images: await toFileTypeResult(
           networkRequests.filter(findRequestByContentType(['image/'])),
+          topDomain.isGreenHost,
+        ),
+        json: await toFileTypeResult(
+          networkRequests.filter(findRequestByContentType(['json'])),
           topDomain.isGreenHost,
         ),
         scripts: await toFileTypeResult(
@@ -306,25 +305,28 @@ export class SyntheticScanService {
           networkRequests.filter(findRequestByContentType(['text/css'])),
           topDomain.isGreenHost,
         ),
-        json: await toFileTypeResult(
-          networkRequests.filter(findRequestByContentType(['json'])),
-          topDomain.isGreenHost,
-        ),
-        fonts: await toFileTypeResult(
-          networkRequests.filter(findRequestByContentType(['font'])),
-          topDomain.isGreenHost,
-        ),
         video: await toFileTypeResult(
           networkRequests.filter(
             findRequestByContentType(['video', 'application/vnd.yt-ump']),
           ),
           topDomain.isGreenHost,
         ),
-        audio: await toFileTypeResult(
-          networkRequests.filter(findRequestByContentType(['audio'])),
-          topDomain.isGreenHost,
-        ),
       },
+      hosting: [
+        {
+          domain: topDomain.fqdn,
+          green: topDomain.isGreenHost,
+        },
+      ],
+      numberOfRequests: networkRequests.length,
+      pageTitle: path.title,
+      time: {
+        domReady: domReadyTime,
+        load: loadTime,
+        networkIdle: networkIdleTime,
+      },
+      totalBytes: await calculateTotalSize(networkRequests),
+      totalBytesFormatted: formatBytes(totalBytes),
     });
 
     void browser.close();

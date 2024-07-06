@@ -1,9 +1,9 @@
-import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 export class FrontendAppDto {
   @Expose()
-  @ApiProperty({ type: 'string', format: 'uuid' })
+  @ApiProperty({ format: 'uuid', type: 'string' })
   id: string;
 
   @Expose()
@@ -11,6 +11,6 @@ export class FrontendAppDto {
   name!: string;
 
   @Expose()
-  @ApiProperty({ type: 'string', format: 'domain', isArray: true })
+  @ApiProperty({ format: 'domain', isArray: true, type: 'string' })
   urls!: string[];
 }

@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
 import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
-import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/core';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UserOrganizationRoleService {

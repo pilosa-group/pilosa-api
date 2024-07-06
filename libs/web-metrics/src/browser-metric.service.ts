@@ -1,17 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
-import { FrontendApp } from './entities/frontend-app.entity';
-import { BrowserMetric } from './entities/browser-metric.entity';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository, wrap } from '@mikro-orm/postgresql';
+import { PaginatorDto } from '@app/api/paginator.dto';
 import {
   MetricPeriod,
   MetricPeriodValue,
 } from '@app/cloud/enum/metric-period.enum';
-import * as bytes from 'bytes';
 import { CarbonEmissionMetricDto } from '@app/web-metrics/dto/carbon-emission-metric.dto';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityRepository, wrap } from '@mikro-orm/postgresql';
+import { Injectable } from '@nestjs/common';
 import { co2 } from '@tgwf/co2';
-import { PaginatorDto } from '@app/api/paginator.dto';
+import * as bytes from 'bytes';
+
+import { CreateBrowserMetricDto } from './dto/create-browser-metric.dto';
+import { BrowserMetric } from './entities/browser-metric.entity';
+import { FrontendApp } from './entities/frontend-app.entity';
 
 @Injectable()
 export class BrowserMetricService {
@@ -33,15 +34,46 @@ export class BrowserMetricService {
     return metric;
   }
 
-  async save(browserMetric: BrowserMetric): Promise<BrowserMetric> {
-    this.browserMetricRepository.getEntityManager().persist(browserMetric);
+  async findByFrontendApp(
+    frontendApp: FrontendApp['id'],
+    {
+      limit = 100,
+      offset = 0,
+      period = MetricPeriod.DAY,
+    }: { limit?: number; offset?: number; period: MetricPeriod },
+  ): Promise<PaginatorDto<CarbonEmissionMetricDto>> {
+    const query = `SELECT time_bucket(?, time)                              as period,
+           SUM("bytesCompressed") + SUM("bytesUncompressed") as bytes
+    FROM browser_metric
+    WHERE "frontendApp" = ?
+    GROUP BY period
+    ORDER BY period ASC
+     LIMIT ? OFFSET ?
+    `;
 
-    await this.browserMetricRepository.getEntityManager().flush();
+    const result = await this.browserMetricRepository
+      .getEntityManager()
+      .getConnection()
+      .execute(query, [period, frontendApp, limit, offset]);
 
-    return browserMetric;
+    return new PaginatorDto<CarbonEmissionMetricDto>(
+      result.map((metric) => {
+        return new CarbonEmissionMetricDto({
+          bytes: metric.bytes,
+          bytesFormatted: bytes.format(metric.bytes, { unitSeparator: ' ' }),
+          co2: (this.co2Emission.perByte(metric.bytes) as any).total,
+          period: metric.period as unknown as MetricPeriodValue,
+        });
+      }),
+      {
+        limit,
+        offset,
+        total: result.length,
+      },
+    );
   }
 
-  async findLatestUnscannedUrl(): Promise<string | null> {
+  async findLatestUnscannedUrl(): Promise<null | string> {
     const [result] = await this.browserMetricRepository
       .getEntityManager()
       .getConnection()
@@ -64,42 +96,11 @@ export class BrowserMetricService {
     return `https://${result.domain}${result.path}`;
   }
 
-  async findByFrontendApp(
-    frontendApp: FrontendApp['id'],
-    {
-      period = MetricPeriod.DAY,
-      limit = 100,
-      offset = 0,
-    }: { period: MetricPeriod; limit?: number; offset?: number },
-  ): Promise<PaginatorDto<CarbonEmissionMetricDto>> {
-    const query = `SELECT time_bucket(?, time)                              as period,
-           SUM("bytesCompressed") + SUM("bytesUncompressed") as bytes
-    FROM browser_metric
-    WHERE "frontendApp" = ?
-    GROUP BY period
-    ORDER BY period ASC
-     LIMIT ? OFFSET ?
-    `;
+  async save(browserMetric: BrowserMetric): Promise<BrowserMetric> {
+    this.browserMetricRepository.getEntityManager().persist(browserMetric);
 
-    const result = await this.browserMetricRepository
-      .getEntityManager()
-      .getConnection()
-      .execute(query, [period, frontendApp, limit, offset]);
+    await this.browserMetricRepository.getEntityManager().flush();
 
-    return new PaginatorDto<CarbonEmissionMetricDto>(
-      result.map((metric) => {
-        return new CarbonEmissionMetricDto({
-          period: metric.period as unknown as MetricPeriodValue,
-          co2: (this.co2Emission.perByte(metric.bytes) as any).total,
-          bytes: metric.bytes,
-          bytesFormatted: bytes.format(metric.bytes, { unitSeparator: ' ' }),
-        });
-      }),
-      {
-        limit,
-        offset,
-        total: result.length,
-      },
-    );
+    return browserMetric;
   }
 }

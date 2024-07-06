@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { EntityManager, EntityName } from '@mikro-orm/core';
-import type { FilterQuery } from '@mikro-orm/core/typings';
 import type { FindOptions } from '@mikro-orm/core/drivers/IDatabaseDriver';
+import type { FilterQuery } from '@mikro-orm/core/typings';
+
 import { PaginatorDto } from '@app/api/paginator.dto';
-import { ClassConstructor } from 'class-transformer';
 import { TransformerService } from '@app/api/transformer.service';
+import { EntityManager, EntityName } from '@mikro-orm/core';
+import { Injectable } from '@nestjs/common';
+import { ClassConstructor } from 'class-transformer';
 
 @Injectable()
 export class PaginatorService {
@@ -30,9 +31,9 @@ export class PaginatorService {
         this.transformerService.entityToDto<Entity, Dto>(entity, DtoClass),
       ),
       {
-        total,
         limit: options.limit,
         offset: options.offset,
+        total,
       },
     );
   }

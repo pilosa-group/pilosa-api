@@ -1,9 +1,9 @@
-import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 export class OrganizationDto {
   @Expose()
-  @ApiProperty({ type: 'string', format: 'uuid' })
+  @ApiProperty({ format: 'uuid', type: 'string' })
   id: string;
 
   @Expose()

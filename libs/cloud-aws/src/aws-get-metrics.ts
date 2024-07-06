@@ -1,9 +1,3 @@
-import { CloudWatch } from '@aws-sdk/client-cloudwatch';
-
-import {
-  GetMetricDataCommand,
-  GetMetricDataCommandInput,
-} from '@aws-sdk/client-cloudwatch';
 import {
   AwsCredentials,
   Instance,
@@ -12,6 +6,11 @@ import {
   CloudProviderMetrics,
   MetricResult,
 } from '@app/cloud/cloud-provider-metrics.interface';
+import { CloudWatch } from '@aws-sdk/client-cloudwatch';
+import {
+  GetMetricDataCommand,
+  GetMetricDataCommandInput,
+} from '@aws-sdk/client-cloudwatch';
 
 const duration = 60;
 
@@ -19,18 +18,19 @@ export class AwsGetMetrics implements CloudProviderMetrics {
   async getMetrics(
     credentials: AwsCredentials,
     instance: Instance,
-    { startTime, endTime },
+    { endTime, startTime },
   ): Promise<MetricResult[]> {
     const cloudWatchClient = new CloudWatch({
       apiVersion: '2010-08-01',
-      region: credentials.region,
       credentials: {
         accessKeyId: credentials.accessKeyId,
         secretAccessKey: credentials.secretAccessKey,
       },
+      region: credentials.region,
     });
 
     const input: GetMetricDataCommandInput = {
+      EndTime: endTime,
       MetricDataQueries: [
         {
           Id: 'cpu', // Required
@@ -128,9 +128,8 @@ export class AwsGetMetrics implements CloudProviderMetrics {
           ReturnData: true,
         },
       ],
-      StartTime: startTime,
-      EndTime: endTime,
       ScanBy: 'TimestampAscending',
+      StartTime: startTime,
     };
 
     const command = new GetMetricDataCommand(input);
@@ -167,13 +166,13 @@ export class AwsGetMetrics implements CloudProviderMetrics {
 
       return cpuTimestamps.map((timestamp, index) => {
         return {
-          duration,
-          datetime: timestamp,
           cpu: cpuValues[index],
-          networkIn: networkInValues[index],
-          networkOut: networkOutValues[index],
+          datetime: timestamp,
           diskReadOps: diskReadOpsValues[index],
           diskWriteOps: diskWriteOpsValues[index],
+          duration,
+          networkIn: networkInValues[index],
+          networkOut: networkOutValues[index],
         };
       });
     }

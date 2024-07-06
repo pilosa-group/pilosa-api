@@ -1,3 +1,5 @@
+import { Project } from '@app/project/entities/project.entity';
+import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
 import {
   Collection,
   Entity,
@@ -5,25 +7,23 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { Project } from '@app/project/entities/project.entity';
-import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
 
 @Entity()
 export class Organization {
-  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
-  id: string;
-
   @Property()
   createdAt = new Date();
 
-  @Property({ onUpdate: () => new Date(), nullable: true })
-  updatedAt?: Date;
+  @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
+  id: string;
 
   @Property()
   name: string;
 
   @OneToMany(() => Project, (project: Project) => project.organization)
   projects = new Collection<Project>(this);
+
+  @Property({ nullable: true, onUpdate: () => new Date() })
+  updatedAt?: Date;
 
   @OneToMany(
     () => UserOrganizationRole,

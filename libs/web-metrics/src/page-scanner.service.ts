@@ -1,16 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { SyntheticScanService } from '@app/synthetic-scan';
+import { BrowserMetricService } from '@app/web-metrics/browser-metric.service';
 import { CreateRequestContext } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/core';
-import { BrowserMetricService } from '@app/web-metrics/browser-metric.service';
-import { SyntheticScanService } from '@app/synthetic-scan';
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import * as Sentry from '@sentry/node';
 
 @Injectable()
 export class PageScannerService {
-  private readonly logger = new Logger(PageScannerService.name);
-
   private isRunning = false;
+
+  private readonly logger = new Logger(PageScannerService.name);
 
   constructor(
     private readonly orm: MikroORM,

@@ -1,16 +1,16 @@
-import './instrument';
-
-import * as Sentry from '@sentry/node';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import {
   BaseExceptionFilter,
   HttpAdapterHost,
   NestFactory,
 } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { initSentry } from './instrument';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as Sentry from '@sentry/node';
+
+import { AppModule } from './app.module';
 import { ENV_DEVELOPMENT } from './config/configuration';
+import './instrument';
+import { initSentry } from './instrument';
 
 async function bootstrap() {
   process.env.SENTRY_DSN &&
@@ -25,9 +25,9 @@ async function bootstrap() {
   Sentry.setupNestErrorHandler(app, new BaseExceptionFilter(httpAdapter));
 
   app.enableVersioning({
-    type: VersioningType.URI,
-    prefix: 'v',
     defaultVersion: '1',
+    prefix: 'v',
+    type: VersioningType.URI,
   });
 
   app.enableCors({
@@ -50,10 +50,10 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      validateCustomDecorators: true,
-      transform: true,
-      whitelist: true,
       enableDebugMessages: process.env.NODE_ENV === ENV_DEVELOPMENT,
+      transform: true,
+      validateCustomDecorators: true,
+      whitelist: true,
     }),
   );
 

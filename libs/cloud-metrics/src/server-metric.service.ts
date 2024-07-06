@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { ServerMetric } from './entities/server-metric.entity';
 import { MetricResult } from '@app/cloud/cloud-provider-metrics.interface';
 import { ServerInstance } from '@app/cloud/entities/server-instance.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
+import { Injectable } from '@nestjs/common';
+
+import { ServerMetric } from './entities/server-metric.entity';
 
 @Injectable()
 export class ServerMetricService {
@@ -17,14 +18,25 @@ export class ServerMetricService {
     serverInstance: ServerInstance,
   ): Promise<ServerMetric> {
     return this.serverMetricRepository.create({
-      serverInstance: serverInstance['id'],
-      time: metricResult.datetime,
       cpu: metricResult.cpu,
-      networkIn: metricResult.networkIn,
-      networkOut: metricResult.networkOut,
       diskReadOps: metricResult.diskReadOps,
       diskWriteOps: metricResult.diskWriteOps,
+      networkIn: metricResult.networkIn,
+      networkOut: metricResult.networkOut,
+      serverInstance: serverInstance['id'],
+      time: metricResult.datetime,
     });
+  }
+
+  findAllByServerInstance(
+    serverInstance: ServerInstance,
+  ): Promise<ServerMetric[]> {
+    return this.serverMetricRepository
+      .createQueryBuilder()
+      .where({
+        serverInstance: serverInstance.id,
+      })
+      .getResult();
   }
 
   async getLastImportedDate(serverInstance: ServerInstance): Promise<Date> {
@@ -51,17 +63,6 @@ export class ServerMetricService {
     await this.serverMetricRepository.getEntityManager().flush();
 
     return serverMetric;
-  }
-
-  findAllByServerInstance(
-    serverInstance: ServerInstance,
-  ): Promise<ServerMetric[]> {
-    return this.serverMetricRepository
-      .createQueryBuilder()
-      .where({
-        serverInstance: serverInstance.id,
-      })
-      .getResult();
   }
 
   // async getMetricsByPeriod(

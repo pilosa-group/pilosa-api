@@ -1,10 +1,18 @@
-import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 export class ServerInstanceDto {
   @Expose()
-  @ApiProperty({ type: 'string', format: 'uuid' })
+  @ApiProperty()
+  class!: string;
+
+  @Expose()
+  @ApiProperty({ format: 'uuid', type: 'string' })
   id: string;
+
+  @Expose()
+  @ApiProperty()
+  instanceId!: string;
 
   @Expose()
   @ApiProperty()
@@ -12,13 +20,5 @@ export class ServerInstanceDto {
 
   @Expose()
   @ApiProperty()
-  class!: string;
-
-  @Expose()
-  @ApiProperty()
   state!: string;
-
-  @Expose()
-  @ApiProperty()
-  instanceId!: string;
 }

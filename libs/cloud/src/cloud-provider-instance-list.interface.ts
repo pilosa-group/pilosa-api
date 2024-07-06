@@ -4,18 +4,18 @@ export type InstanceTag = {
 };
 
 export type Instance = {
-  provider: 'aws' | 'gcp' | 'azure' | 'other';
-  state: 'pending' | 'running' | 'stopped' | 'terminated';
-  type: 'vm' | 'database';
-  tags: InstanceTag[];
   class: string;
   id: string;
+  provider: 'aws' | 'azure' | 'gcp' | 'other';
+  state: 'pending' | 'running' | 'stopped' | 'terminated';
+  tags: InstanceTag[];
+  type: 'database' | 'vm';
 };
 
 export type AwsCredentials = {
   accessKeyId: string;
-  secretAccessKey: string;
   region: string;
+  secretAccessKey: string;
 };
 
 export interface CloudProviderInstanceList {

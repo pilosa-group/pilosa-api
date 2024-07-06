@@ -1,21 +1,21 @@
 import {
-  Instance,
   AwsCredentials,
+  Instance,
 } from './cloud-provider-instance-list.interface';
 
 export type MetricResult = {
-  datetime: Date;
-  duration: number;
   cpu?: number;
-  networkIn?: number;
-  networkOut?: number;
+  datetime: Date;
   diskReadOps?: number;
   diskWriteOps?: number;
+  duration: number;
+  networkIn?: number;
+  networkOut?: number;
 };
 
 interface GetMetricsOptions {
-  startTime: Date;
   endTime: Date;
+  startTime: Date;
 }
 
 export interface CloudProviderMetrics {

@@ -1,20 +1,20 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
-import { ProjectService } from '@app/project/project.service';
-import { Project } from '@app/project/entities/project.entity';
-import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { PaginatorService } from '@app/api';
-import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
+import { ApiPaginatedResponse } from '@app/api/openapi/decorators/api-paginated-response.decorator';
 import { PaginatorDto } from '@app/api/paginator.dto';
+import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
+import { TransformerService } from '@app/api/transformer.service';
+import { ProjectDto } from '@app/project/dto/project.dto';
+import { Project } from '@app/project/entities/project.entity';
+import { ProjectService } from '@app/project/project.service';
+import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
+import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
-import { ProjectDto } from '@app/project/dto/project.dto';
-import { TransformerService } from '@app/api/transformer.service';
-import { ApiPaginatedResponse } from '@app/api/openapi/decorators/api-paginated-response.decorator';
 
 @ApiBearerAuth()
 @ApiTags('Organizations')
@@ -31,8 +31,8 @@ export class ProjectsController {
     description: 'Get all projects',
   })
   @ApiOperation({
-    summary: 'Get all projects by organization',
     operationId: 'getProjects',
+    summary: 'Get all projects by organization',
   })
   async getAllProjects(
     @Param('organizationId', ParseUUIDPipe) organization: string,
@@ -47,32 +47,13 @@ export class ProjectsController {
     );
   }
 
-  @Get('projects/:id')
-  @ApiResponse({
-    status: 200,
-    description: 'Get a project',
-    type: ProjectDto,
-  })
-  @ApiOperation({
-    summary: 'Get a project',
-    operationId: 'getProject',
-  })
-  async getProject(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ProjectDto> {
-    return this.transformerService.entityToDto<Project, ProjectDto>(
-      await this.projectService.findOne(id),
-      ProjectDto,
-    );
-  }
-
   @Get('projects/:projectId/frontend-apps')
   @ApiPaginatedResponse(FrontendAppDto, {
     description: 'Get all frontend apps for a project',
   })
   @ApiOperation({
-    summary: 'Get all frontend apps by project',
     operationId: 'getFrontendApps',
+    summary: 'Get all frontend apps by project',
   })
   async getFrontendApps(
     @Param('projectId', ParseUUIDPipe) projectId: string,
@@ -84,6 +65,25 @@ export class ProjectsController {
       {
         project: projectId,
       },
+    );
+  }
+
+  @Get('projects/:id')
+  @ApiResponse({
+    description: 'Get a project',
+    status: 200,
+    type: ProjectDto,
+  })
+  @ApiOperation({
+    operationId: 'getProject',
+    summary: 'Get a project',
+  })
+  async getProject(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ProjectDto> {
+    return this.transformerService.entityToDto<Project, ProjectDto>(
+      await this.projectService.findOne(id),
+      ProjectDto,
     );
   }
 }

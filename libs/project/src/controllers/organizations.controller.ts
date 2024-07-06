@@ -1,18 +1,18 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
-import { OrganizationService } from '@app/project/organization.service';
-import { Organization } from '@app/project/entities/organization.entity';
 import { PaginatorService } from '@app/api';
-import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
+import { ApiPaginatedResponse } from '@app/api/openapi/decorators/api-paginated-response.decorator';
 import { PaginatorDto } from '@app/api/paginator.dto';
+import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
+import { TransformerService } from '@app/api/transformer.service';
+import { OrganizationDto } from '@app/project/dto/organization.dto';
+import { Organization } from '@app/project/entities/organization.entity';
+import { OrganizationService } from '@app/project/organization.service';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { OrganizationDto } from '@app/project/dto/organization.dto';
-import { TransformerService } from '@app/api/transformer.service';
-import { ApiPaginatedResponse } from '@app/api/openapi/decorators/api-paginated-response.decorator';
 
 @ApiBearerAuth()
 @ApiTags('Organizations')
@@ -29,8 +29,8 @@ export class OrganizationsController {
     description: 'Get all organizations',
   })
   @ApiOperation({
-    summary: 'Get all organizations',
     operationId: 'getOrganizations',
+    summary: 'Get all organizations',
   })
   async getAllOrganizations(
     @Query() paginatorOptions: PaginatorOptionsDto,
@@ -43,13 +43,13 @@ export class OrganizationsController {
 
   @Get('/:id')
   @ApiResponse({
-    status: 200,
     description: 'Get an organization',
+    status: 200,
     type: OrganizationDto,
   })
   @ApiOperation({
-    summary: 'Get an organization',
     operationId: 'getOrganization',
+    summary: 'Get an organization',
   })
   async getOrganization(
     @Param('id', ParseUUIDPipe) id: string,

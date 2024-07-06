@@ -1,3 +1,5 @@
+import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
+import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 import {
   Collection,
   Entity,
@@ -5,24 +7,19 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
-import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
 import { Expose } from 'class-transformer';
 
 @Entity()
 export class User {
-  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
-  @Expose()
-  id: string;
+  @Property({ unique: true })
+  clerkId: string;
 
   @Property()
   createdAt = new Date();
 
-  @Property({ onUpdate: () => new Date(), nullable: true })
-  updatedAt?: Date;
-
-  @Property({ unique: true })
-  clerkId: string;
+  @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
+  @Expose()
+  id: string;
 
   @OneToMany(
     () => UserOrganizationRole,
@@ -32,4 +29,7 @@ export class User {
 
   @OneToMany(() => UserProjectRole, (projectToUser) => projectToUser.user)
   projectRoles = new Collection<UserProjectRole>(this);
+
+  @Property({ nullable: true, onUpdate: () => new Date() })
+  updatedAt?: Date;
 }

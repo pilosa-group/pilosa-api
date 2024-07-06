@@ -1,11 +1,11 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
-import { BrowserMetricService } from '@app/web-metrics/browser-metric.service';
-import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
-import { CarbonEmissionMetricDto } from '@app/web-metrics/dto/carbon-emission-metric.dto';
-import { PaginatorDto } from '@app/api/paginator.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GetBrowserMetricsOptionsDto } from '@app/web-metrics/dto/browser-metrics-options.dto';
 import { ApiPaginatedResponse } from '@app/api/openapi/decorators/api-paginated-response.decorator';
+import { PaginatorDto } from '@app/api/paginator.dto';
+import { BrowserMetricService } from '@app/web-metrics/browser-metric.service';
+import { GetBrowserMetricsOptionsDto } from '@app/web-metrics/dto/browser-metrics-options.dto';
+import { CarbonEmissionMetricDto } from '@app/web-metrics/dto/carbon-emission-metric.dto';
+import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @ApiTags('Metrics')
@@ -18,8 +18,8 @@ export class BrowserMetricsController {
     description: 'Get browser metrics for a frontend app',
   })
   @ApiOperation({
-    summary: 'Get browser metrics for a frontend app',
     operationId: 'getBrowserMetrics',
+    summary: 'Get browser metrics for a frontend app',
   })
   async getMetrics(
     @Param('frontendAppId', ParseUUIDPipe) frontendAppId: FrontendApp['id'],
