@@ -41,7 +41,6 @@ const w = window;
 const d = document;
 const noop = () => {};
 const CLIENT_ID = d.currentScript.getAttribute('data-client-id');
-const isNumber = (value: any): value is number => typeof value === 'number';
 
 /**
  * Debounce function
@@ -73,6 +72,9 @@ const colorScheme = w.matchMedia('(prefers-color-scheme: dark)').matches
   ? 'd'
   : 'l';
 
+const compressedKey = 0;
+const uncompressedKey = 1;
+
 const sendBeacon = (): void => {
   const groupedPayloads: BeaconPayloadDto = {
     b: [0, 0],
@@ -81,9 +83,6 @@ const sendBeacon = (): void => {
     v: [w.innerWidth, w.innerHeight],
   };
 
-  const compressedKey = 0;
-  const uncompressedKey = 1;
-
   for (const payload of payloads) {
     const pageLoaded = payload.l;
     const domain = payload.d;
@@ -91,7 +90,7 @@ const sendBeacon = (): void => {
     const initiatorType = payload.it;
     const extension = payload.e;
     const compressed = payload.c;
-    const bytes = payload.b;
+    const bytes = Number(payload.b);
     const crossOrigin = payload.co;
 
     // If the domain doesn't exist in the groupedPayloads, add it
@@ -178,10 +177,6 @@ const observer = new PerformanceObserver((list) => {
 
     switch (entryType) {
       case ENTRY_TYPE_RESOURCE: {
-        if ([decodedBodySize, transferSize].some((value) => value === null)) {
-          return;
-        }
-
         const cached = transferSize === 0 && decodedBodySize > 0;
 
         if (cached) {
@@ -191,10 +186,7 @@ const observer = new PerformanceObserver((list) => {
         const { host, pathname } = new URL(name);
 
         // Check if the resource is compressed
-        const compressed =
-          isNumber(decodedBodySize) &&
-          isNumber(encodedBodySize) &&
-          decodedBodySize !== encodedBodySize;
+        const compressed = decodedBodySize !== encodedBodySize;
 
         let extension = '_';
         if (pathname.includes('.')) {
