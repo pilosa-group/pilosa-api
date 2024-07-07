@@ -90,7 +90,7 @@ const sendBeacon = (): void => {
     const initiatorType = payload.it;
     const extension = payload.e;
     const compressed = payload.c;
-    const bytes = Number(payload.b);
+    const bytes = payload.b;
     const crossOrigin = payload.co;
 
     // If the domain doesn't exist in the groupedPayloads, add it
@@ -166,14 +166,14 @@ const observer = new PerformanceObserver((list) => {
   list.getEntries().map((entry: PerformanceResourceTiming) => {
     const { hostname: domain, pathname: path } = w.location;
 
-    const {
+    const { entryType, initiatorType, name } = entry;
+    let { decodedBodySize, encodedBodySize, transferSize } = entry;
+
+    [decodedBodySize, encodedBodySize, transferSize] = [
       decodedBodySize,
       encodedBodySize,
-      entryType,
-      initiatorType,
-      name,
       transferSize,
-    } = entry;
+    ].map(Number);
 
     switch (entryType) {
       case ENTRY_TYPE_RESOURCE: {
