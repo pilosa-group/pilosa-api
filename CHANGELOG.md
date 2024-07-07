@@ -1,3 +1,10 @@
+## [1.13.2](https://github.com/pilosa-group/pilosa-api/compare/v1.13.1...v1.13.2) (2024-07-07)
+
+
+### Bug Fixes
+
+* **sloth:** cast to number earlier ([#24](https://github.com/pilosa-group/pilosa-api/issues/24)) ([558da72](https://github.com/pilosa-group/pilosa-api/commit/558da72d56e6108d14e298d5591ab16d910a3e8b))
+
 ## [1.13.1](https://github.com/pilosa-group/pilosa-api/compare/v1.13.0...v1.13.1) (2024-07-05)
 
 
