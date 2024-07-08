@@ -40,6 +40,7 @@ let payloads: Payload[] = [];
 const w = window;
 const d = document;
 const noop = () => {};
+const isNumber = (value: unknown): value is number => typeof value === 'number';
 const CLIENT_ID = d.currentScript.getAttribute('data-client-id');
 
 /**
@@ -74,6 +75,7 @@ const colorScheme = w.matchMedia('(prefers-color-scheme: dark)').matches
 
 const compressedKey = 0;
 const uncompressedKey = 1;
+const isSupported = !!(w.PerformanceObserver && w.PerformanceResourceTiming);
 
 const sendBeacon = (): void => {
   const groupedPayloads: BeaconPayloadDto = {
@@ -143,7 +145,6 @@ const sendBeacon = (): void => {
   const hasData = Object.keys(groupedPayloads.d).length > 0;
 
   if (hasBytes || hasData) {
-    // console.log(groupedPayloads);
     fetch(BEACON_API_URL, {
       body: JSON.stringify(groupedPayloads),
       headers: {
@@ -162,83 +163,98 @@ const sendBeacon = (): void => {
 // Send the beacon after a certain amount of time
 const sendBeaconDebounced = debounce(sendBeacon, BATCH_REPORT_WAIT_TIME_IN_MS);
 
-const observer = new PerformanceObserver((list) => {
-  list.getEntries().map((entry: PerformanceResourceTiming) => {
-    const { hostname: domain, pathname: path } = w.location;
+if (isSupported) {
+  const observer = new PerformanceObserver((list) => {
+    list.getEntries().map((entry: PerformanceResourceTiming) => {
+      const { hostname: domain, pathname: path } = w.location;
 
-    const { entryType, initiatorType, name } = entry;
-    let { decodedBodySize, encodedBodySize, transferSize } = entry;
+      const {
+        decodedBodySize,
+        encodedBodySize,
+        entryType,
+        initiatorType,
+        name,
+        transferSize,
+      } = entry;
 
-    [decodedBodySize, encodedBodySize, transferSize] = [
-      decodedBodySize,
-      encodedBodySize,
-      transferSize,
-    ].map(Number);
+      const hasValidPerformanceTimingValues = [
+        decodedBodySize,
+        encodedBodySize,
+        transferSize,
+      ].every(isNumber);
 
-    switch (entryType) {
-      case ENTRY_TYPE_RESOURCE: {
-        const cached = transferSize === 0 && decodedBodySize > 0;
-
-        if (cached) {
-          return;
-        }
-
-        const { host, pathname } = new URL(name);
-
-        // Check if the resource is compressed
-        const compressed = decodedBodySize !== encodedBodySize;
-
-        let extension = '_';
-        if (pathname.includes('.')) {
-          extension = pathname.split('.').pop();
-        }
-
-        const payload: Payload = {
-          b: transferSize,
-          c: compressed,
-          co: [],
-          d: domain,
-          e: extension,
-          it: initiatorType,
-          l: pageLoaded,
-          p: path,
-        };
-
-        // Cached page when EXACTLY 300 bytes?
-        if (transferSize === 300 && initiatorType === 'fetch') {
-          return;
-        }
-
-        // If the transfer size is 0, it's a cross-origin request
-        if (transferSize === 0) {
-          const origin = host;
-
-          // Only add the origin if it's not already in the list
-          if (!payload.co.includes(origin)) {
-            payload.co.push(origin);
-          }
-        }
-
-        // If the initiator type is fetch, and it's a call to the snippet API, ignore it
-        if (
-          payload.it === 'fetch' &&
-          payload.co.length === 1 &&
-          BEACON_API_URL.includes(payload.co[0])
-        ) {
-          return;
-        }
-
-        payloads.push(payload);
-
-        break;
+      // on some occasions these values can be undefined, for example in iOS 16.3 and lower
+      if (!hasValidPerformanceTimingValues) {
+        observer.disconnect();
+        // @TODO also track non-supported entries, so we can determine number of visits and still make an estimate
+        return;
       }
+
+      switch (entryType) {
+        case ENTRY_TYPE_RESOURCE: {
+          const cached = transferSize === 0 && decodedBodySize > 0;
+
+          if (cached) {
+            return;
+          }
+
+          const { host, pathname } = new URL(name);
+
+          // Check if the resource is compressed
+          const compressed = decodedBodySize !== encodedBodySize;
+
+          let extension = '_';
+          if (pathname.includes('.')) {
+            extension = pathname.split('.').pop();
+          }
+
+          const payload: Payload = {
+            b: transferSize,
+            c: compressed,
+            co: [],
+            d: domain,
+            e: extension,
+            it: initiatorType,
+            l: pageLoaded,
+            p: path,
+          };
+
+          // Cached page when EXACTLY 300 bytes?
+          if (transferSize === 300 && initiatorType === 'fetch') {
+            return;
+          }
+
+          // If the transfer size is 0, it's a cross-origin request
+          if (transferSize === 0) {
+            const origin = host;
+
+            // Only add the origin if it's not already in the list
+            if (!payload.co.includes(origin)) {
+              payload.co.push(origin);
+            }
+          }
+
+          // If the initiator type is fetch, and it's a call to the snippet API, ignore it
+          if (
+            payload.it === 'fetch' &&
+            payload.co.length === 1 &&
+            BEACON_API_URL.includes(payload.co[0])
+          ) {
+            return;
+          }
+
+          payloads.push(payload);
+
+          break;
+        }
+      }
+    });
+
+    // If there are payloads, send the beacon
+    if (payloads.length > 0) {
+      sendBeaconDebounced();
     }
   });
 
-  // If there are payloads, send the beacon
-  if (payloads.length > 0) {
-    sendBeaconDebounced();
-  }
-});
-
-observer.observe({ buffered: true, type: ENTRY_TYPE_RESOURCE });
+  observer.observe({ buffered: true, type: ENTRY_TYPE_RESOURCE });
+}
