@@ -1,3 +1,10 @@
+## [1.13.3](https://github.com/pilosa-group/pilosa-api/compare/v1.13.2...v1.13.3) (2024-07-08)
+
+
+### Bug Fixes
+
+* **sloth:** fix ios 16.x unsupported PerformanceResourceTiming entries ([#25](https://github.com/pilosa-group/pilosa-api/issues/25)) ([b327644](https://github.com/pilosa-group/pilosa-api/commit/b327644db7305ab4de1e63f0b234f74a8ac29164))
+
 ## [1.13.2](https://github.com/pilosa-group/pilosa-api/compare/v1.13.1...v1.13.2) (2024-07-07)
 
 
