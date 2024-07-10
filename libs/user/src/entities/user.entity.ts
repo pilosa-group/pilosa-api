@@ -1,5 +1,5 @@
-import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
-import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
+import { OrganizationMember } from '@app/project/entities/organization-member.entity';
+import { ProjectMember } from '@app/project/entities/project-member.entity';
 import {
   Collection,
   Entity,
@@ -17,18 +17,24 @@ export class User {
   @Property()
   createdAt = new Date();
 
+  @Property({ nullable: true })
+  email: string;
+
   @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
   @Expose()
   id: string;
 
+  @Property({ nullable: true })
+  name!: string;
+
   @OneToMany(
-    () => UserOrganizationRole,
+    () => OrganizationMember,
     (organizationToUser) => organizationToUser.user,
   )
-  organizationRoles = new Collection<UserOrganizationRole>(this);
+  organizationMembers = new Collection<OrganizationMember>(this);
 
-  @OneToMany(() => UserProjectRole, (projectToUser) => projectToUser.user)
-  projectRoles = new Collection<UserProjectRole>(this);
+  @OneToMany(() => ProjectMember, (projectToUser) => projectToUser.user)
+  projectMembers = new Collection<ProjectMember>(this);
 
   @Property({ nullable: true, onUpdate: () => new Date() })
   updatedAt?: Date;

@@ -6,9 +6,18 @@ import { TransformerService } from '@app/api/transformer.service';
 import { ProjectDto } from '@app/project/dto/project.dto';
 import { Project } from '@app/project/entities/project.entity';
 import { ProjectService } from '@app/project/project.service';
+import { CurrentUser } from '@app/user/decorators/current-user.decorator';
+import { UserDto } from '@app/user/dto/user';
 import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -37,12 +46,20 @@ export class ProjectsController {
   async getAllProjects(
     @Param('organizationId', ParseUUIDPipe) organization: string,
     @Query() paginatorOptions: PaginatorOptionsDto,
+    @CurrentUser() user: UserDto,
   ): Promise<PaginatorDto<ProjectDto>> {
     return this.paginatorService.findAll<Project, ProjectDto>(
       [Project.name, ProjectDto],
       paginatorOptions,
       {
-        organization,
+        members: {
+          user: {
+            id: user.id,
+          },
+        },
+        organization: {
+          id: organization,
+        },
       },
     );
   }
@@ -58,12 +75,20 @@ export class ProjectsController {
   async getFrontendApps(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Query() paginatorOptions: PaginatorOptionsDto,
+    @CurrentUser() user: UserDto,
   ): Promise<PaginatorDto<FrontendAppDto>> {
     return this.paginatorService.findAll<FrontendApp, FrontendAppDto>(
       [FrontendApp.name, FrontendAppDto],
       paginatorOptions,
       {
-        project: projectId,
+        project: {
+          id: projectId,
+          members: {
+            user: {
+              id: user.id,
+            },
+          },
+        },
       },
     );
   }
@@ -80,9 +105,16 @@ export class ProjectsController {
   })
   async getProject(
     @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserDto,
   ): Promise<ProjectDto> {
+    const project = await this.projectService.findOne(id, user);
+
+    if (!project) {
+      throw new NotFoundException();
+    }
+
     return this.transformerService.entityToDto<Project, ProjectDto>(
-      await this.projectService.findOne(id),
+      project,
       ProjectDto,
     );
   }

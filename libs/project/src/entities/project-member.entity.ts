@@ -1,15 +1,10 @@
 import { Project } from '@app/project/entities/project.entity';
+import { ProjectRole } from '@app/project/enum/project-role.enum';
 import { User } from '@app/user/entities/user.entity';
-import {
-  ArrayType,
-  Entity,
-  ManyToOne,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, PrimaryKey } from '@mikro-orm/core';
 
-@Entity({ tableName: 'project_to_user' })
-export class UserProjectRole {
+@Entity({ tableName: 'project_member' })
+export class ProjectMember {
   @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
   id: string;
 
@@ -19,8 +14,8 @@ export class UserProjectRole {
   })
   public project: Project;
 
-  @Property({ type: ArrayType })
-  roles: string[];
+  @Enum(() => ProjectRole)
+  role: ProjectRole = ProjectRole.MEMBER;
 
   @ManyToOne({
     deleteRule: 'cascade',

@@ -37,7 +37,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: JWTPayload): Promise<User> {
-    return this.userService.findOrCreateOneByClerkId(payload.sub);
+    return this.userService.findOrCreateOneByClerkId({
+      clerkId: payload.sub,
+      email: payload.clerk.email,
+      name: payload.clerk.full_name,
+    });
 
     // return {
     //   id: user.id,

@@ -1,15 +1,10 @@
 import { Organization } from '@app/project/entities/organization.entity';
+import { OrganizationRole } from '@app/project/enum/organization-role.enum';
 import { User } from '@app/user/entities/user.entity';
-import {
-  ArrayType,
-  Entity,
-  ManyToOne,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, PrimaryKey } from '@mikro-orm/core';
 
-@Entity({ tableName: 'organization_to_user' })
-export class UserOrganizationRole {
+@Entity({ tableName: 'organization_member' })
+export class OrganizationMember {
   @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
   id: string;
 
@@ -19,8 +14,8 @@ export class UserOrganizationRole {
   })
   organization!: Organization;
 
-  @Property({ type: ArrayType })
-  roles: string[];
+  @Enum(() => OrganizationRole)
+  role: OrganizationRole = OrganizationRole.MEMBER;
 
   @ManyToOne({
     deleteRule: 'cascade',

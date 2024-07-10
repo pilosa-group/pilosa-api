@@ -1,13 +1,13 @@
-import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
+import { ProjectMember } from '@app/project/entities/project-member.entity';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class UserProjectRoleService {
+export class ProjectMemberService {
   constructor(
-    @InjectRepository(UserProjectRole)
-    private projectRoleRepository: EntityRepository<UserProjectRole>,
+    @InjectRepository(ProjectMember)
+    private projectRoleRepository: EntityRepository<ProjectMember>,
   ) {}
 
   // async findAllForUser(user: User): Promise<UserProjectRole[]> {
