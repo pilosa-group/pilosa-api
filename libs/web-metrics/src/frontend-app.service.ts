@@ -1,4 +1,4 @@
-import { Project } from '@app/project/entities/project.entity';
+import { UserDto } from '@app/user/dto/user';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
@@ -12,17 +12,27 @@ export class FrontendAppService {
     private frontendAppRepository: EntityRepository<FrontendApp>,
   ) {}
 
-  async findByProject(
-    project: Project | Project['id'],
-  ): Promise<FrontendApp[]> {
-    return this.frontendAppRepository.find({
-      project,
+  async findOneById(
+    id: FrontendApp['id'],
+    user: UserDto,
+  ): Promise<FrontendApp> {
+    return this.frontendAppRepository.findOne({
+      id,
+      project: {
+        members: {
+          user: {
+            id: user.id,
+          },
+        },
+      },
     });
   }
 
-  async findOneById(id: FrontendApp['id']): Promise<FrontendApp> {
+  async findOneByIdForBeacon(id: FrontendApp['id']): Promise<FrontendApp> {
     return this.frontendAppRepository.findOne(
-      { id },
+      {
+        id,
+      },
       {
         cache: 60 * 1000, // 1 minute
       },

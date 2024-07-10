@@ -1,5 +1,5 @@
+import { OrganizationMember } from '@app/project/entities/organization-member.entity';
 import { Project } from '@app/project/entities/project.entity';
-import { UserOrganizationRole } from '@app/project/entities/user-organization-role.entity';
 import {
   Collection,
   Entity,
@@ -16,6 +16,12 @@ export class Organization {
   @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
   id: string;
 
+  @OneToMany(
+    () => OrganizationMember,
+    (organizationMember) => organizationMember.organization,
+  )
+  members = new Collection<OrganizationMember>(this);
+
   @Property()
   name: string;
 
@@ -24,10 +30,4 @@ export class Organization {
 
   @Property({ nullable: true, onUpdate: () => new Date() })
   updatedAt?: Date;
-
-  @OneToMany(
-    () => UserOrganizationRole,
-    (organizationToUser) => organizationToUser.organization,
-  )
-  userRoles = new Collection<UserOrganizationRole>(this);
 }

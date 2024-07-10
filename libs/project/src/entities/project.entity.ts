@@ -1,6 +1,6 @@
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { Organization } from '@app/project/entities/organization.entity';
-import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
+import { ProjectMember } from '@app/project/entities/project-member.entity';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import {
   Collection,
@@ -36,6 +36,9 @@ export class Project {
   @ApiProperty({ format: 'uuid', type: 'string' })
   id: string;
 
+  @OneToMany(() => ProjectMember, (projectMember) => projectMember.project)
+  members = new Collection<ProjectMember>(this);
+
   @Property()
   @Expose()
   @ApiProperty()
@@ -49,7 +52,4 @@ export class Project {
 
   @Property({ nullable: true, onUpdate: () => new Date() })
   updatedAt?: Date;
-
-  @OneToMany(() => UserProjectRole, (projectToUser) => projectToUser.project)
-  userRoles = new Collection<UserProjectRole>(this);
 }

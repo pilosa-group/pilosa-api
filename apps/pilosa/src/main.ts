@@ -52,7 +52,7 @@ async function bootstrap() {
     new ValidationPipe({
       enableDebugMessages: process.env.NODE_ENV === ENV_DEVELOPMENT,
       transform: true,
-      validateCustomDecorators: true,
+      // validateCustomDecorators: true,
       whitelist: true,
     }),
   );

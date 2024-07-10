@@ -6,7 +6,16 @@ import { TransformerService } from '@app/api/transformer.service';
 import { OrganizationDto } from '@app/project/dto/organization.dto';
 import { Organization } from '@app/project/entities/organization.entity';
 import { OrganizationService } from '@app/project/organization.service';
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { CurrentUser } from '@app/user/decorators/current-user.decorator';
+import { UserDto } from '@app/user/dto/user';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -34,10 +43,18 @@ export class OrganizationsController {
   })
   async getAllOrganizations(
     @Query() paginatorOptions: PaginatorOptionsDto,
+    @CurrentUser() user: UserDto,
   ): Promise<PaginatorDto<OrganizationDto>> {
     return this.paginatorService.findAll<Organization, OrganizationDto>(
       [Organization.name, OrganizationDto],
       paginatorOptions,
+      {
+        members: {
+          user: {
+            id: user.id,
+          },
+        },
+      },
     );
   }
 
@@ -53,9 +70,16 @@ export class OrganizationsController {
   })
   async getOrganization(
     @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserDto,
   ): Promise<OrganizationDto> {
+    const organization = await this.organizationService.findOne(id, user);
+
+    if (!organization) {
+      throw new NotFoundException();
+    }
+
     return this.transformerService.entityToDto<Organization, OrganizationDto>(
-      await this.organizationService.findOne(id),
+      organization,
       OrganizationDto,
     );
   }

@@ -1,4 +1,5 @@
 import { Organization } from '@app/project/entities/organization.entity';
+import { UserDto } from '@app/user/dto/user';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
@@ -10,7 +11,14 @@ export class OrganizationService {
     private organizationRepository: EntityRepository<Organization>,
   ) {}
 
-  async findOne(id: string): Promise<Organization | null> {
-    return this.organizationRepository.findOne({ id });
+  async findOne(id: string, user: UserDto): Promise<Organization | null> {
+    return this.organizationRepository.findOne({
+      id,
+      members: {
+        user: {
+          id: user.id,
+        },
+      },
+    });
   }
 }

@@ -1,5 +1,5 @@
-import { Organization } from '@app/project/entities/organization.entity';
 import { Project } from '@app/project/entities/project.entity';
+import { UserDto } from '@app/user/dto/user';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
@@ -11,14 +11,15 @@ export class ProjectService {
     private projectRepository: EntityRepository<Project>,
   ) {}
 
-  findAll(organization: Organization | Organization['id']): Promise<Project[]> {
-    return this.projectRepository.find({
-      organization,
+  findOne(id: string, user: UserDto): Promise<Project | null> {
+    return this.projectRepository.findOne({
+      id,
+      members: {
+        user: {
+          id: user.id,
+        },
+      },
     });
-  }
-
-  findOne(id: string): Promise<Project | null> {
-    return this.projectRepository.findOne({ id });
   }
 
   // async findByUserRole(userProjectRole: UserProjectRole): Promise<Project> {

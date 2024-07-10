@@ -103,7 +103,7 @@ export class BeaconController {
   ) {
     try {
       const frontendApp =
-        await this.frontendAppService.findOneById(frontendAppId);
+        await this.frontendAppService.findOneByIdForBeacon(frontendAppId);
 
       if (!frontendApp) {
         throw new ForbiddenException(`App ${frontendAppId} not found`);
