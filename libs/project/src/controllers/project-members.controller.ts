@@ -5,7 +5,7 @@ import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
 import { ProjectMemberDto } from '@app/project/dto/project-member.dto';
 import { ProjectMember } from '@app/project/entities/project-member.entity';
 import { CurrentUser } from '@app/user/decorators/current-user.decorator';
-import { UserDto } from '@app/user/dto/user';
+import { UserDto } from '@app/user/dto/user.dto';
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -15,7 +15,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 export class ProjectMembersController {
   constructor(private paginatorService: PaginatorService) {}
 
-  @Get('')
+  @Get()
   @ApiPaginatedResponse(ProjectMemberDto, {
     description: 'Get all project members',
   })

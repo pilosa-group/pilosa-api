@@ -1,6 +1,6 @@
 import { TransformerService } from '@app/api/transformer.service';
 import { CurrentUser } from '@app/user/decorators/current-user.decorator';
-import { UserDto } from '@app/user/dto/user';
+import { UserDto } from '@app/user/dto/user.dto';
 import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { FrontendAppService } from '@app/web-metrics/frontend-app.service';

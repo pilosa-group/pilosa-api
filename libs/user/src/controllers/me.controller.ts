@@ -1,7 +1,12 @@
 import { CurrentUser } from '@app/user/decorators/current-user.decorator';
-import { UserDto } from '@app/user/dto/user';
+import { UserDto } from '@app/user/dto/user.dto';
 import { Controller, Get } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @ApiTags('Auth')
@@ -9,9 +14,13 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class MeController {
   @Get('me')
   @ApiResponse({
-    description: 'Get current user profile',
+    description: 'Get user profile of authenticated user',
     status: 200,
     type: UserDto,
+  })
+  @ApiOperation({
+    operationId: 'getProfile',
+    summary: 'Get user profile of authenticated user',
   })
   getProfile(@CurrentUser() user: UserDto): UserDto {
     return user;

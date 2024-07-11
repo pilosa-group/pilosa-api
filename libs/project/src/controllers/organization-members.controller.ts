@@ -6,7 +6,7 @@ import { OrganizationDto } from '@app/project/dto/organization.dto';
 import { OrganizationMemberDto } from '@app/project/dto/organization-member.dto';
 import { OrganizationMember } from '@app/project/entities/organization-member.entity';
 import { CurrentUser } from '@app/user/decorators/current-user.decorator';
-import { UserDto } from '@app/user/dto/user';
+import { UserDto } from '@app/user/dto/user.dto';
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 

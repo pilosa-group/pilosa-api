@@ -7,7 +7,7 @@ import { OrganizationDto } from '@app/project/dto/organization.dto';
 import { Organization } from '@app/project/entities/organization.entity';
 import { OrganizationService } from '@app/project/organization.service';
 import { CurrentUser } from '@app/user/decorators/current-user.decorator';
-import { UserDto } from '@app/user/dto/user';
+import { UserDto } from '@app/user/dto/user.dto';
 import {
   Controller,
   Get,

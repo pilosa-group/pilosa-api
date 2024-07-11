@@ -13,6 +13,8 @@ import './instrument';
 import { initSentry } from './instrument';
 
 async function bootstrap() {
+  const debugMode = process.env.NODE_ENV === ENV_DEVELOPMENT;
+
   process.env.SENTRY_DSN &&
     initSentry({
       dsn: process.env.SENTRY_DSN,
@@ -50,9 +52,10 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      enableDebugMessages: process.env.NODE_ENV === ENV_DEVELOPMENT,
+      enableDebugMessages: debugMode,
+      forbidNonWhitelisted: debugMode,
       transform: true,
-      // validateCustomDecorators: true,
+      validateCustomDecorators: true,
       whitelist: true,
     }),
   );

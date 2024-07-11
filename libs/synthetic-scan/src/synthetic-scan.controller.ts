@@ -20,6 +20,7 @@ export class SyntheticScanController {
   @Post()
   @Public()
   @ApiOperation({
+    operationId: 'syntheticScan',
     summary: 'Run a synthetic scan on a given URL',
   })
   scan(@Body() { url }: ScanPayloadDto): Promise<ScanResultV1Dto> {

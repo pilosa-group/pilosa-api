@@ -7,7 +7,7 @@ import { ProjectDto } from '@app/project/dto/project.dto';
 import { Project } from '@app/project/entities/project.entity';
 import { ProjectService } from '@app/project/project.service';
 import { CurrentUser } from '@app/user/decorators/current-user.decorator';
-import { UserDto } from '@app/user/dto/user';
+import { UserDto } from '@app/user/dto/user.dto';
 import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import {
@@ -27,7 +27,7 @@ import {
 
 @ApiBearerAuth()
 @ApiTags('Organizations')
-@Controller('')
+@Controller()
 export class ProjectsController {
   constructor(
     private projectService: ProjectService,

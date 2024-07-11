@@ -1,4 +1,6 @@
+import { TransformerService } from '@app/api/transformer.service';
 import { JWTPayload } from '@app/auth/types';
+import { UserDto } from '@app/user/dto/user.dto';
 import { User } from '@app/user/entities/user.entity';
 import { UserService } from '@app/user/user.service';
 import { Injectable } from '@nestjs/common';
@@ -17,6 +19,7 @@ import {
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private userService: UserService,
+    private transformerService: TransformerService,
     configService: ConfigService,
   ) {
     const clerkConfig = configService.get<ClerkConfig>('clerk');
@@ -36,21 +39,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: JWTPayload): Promise<User> {
-    return this.userService.findOrCreateOneByClerkId({
+  async validate(payload: JWTPayload): Promise<UserDto> {
+    const user = await this.userService.findOrCreateOneByClerkId({
       clerkId: payload.sub,
       email: payload.clerk.email,
       name: payload.clerk.full_name,
     });
 
-    // return {
-    //   id: user.id,
-    //   email: payload.clerk.email,
-    //   emailVerified: payload.clerk.email_verified,
-    //   firstName: payload.clerk.first_name,
-    //   lastName: payload.clerk.last_name,
-    //   fullName: payload.clerk.full_name,
-    //   avatar: payload.clerk.avatar,
-    // };
+    return this.transformerService.entityToDto<User, UserDto>(user, UserDto);
   }
 }

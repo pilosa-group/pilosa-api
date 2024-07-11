@@ -7,7 +7,6 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { Expose } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -21,7 +20,6 @@ export class User {
   email: string;
 
   @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
-  @Expose()
   id: string;
 
   @Property({ nullable: true })

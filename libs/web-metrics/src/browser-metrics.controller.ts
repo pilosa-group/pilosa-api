@@ -1,7 +1,7 @@
 import { ApiPaginatedResponse } from '@app/api/openapi/decorators/api-paginated-response.decorator';
 import { PaginatorDto } from '@app/api/paginator.dto';
 import { CurrentUser } from '@app/user/decorators/current-user.decorator';
-import { UserDto } from '@app/user/dto/user';
+import { UserDto } from '@app/user/dto/user.dto';
 import { BrowserMetricService } from '@app/web-metrics/browser-metric.service';
 import { GetBrowserMetricsOptionsDto } from '@app/web-metrics/dto/browser-metrics-options.dto';
 import { CarbonEmissionMetricDto } from '@app/web-metrics/dto/carbon-emission-metric.dto';
