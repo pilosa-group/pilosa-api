@@ -7,13 +7,6 @@ import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 
-// export type PaginatorItemDto =
-//   | OrganizationDto
-//   | ProjectDto
-//   | ServerInstanceDto
-//   | FrontendAppDto
-//   | CarbonEmissionMetricDto;
-
 export class PaginatorDto<T extends object> {
   @Expose()
   @ApiProperty({

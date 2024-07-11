@@ -3,7 +3,7 @@ import {
   MetricPeriod,
   MetricPeriodValue,
 } from '@app/cloud/enum/metric-period.enum';
-import { UserDto } from '@app/user/dto/user';
+import { UserDto } from '@app/user/dto/user.dto';
 import { CarbonEmissionMetricDto } from '@app/web-metrics/dto/carbon-emission-metric.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository, wrap } from '@mikro-orm/postgresql';
