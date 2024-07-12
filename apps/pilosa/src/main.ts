@@ -12,9 +12,9 @@ import { ENV_DEVELOPMENT } from './config/configuration';
 import './instrument';
 import { initSentry } from './instrument';
 
-async function bootstrap() {
-  const debugMode = process.env.NODE_ENV === ENV_DEVELOPMENT;
+export const debugMode = process.env.NODE_ENV === ENV_DEVELOPMENT;
 
+async function bootstrap() {
   process.env.SENTRY_DSN &&
     initSentry({
       dsn: process.env.SENTRY_DSN,
@@ -60,7 +60,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(4000);
+  await app.listen(process.env.APP_PORT);
 }
 
 void bootstrap();

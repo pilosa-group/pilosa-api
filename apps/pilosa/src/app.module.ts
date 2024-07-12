@@ -23,6 +23,7 @@ import configuration, {
   AppConfig,
   DatabaseConfig,
   ENV_DEVELOPMENT,
+  ENV_TEST,
 } from './config/configuration';
 import { CustomNamingStrategy } from './config/custom-naming.strategy';
 import { validationSchema } from './config/validation.schema';
@@ -40,6 +41,7 @@ const distSource = path.join(process.cwd(), 'dist');
       isGlobal: true,
     }),
     ConfigModule.forRoot({
+      envFilePath: [process.env.NODE_ENV === ENV_TEST ? '.env.test' : '.env'],
       load: [configuration],
       validationSchema,
     }),

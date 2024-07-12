@@ -6,6 +6,9 @@ export const validationSchema = Joi.object({
     .required()
     .description('Public base URL of the API'),
 
+  // App
+  APP_PORT: Joi.number().port().default(4000),
+
   // Clerk
   CLERK_ISSUER_URL: Joi.string().required(),
   DB_DATABASE: Joi.string().required(),
