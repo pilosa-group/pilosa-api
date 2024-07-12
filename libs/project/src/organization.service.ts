@@ -11,14 +11,14 @@ export class OrganizationService {
     private organizationRepository: EntityRepository<Organization>,
   ) {}
 
-  async findOne(id: string, user: UserDto): Promise<Organization | null> {
+  async findOne(slug: string, user: UserDto): Promise<Organization | null> {
     return this.organizationRepository.findOne({
-      id,
       members: {
         user: {
           id: user.id,
         },
       },
+      slug,
     });
   }
 }

@@ -9,4 +9,8 @@ export class OrganizationDto {
   @Expose()
   @ApiProperty()
   name: string;
+
+  @Expose()
+  @ApiProperty()
+  slug: string;
 }

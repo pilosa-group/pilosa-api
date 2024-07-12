@@ -35,7 +35,7 @@ export class ProjectsController {
     private transformerService: TransformerService,
   ) {}
 
-  @Get('organizations/:organizationId/projects')
+  @Get('organizations/:organizationSlug/projects')
   @ApiPaginatedResponse(ProjectDto, {
     description: 'Get all projects',
   })
@@ -44,7 +44,7 @@ export class ProjectsController {
     summary: 'Get all projects by organization',
   })
   async getAllProjects(
-    @Param('organizationId', ParseUUIDPipe) organization: string,
+    @Param('organizationSlug') organizationSlug: string,
     @Query() paginatorOptions: PaginatorOptionsDto,
     @CurrentUser() user: UserDto,
   ): Promise<PaginatorDto<ProjectDto>> {
@@ -58,13 +58,13 @@ export class ProjectsController {
           },
         },
         organization: {
-          id: organization,
+          slug: organizationSlug,
         },
       },
     );
   }
 
-  @Get('projects/:projectId/frontend-apps')
+  @Get('projects/:slug/frontend-apps')
   @ApiPaginatedResponse(FrontendAppDto, {
     description: 'Get all frontend apps for a project',
   })
@@ -73,7 +73,7 @@ export class ProjectsController {
     summary: 'Get all frontend apps by project',
   })
   async getFrontendApps(
-    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('slug') slug: string,
     @Query() paginatorOptions: PaginatorOptionsDto,
     @CurrentUser() user: UserDto,
   ): Promise<PaginatorDto<FrontendAppDto>> {
@@ -82,18 +82,18 @@ export class ProjectsController {
       paginatorOptions,
       {
         project: {
-          id: projectId,
           members: {
             user: {
               id: user.id,
             },
           },
+          slug,
         },
       },
     );
   }
 
-  @Get('projects/:id')
+  @Get('projects/:slug')
   @ApiResponse({
     description: 'Get a project',
     status: 200,
@@ -104,10 +104,10 @@ export class ProjectsController {
     summary: 'Get a project',
   })
   async getProject(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('slug') slug: string,
     @CurrentUser() user: UserDto,
   ): Promise<ProjectDto> {
-    const project = await this.projectService.findOne(id, user);
+    const project = await this.projectService.findOne(slug, user);
 
     if (!project) {
       throw new NotFoundException();

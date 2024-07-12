@@ -28,6 +28,9 @@ export class Organization {
   @OneToMany(() => Project, (project: Project) => project.organization)
   projects = new Collection<Project>(this);
 
+  @Property({ unique: true })
+  slug!: string;
+
   @Property({ nullable: true, onUpdate: () => new Date() })
   updatedAt?: Date;
 }

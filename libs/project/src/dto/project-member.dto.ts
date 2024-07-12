@@ -13,5 +13,8 @@ export class ProjectMemberDto {
 
   @Expose()
   @Type(() => UserDto)
+  @ApiProperty({
+    type: () => UserDto,
+  })
   user: UserDto;
 }
