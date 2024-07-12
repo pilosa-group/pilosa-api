@@ -1,5 +1,6 @@
 export type AppConfig = {
   env: string;
+  port?: number;
 };
 
 export type ApiConfig = {
@@ -32,6 +33,7 @@ export type Config = {
 };
 
 export const ENV_DEVELOPMENT = 'development';
+export const ENV_TEST = 'test';
 
 export default (): Config => ({
   api: {
@@ -39,6 +41,7 @@ export default (): Config => ({
   },
   app: {
     env: process.env.NODE_ENV,
+    port: Number(process.env.APP_PORT),
   },
   clerk: {
     issuerUrl: process.env.CLERK_ISSUER_URL,
