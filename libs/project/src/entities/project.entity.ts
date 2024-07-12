@@ -10,8 +10,6 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
 
 @Entity()
 export class Project {
@@ -32,16 +30,12 @@ export class Project {
   frontendApps = new Collection<FrontendApp>(this);
 
   @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
-  @Expose()
-  @ApiProperty({ format: 'uuid', type: 'string' })
   id: string;
 
   @OneToMany(() => ProjectMember, (projectMember) => projectMember.project)
   members = new Collection<ProjectMember>(this);
 
   @Property()
-  @Expose()
-  @ApiProperty()
   name!: string;
 
   @ManyToOne({
@@ -49,6 +43,9 @@ export class Project {
     entity: () => Organization,
   })
   organization!: Organization;
+
+  @Property({ unique: true })
+  slug!: string;
 
   @Property({ nullable: true, onUpdate: () => new Date() })
   updatedAt?: Date;

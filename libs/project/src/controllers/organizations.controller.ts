@@ -13,7 +13,6 @@ import {
   Get,
   NotFoundException,
   Param,
-  ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
 import {
@@ -58,7 +57,7 @@ export class OrganizationsController {
     );
   }
 
-  @Get('/:id')
+  @Get(':slug')
   @ApiResponse({
     description: 'Get an organization',
     status: 200,
@@ -69,7 +68,7 @@ export class OrganizationsController {
     summary: 'Get an organization',
   })
   async getOrganization(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('slug') id: string,
     @CurrentUser() user: UserDto,
   ): Promise<OrganizationDto> {
     const organization = await this.organizationService.findOne(id, user);

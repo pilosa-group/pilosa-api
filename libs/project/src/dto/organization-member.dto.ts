@@ -13,5 +13,8 @@ export class OrganizationMemberDto {
 
   @Expose()
   @Type(() => UserDto)
+  @ApiProperty({
+    type: () => UserDto,
+  })
   user: UserDto;
 }

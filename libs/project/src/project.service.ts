@@ -11,14 +11,14 @@ export class ProjectService {
     private projectRepository: EntityRepository<Project>,
   ) {}
 
-  findOne(id: string, user: UserDto): Promise<Project | null> {
+  findOne(slug: string, user: UserDto): Promise<Project | null> {
     return this.projectRepository.findOne({
-      id,
       members: {
         user: {
           id: user.id,
         },
       },
+      slug,
     });
   }
 

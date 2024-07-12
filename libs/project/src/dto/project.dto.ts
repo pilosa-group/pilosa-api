@@ -8,5 +8,9 @@ export class ProjectDto {
 
   @Expose()
   @ApiProperty()
-  name!: string;
+  name: string;
+
+  @Expose()
+  @ApiProperty()
+  slug: string;
 }
