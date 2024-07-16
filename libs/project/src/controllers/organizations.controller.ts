@@ -46,7 +46,12 @@ export class OrganizationsController {
   ): Promise<PaginatorDto<OrganizationDto>> {
     return this.paginatorService.findAll<Organization, OrganizationDto>(
       [Organization.name, OrganizationDto],
-      paginatorOptions,
+      {
+        ...paginatorOptions,
+        orderBy: {
+          name: 'ASC',
+        },
+      },
       {
         members: {
           user: {

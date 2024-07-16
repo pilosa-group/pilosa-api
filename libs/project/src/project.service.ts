@@ -1,25 +1,89 @@
+import { CreateProjectDto } from '@app/project/dto/create-project.dto';
 import { Project } from '@app/project/entities/project.entity';
+import { ProjectMember } from '@app/project/entities/project-member.entity';
+import { ProjectRole } from '@app/project/enum/project-role.enum';
+import { OrganizationService } from '@app/project/organization.service';
 import { UserDto } from '@app/user/dto/user.dto';
+import { UserService } from '@app/user/user.service';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable } from '@nestjs/common';
+import { wrap } from '@mikro-orm/postgresql';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectRepository(Project)
     private projectRepository: EntityRepository<Project>,
+    private organizationService: OrganizationService,
+    private userService: UserService,
   ) {}
 
-  findOne(slug: string, user: UserDto): Promise<Project | null> {
-    return this.projectRepository.findOne({
-      members: {
-        user: {
-          id: user.id,
+  async create(
+    createProjectDto: CreateProjectDto,
+    {
+      organizationSlug,
+      userDto,
+    }: {
+      organizationSlug: string;
+      userDto: UserDto;
+    },
+  ): Promise<Project> {
+    const organization = await this.organizationService.findOne(
+      organizationSlug,
+      userDto,
+    );
+
+    if (!organization) {
+      throw new NotFoundException(
+        `Organization "${organizationSlug} not found"`,
+      );
+    }
+
+    const user = await this.userService.findOne(userDto.id);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const project = new Project();
+    wrap(project).assign(createProjectDto);
+    project.organization = organization;
+
+    const member = new ProjectMember();
+    member.role = ProjectRole.OWNER;
+    member.project = project;
+    member.user = user;
+
+    return project;
+  }
+
+  findOne(id: string, user: UserDto): Promise<Project | null> {
+    return this.projectRepository.findOne(
+      {
+        id,
+        members: {
+          user: {
+            id: user.id,
+          },
         },
       },
-      slug,
-    });
+      {
+        populate: ['organization'],
+      },
+    );
+  }
+
+  async remove(id: string, user: UserDto): Promise<void> {
+    const project = await this.findOne(id, user);
+
+    await this.projectRepository.getEntityManager().removeAndFlush(project);
+  }
+
+  async save(project: Project): Promise<Project> {
+    await this.projectRepository.getEntityManager().persistAndFlush(project);
+
+    return project;
   }
 
   // async findByUserRole(userProjectRole: UserProjectRole): Promise<Project> {

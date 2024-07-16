@@ -11,9 +11,10 @@ import { ProjectMember } from '@app/project/entities/project-member.entity';
 import { OrganizationService } from '@app/project/organization.service';
 import { OrganizationMemberService } from '@app/project/organization-member.service';
 import { ProjectService } from '@app/project/project.service';
+import { UserModule } from '@app/user';
 import { WebMetricsModule } from '@app/web-metrics';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 
 import { ProjectMemberService } from './project-member.service';
 
@@ -29,6 +30,7 @@ import { ProjectMemberService } from './project-member.service';
     WebMetricsModule,
     CloudModule,
     ApiModule,
+    forwardRef(() => UserModule),
     MikroOrmModule.forFeature([
       Project,
       Organization,

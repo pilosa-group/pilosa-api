@@ -1,7 +1,14 @@
+import { OrganizationDto } from '@app/project/dto/organization.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 
 export class ProjectDto {
+  @Expose()
+  @ApiProperty({
+    type: () => Date,
+  })
+  createdAt: Date;
+
   @Expose()
   @ApiProperty({ format: 'uuid', type: 'string' })
   id: string;
@@ -11,6 +18,15 @@ export class ProjectDto {
   name: string;
 
   @Expose()
-  @ApiProperty()
-  slug: string;
+  @ApiProperty({
+    type: () => OrganizationDto,
+  })
+  @Type(() => OrganizationDto)
+  organization: OrganizationDto;
+
+  @Expose()
+  @ApiProperty({
+    type: () => Date,
+  })
+  updatedAt: Date;
 }

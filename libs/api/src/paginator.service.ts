@@ -16,15 +16,12 @@ export class PaginatorService {
 
   public async findAll<Entity extends object, Dto extends object>(
     [entity, DtoClass]: [EntityName<Entity>, ClassConstructor<Dto>],
-    options: FindOptions<Entity>,
+    options: FindOptions<Entity, any, any>,
     where?: FilterQuery<Entity>,
   ) {
     const repository = this.entityManager.getRepository<Entity>(entity);
 
-    const [items, total] = await repository.findAndCount(where, {
-      cache: 60 * 1000,
-      ...options,
-    } as FindOptions<Entity>);
+    const [items, total] = await repository.findAndCount(where, options);
 
     return new PaginatorDto(
       items.map((entity: Entity) =>

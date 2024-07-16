@@ -44,9 +44,6 @@ export class Project {
   })
   organization!: Organization;
 
-  @Property({ unique: true })
-  slug!: string;
-
   @Property({ nullable: true, onUpdate: () => new Date() })
   updatedAt?: Date;
 }

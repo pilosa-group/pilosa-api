@@ -11,6 +11,12 @@ export class UserService {
     private userRepository: EntityRepository<User>,
   ) {}
 
+  findOne(id: string): Promise<User | undefined> {
+    return this.userRepository.findOne({
+      id,
+    });
+  }
+
   async findOrCreateOneByClerkId(
     user: CreateUserDto,
   ): Promise<User | undefined> {

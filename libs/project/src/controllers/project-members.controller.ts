@@ -6,12 +6,12 @@ import { ProjectMemberDto } from '@app/project/dto/project-member.dto';
 import { ProjectMember } from '@app/project/entities/project-member.entity';
 import { CurrentUser } from '@app/user/decorators/current-user.decorator';
 import { UserDto } from '@app/user/dto/user.dto';
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @ApiTags('Projects')
-@Controller('projects/:projectSlug/members')
+@Controller('projects/:projectId/members')
 export class ProjectMembersController {
   constructor(private paginatorService: PaginatorService) {}
 
@@ -24,7 +24,7 @@ export class ProjectMembersController {
     summary: 'Get all project members',
   })
   async getAllProjectMembers(
-    @Param('projectSlug') projectSlug: string,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
     @Query() paginatorOptions: PaginatorOptionsDto,
     @CurrentUser() user: UserDto,
   ): Promise<PaginatorDto<ProjectMemberDto>> {
@@ -33,12 +33,12 @@ export class ProjectMembersController {
       paginatorOptions,
       {
         project: {
+          id: projectId,
           members: {
             user: {
               id: user.id,
             },
           },
-          slug: projectSlug,
         },
       },
     );
