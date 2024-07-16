@@ -7,6 +7,7 @@ import { CreateProjectDto } from '@app/project/dto/create-project.dto';
 import { ProjectDto } from '@app/project/dto/project.dto';
 import { UpdateProjectDto } from '@app/project/dto/update-project.dto';
 import { Project } from '@app/project/entities/project.entity';
+import { ProjectRole } from '@app/project/enum/project-role.enum';
 import { ProjectService } from '@app/project/project.service';
 import { CurrentUser } from '@app/user/decorators/current-user.decorator';
 import { UserDto } from '@app/user/dto/user.dto';
@@ -17,6 +18,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpStatus,
   NotFoundException,
@@ -69,23 +71,6 @@ export class ProjectsController {
       project,
       ProjectDto,
     );
-  }
-
-  @Delete('projects/:id')
-  @ApiResponse({
-    description: 'Delete a project',
-    status: HttpStatus.ACCEPTED,
-    type: ProjectDto,
-  })
-  @ApiOperation({
-    operationId: 'deleteProject',
-    summary: 'Delete a project',
-  })
-  async deleteProject(
-    @CurrentUser() user: UserDto,
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<void> {
-    await this.projectService.remove(id, user);
   }
 
   @Get('projects')
@@ -214,6 +199,23 @@ export class ProjectsController {
     );
   }
 
+  @Delete('projects/:id')
+  @ApiResponse({
+    description: 'Remove a project',
+    status: HttpStatus.ACCEPTED,
+    type: ProjectDto,
+  })
+  @ApiOperation({
+    operationId: 'removeProject',
+    summary: 'Remove a project',
+  })
+  async removeProject(
+    @CurrentUser() user: UserDto,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await this.projectService.remove(id, user);
+  }
+
   @Patch('projects/:id')
   @ApiResponse({
     description: 'Update a project',
@@ -229,7 +231,13 @@ export class ProjectsController {
     @CurrentUser() currentUser: UserDto,
     @Body() updateProjectDto: UpdateProjectDto,
   ): Promise<ProjectDto> {
-    const project = await this.projectService.findOne(id, currentUser);
+    const project = await this.projectService.findOne(id, currentUser, [
+      ProjectRole.OWNER,
+    ]);
+
+    if (!project) {
+      throw new ForbiddenException();
+    }
 
     wrap(project).assign(updateProjectDto);
 
