@@ -20,9 +20,14 @@ export class UserService {
   async findOrCreateOneByClerkId(
     user: CreateUserDto,
   ): Promise<User | undefined> {
-    const existingUser = await this.userRepository.findOne({
-      clerkId: user.clerkId,
-    });
+    const existingUser = await this.userRepository.findOne(
+      {
+        clerkId: user.clerkId,
+      },
+      {
+        cache: 5 * 1000,
+      },
+    );
 
     if (!existingUser) {
       const newUser = this.userRepository.create(user);
