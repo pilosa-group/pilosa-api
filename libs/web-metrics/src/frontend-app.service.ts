@@ -16,16 +16,21 @@ export class FrontendAppService {
     id: FrontendApp['id'],
     user: UserDto,
   ): Promise<FrontendApp> {
-    return this.frontendAppRepository.findOne({
-      id,
-      project: {
-        members: {
-          user: {
-            id: user.id,
+    return this.frontendAppRepository.findOne(
+      {
+        id,
+        project: {
+          members: {
+            user: {
+              id: user.id,
+            },
           },
         },
       },
-    });
+      {
+        cache: 60 * 1000,
+      },
+    );
   }
 
   async findOneByIdForBeacon(id: FrontendApp['id']): Promise<FrontendApp> {
