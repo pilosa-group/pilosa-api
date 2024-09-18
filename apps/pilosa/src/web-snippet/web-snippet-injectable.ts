@@ -160,7 +160,7 @@ const sendBeaconDebounced = debounce(sendBeacon, BATCH_REPORT_WAIT_TIME_IN_MS);
 
 if (isSupported) {
   const observer = new PerformanceObserver((list) => {
-    list.getEntries().map((entry: PerformanceResourceTiming) => {
+    list.getEntries().forEach((entry: PerformanceResourceTiming) => {
       const { hostname: domain, pathname: path } = w.location;
 
       const {
