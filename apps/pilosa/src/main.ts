@@ -53,7 +53,6 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       enableDebugMessages: debugMode,
-      forbidNonWhitelisted: debugMode,
       transform: true,
       validateCustomDecorators: true,
       whitelist: true,
