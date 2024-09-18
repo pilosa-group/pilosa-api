@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   ArrayMaxSize,
   ArrayMinSize,
+  IsBoolean,
   IsDefined,
   IsIn,
   IsInt,
@@ -19,7 +20,7 @@ export type Light = 'l';
 export type ColorScheme = Dark | Light;
 export type CompressedBytes = NumberOfBytes;
 export type UncompressedBytes = NumberOfBytes;
-export type PageLoaded = boolean;
+export type FirstPageLoad = boolean;
 export type Viewport = [number, number];
 
 export type ByteData = {
@@ -29,7 +30,6 @@ export type ByteData = {
         [key: FileExtension]: {
           b: [CompressedBytes, UncompressedBytes];
           co: CrossOriginDomain[];
-          l: PageLoaded;
         };
       };
     };
@@ -45,7 +45,6 @@ const byteDataExample: ByteData = {
         js: {
           b: bytesExample,
           co: ['https://cross-origin.com'],
-          l: true,
         },
       },
     },
@@ -87,10 +86,6 @@ export class BeaconPayloadDto {
                   },
                   type: 'array',
                 },
-                l: {
-                  example: true,
-                  type: 'boolean',
-                },
               },
               type: 'object',
             },
@@ -105,6 +100,10 @@ export class BeaconPayloadDto {
   })
   @IsDefined()
   d: ByteData;
+
+  @ApiProperty({ type: 'boolean' })
+  @IsBoolean()
+  f: FirstPageLoad;
 
   @ApiProperty({ enum: ['d', 'l'], example: 'd', type: 'enum' })
   @IsIn(['d', 'l'])
