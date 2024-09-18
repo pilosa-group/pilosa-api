@@ -103,7 +103,7 @@ export class BeaconController {
   ) {
     try {
       const frontendApp =
-        await this.frontendAppService.findOneById(frontendAppId);
+        await this.frontendAppService.findOneByIdForBeacon(frontendAppId);
 
       if (!frontendApp) {
         throw new ForbiddenException(`App ${frontendAppId} not found`);
@@ -147,17 +147,16 @@ export class BeaconController {
 
       const visitor = hashValue(`${clientIp}${userAgent}`);
 
+      const { f: firstLoad } = payload;
+
       Object.keys(payload.d).forEach((domain) => {
         Object.keys(payload.d[domain]).forEach((path) => {
           Object.keys(payload.d[domain][path]).forEach((initiatorType) => {
             if (isValidInitiatorType(initiatorType)) {
               Object.keys(payload.d[domain][path][initiatorType]).forEach(
                 async (extension) => {
-                  const {
-                    b: bytes,
-                    co: crossOrigins,
-                    l: pageLoaded,
-                  } = payload.d[domain][path][initiatorType][extension];
+                  const { b: bytes, co: crossOrigins } =
+                    payload.d[domain][path][initiatorType][extension];
 
                   const [bytesCompressed, bytesUncompressed] = bytes;
 
@@ -177,9 +176,9 @@ export class BeaconController {
                       extension: nullableExtensions.includes(extension)
                         ? null
                         : extension,
+                      firstLoad,
                       initiatorType,
                       os,
-                      pageLoaded,
                       path,
                       viewportHeight: payload.v[1],
                       viewportWidth: payload.v[0],

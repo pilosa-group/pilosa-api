@@ -3,12 +3,31 @@ import { ApiPaginatedResponse } from '@app/api/openapi/decorators/api-paginated-
 import { PaginatorDto } from '@app/api/paginator.dto';
 import { PaginatorOptionsDto } from '@app/api/paginator-options.dto';
 import { TransformerService } from '@app/api/transformer.service';
+import { CreateProjectDto } from '@app/project/dto/create-project.dto';
 import { ProjectDto } from '@app/project/dto/project.dto';
+import { UpdateProjectDto } from '@app/project/dto/update-project.dto';
 import { Project } from '@app/project/entities/project.entity';
+import { ProjectRole } from '@app/project/enum/project-role.enum';
 import { ProjectService } from '@app/project/project.service';
+import { CurrentUser } from '@app/user/decorators/current-user.decorator';
+import { UserDto } from '@app/user/dto/user.dto';
 import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { wrap } from '@mikro-orm/postgresql';
+import {
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -18,7 +37,7 @@ import {
 
 @ApiBearerAuth()
 @ApiTags('Organizations')
-@Controller('')
+@Controller()
 export class ProjectsController {
   constructor(
     private projectService: ProjectService,
@@ -26,23 +45,96 @@ export class ProjectsController {
     private transformerService: TransformerService,
   ) {}
 
-  @Get('organizations/:organizationId/projects')
+  @Post('organizations/:organizationSlug/projects')
+  @ApiResponse({
+    description: 'Create a project',
+    status: HttpStatus.CREATED,
+    type: ProjectDto,
+  })
+  @ApiOperation({
+    operationId: 'createProject',
+    summary: 'Create a project',
+  })
+  async createProject(
+    @Param('organizationSlug') organizationSlug: string,
+    @CurrentUser() currentUser: UserDto,
+    @Body() createProjectDto: CreateProjectDto,
+  ): Promise<ProjectDto> {
+    const project = await this.projectService.create(createProjectDto, {
+      organizationSlug,
+      userDto: currentUser,
+    });
+
+    await this.projectService.save(project);
+
+    return this.transformerService.entityToDto<Project, ProjectDto>(
+      project,
+      ProjectDto,
+    );
+  }
+
+  @Get('projects')
   @ApiPaginatedResponse(ProjectDto, {
     description: 'Get all projects',
   })
   @ApiOperation({
     operationId: 'getProjects',
-    summary: 'Get all projects by organization',
+    summary: 'Get all projects',
   })
   async getAllProjects(
-    @Param('organizationId', ParseUUIDPipe) organization: string,
     @Query() paginatorOptions: PaginatorOptionsDto,
+    @CurrentUser() user: UserDto,
   ): Promise<PaginatorDto<ProjectDto>> {
     return this.paginatorService.findAll<Project, ProjectDto>(
       [Project.name, ProjectDto],
-      paginatorOptions,
       {
-        organization,
+        ...paginatorOptions,
+        orderBy: {
+          name: 'ASC',
+        },
+        populate: ['organization.slug'],
+      },
+      {
+        members: {
+          user: {
+            id: user.id,
+          },
+        },
+      },
+    );
+  }
+
+  @Get('organizations/:organizationSlug/projects')
+  @ApiPaginatedResponse(ProjectDto, {
+    description: 'Get all projects',
+  })
+  @ApiOperation({
+    operationId: 'getAllProjectsByOrganization',
+    summary: 'Get all projects by organization',
+  })
+  async getAllProjectsByOrganization(
+    @Param('organizationSlug') organizationSlug: string,
+    @Query() paginatorOptions: PaginatorOptionsDto,
+    @CurrentUser() user: UserDto,
+  ): Promise<PaginatorDto<ProjectDto>> {
+    return this.paginatorService.findAll<Project, ProjectDto>(
+      [Project.name, ProjectDto],
+      {
+        ...paginatorOptions,
+        orderBy: {
+          name: 'ASC',
+        },
+        populate: ['organization.slug'],
+      },
+      {
+        members: {
+          user: {
+            id: user.id,
+          },
+        },
+        organization: {
+          slug: organizationSlug,
+        },
       },
     );
   }
@@ -58,12 +150,25 @@ export class ProjectsController {
   async getFrontendApps(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Query() paginatorOptions: PaginatorOptionsDto,
+    @CurrentUser() user: UserDto,
   ): Promise<PaginatorDto<FrontendAppDto>> {
     return this.paginatorService.findAll<FrontendApp, FrontendAppDto>(
       [FrontendApp.name, FrontendAppDto],
-      paginatorOptions,
       {
-        project: projectId,
+        ...paginatorOptions,
+        orderBy: {
+          name: 'ASC',
+        },
+      },
+      {
+        project: {
+          id: projectId,
+          members: {
+            user: {
+              id: user.id,
+            },
+          },
+        },
       },
     );
   }
@@ -71,7 +176,7 @@ export class ProjectsController {
   @Get('projects/:id')
   @ApiResponse({
     description: 'Get a project',
-    status: 200,
+    status: HttpStatus.OK,
     type: ProjectDto,
   })
   @ApiOperation({
@@ -80,9 +185,66 @@ export class ProjectsController {
   })
   async getProject(
     @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserDto,
   ): Promise<ProjectDto> {
+    const project = await this.projectService.findOne(id, user);
+
+    if (!project) {
+      throw new NotFoundException();
+    }
+
     return this.transformerService.entityToDto<Project, ProjectDto>(
-      await this.projectService.findOne(id),
+      project,
+      ProjectDto,
+    );
+  }
+
+  @Delete('projects/:id')
+  @ApiResponse({
+    description: 'Remove a project',
+    status: HttpStatus.ACCEPTED,
+    type: ProjectDto,
+  })
+  @ApiOperation({
+    operationId: 'removeProject',
+    summary: 'Remove a project',
+  })
+  async removeProject(
+    @CurrentUser() user: UserDto,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await this.projectService.remove(id, user);
+  }
+
+  @Patch('projects/:id')
+  @ApiResponse({
+    description: 'Update a project',
+    status: HttpStatus.OK,
+    type: ProjectDto,
+  })
+  @ApiOperation({
+    operationId: 'updateProject',
+    summary: 'Update a project',
+  })
+  async updateProject(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() currentUser: UserDto,
+    @Body() updateProjectDto: UpdateProjectDto,
+  ): Promise<ProjectDto> {
+    const project = await this.projectService.findOne(id, currentUser, [
+      ProjectRole.OWNER,
+    ]);
+
+    if (!project) {
+      throw new ForbiddenException();
+    }
+
+    wrap(project).assign(updateProjectDto);
+
+    await this.projectService.save(project);
+
+    return this.transformerService.entityToDto<Project, ProjectDto>(
+      project,
       ProjectDto,
     );
   }

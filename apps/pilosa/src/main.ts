@@ -12,6 +12,8 @@ import { ENV_DEVELOPMENT } from './config/configuration';
 import './instrument';
 import { initSentry } from './instrument';
 
+export const debugMode = process.env.NODE_ENV === ENV_DEVELOPMENT;
+
 async function bootstrap() {
   process.env.SENTRY_DSN &&
     initSentry({
@@ -50,14 +52,14 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      enableDebugMessages: process.env.NODE_ENV === ENV_DEVELOPMENT,
+      enableDebugMessages: debugMode,
       transform: true,
       validateCustomDecorators: true,
       whitelist: true,
     }),
   );
 
-  await app.listen(4000);
+  await app.listen(process.env.APP_PORT);
 }
 
 void bootstrap();

@@ -3,10 +3,10 @@ import {
   CrossOriginDomain,
   Domain,
   FileExtension,
+  FirstPageLoad,
   InitiatorType,
   IsCompressed,
   NumberOfBytes,
-  PageLoaded,
   Path,
 } from '@app/web-metrics/dto/beacon-payload.dto';
 
@@ -21,10 +21,10 @@ type Payload = {
   d: Domain;
   // extension
   e: FileExtension;
+  // Whether this is the first page load (instead of subsequent loaded resources)
+  f: FirstPageLoad;
   // The type of the initiator of the resource
   it: InitiatorType;
-  // Whether the document has reached "load" state
-  l: PageLoaded;
   // The path of the resource
   p: Path;
 };
@@ -35,6 +35,7 @@ declare let BATCH_REPORT_WAIT_TIME_IN_MS: number;
 const BEACON_API_URL = SNIPPET_API_ENDPOINT;
 const ENTRY_TYPE_RESOURCE = 'resource';
 
+let firstPageLoad = true;
 let payloads: Payload[] = [];
 
 const w = window;
@@ -58,13 +59,6 @@ const debounce = (fn: () => void, wait: number) => {
   };
 };
 
-// whether this was the first page load
-let pageLoaded = false;
-
-w.addEventListener('load', () => {
-  pageLoaded = true;
-});
-
 d.addEventListener('visibilitychange', () => {
   sendBeacon();
 });
@@ -81,12 +75,14 @@ const sendBeacon = (): void => {
   const groupedPayloads: BeaconPayloadDto = {
     b: [0, 0],
     d: {},
+    f: firstPageLoad,
     m: colorScheme,
     v: [w.innerWidth, w.innerHeight],
   };
 
+  firstPageLoad = false;
+
   for (const payload of payloads) {
-    const pageLoaded = payload.l;
     const domain = payload.d;
     const path = payload.p;
     const initiatorType = payload.it;
@@ -115,7 +111,6 @@ const sendBeacon = (): void => {
       groupedPayloads.d[domain][path][initiatorType][extension] = {
         b: [0, 0],
         co: [],
-        l: pageLoaded,
       };
     }
 
@@ -214,8 +209,8 @@ if (isSupported) {
             co: [],
             d: domain,
             e: extension,
+            f: firstPageLoad,
             it: initiatorType,
-            l: pageLoaded,
             p: path,
           };
 
@@ -256,5 +251,8 @@ if (isSupported) {
     }
   });
 
-  observer.observe({ buffered: true, type: ENTRY_TYPE_RESOURCE });
+  observer.observe({
+    buffered: true,
+    type: ENTRY_TYPE_RESOURCE,
+  });
 }

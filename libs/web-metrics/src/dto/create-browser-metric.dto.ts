@@ -10,9 +10,9 @@ export class CreateBrowserMetricDto {
   deviceType: string;
   domain: string;
   extension: string;
+  firstLoad: boolean;
   initiatorType: string;
   os: string;
-  pageLoaded: boolean;
   path: string;
   viewportHeight: number;
   viewportWidth: number;

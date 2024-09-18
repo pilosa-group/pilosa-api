@@ -35,14 +35,14 @@ export class BrowserMetricService {
   }
 
   async findByFrontendApp(
-    frontendApp: FrontendApp['id'],
+    frontendApp: FrontendApp,
     {
       limit = 100,
       offset = 0,
       period = MetricPeriod.DAY,
     }: { limit?: number; offset?: number; period: MetricPeriod },
   ): Promise<PaginatorDto<CarbonEmissionMetricDto>> {
-    const query = `SELECT time_bucket(?, time)                              as period,
+    const query = `SELECT time_bucket(?, time) as period,
            SUM("bytesCompressed") + SUM("bytesUncompressed") as bytes
     FROM browser_metric
     WHERE "frontendApp" = ?
@@ -54,7 +54,7 @@ export class BrowserMetricService {
     const result = await this.browserMetricRepository
       .getEntityManager()
       .getConnection()
-      .execute(query, [period, frontendApp, limit, offset]);
+      .execute(query, [period, frontendApp.id, limit, offset]);
 
     return new PaginatorDto<CarbonEmissionMetricDto>(
       result.map((metric) => {

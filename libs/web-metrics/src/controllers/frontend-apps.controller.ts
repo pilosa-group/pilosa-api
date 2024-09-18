@@ -1,8 +1,10 @@
 import { TransformerService } from '@app/api/transformer.service';
+import { CurrentUser } from '@app/user/decorators/current-user.decorator';
+import { UserDto } from '@app/user/dto/user.dto';
 import { FrontendAppDto } from '@app/web-metrics/dto/frontend-app.dto';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import { FrontendAppService } from '@app/web-metrics/frontend-app.service';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -29,9 +31,18 @@ export class FrontendAppsController {
     operationId: 'getFrontendApp',
     summary: 'Get a frontend application',
   })
-  async getFrontendApp(@Param('id') id: string): Promise<FrontendAppDto> {
+  async getFrontendApp(
+    @Param('id') id: string,
+    @CurrentUser() user: UserDto,
+  ): Promise<FrontendAppDto> {
+    const frontendApp = await this.frontendAppService.findOneById(id, user);
+
+    if (!frontendApp) {
+      throw new NotFoundException();
+    }
+
     return this.transformerService.entityToDto<FrontendApp, FrontendAppDto>(
-      await this.frontendAppService.findOneById(id),
+      frontendApp,
       FrontendAppDto,
     );
   }

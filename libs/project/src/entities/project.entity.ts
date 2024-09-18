@@ -1,6 +1,6 @@
 import { CloudProviderAccount } from '@app/cloud/entities/cloud-provider-account.entity';
 import { Organization } from '@app/project/entities/organization.entity';
-import { UserProjectRole } from '@app/project/entities/user-project-role.entity';
+import { ProjectMember } from '@app/project/entities/project-member.entity';
 import { FrontendApp } from '@app/web-metrics/entities/frontend-app.entity';
 import {
   Collection,
@@ -10,8 +10,6 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
 
 @Entity()
 export class Project {
@@ -32,13 +30,12 @@ export class Project {
   frontendApps = new Collection<FrontendApp>(this);
 
   @PrimaryKey({ defaultRaw: 'gen_random_uuid()', type: 'uuid' })
-  @Expose()
-  @ApiProperty({ format: 'uuid', type: 'string' })
   id: string;
 
+  @OneToMany(() => ProjectMember, (projectMember) => projectMember.project)
+  members = new Collection<ProjectMember>(this);
+
   @Property()
-  @Expose()
-  @ApiProperty()
   name!: string;
 
   @ManyToOne({
@@ -49,7 +46,4 @@ export class Project {
 
   @Property({ nullable: true, onUpdate: () => new Date() })
   updatedAt?: Date;
-
-  @OneToMany(() => UserProjectRole, (projectToUser) => projectToUser.project)
-  userRoles = new Collection<UserProjectRole>(this);
 }

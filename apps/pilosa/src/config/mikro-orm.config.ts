@@ -2,13 +2,14 @@ import { Migrator } from '@mikro-orm/migrations';
 import { PostgreSqlDriver, defineConfig } from '@mikro-orm/postgresql';
 import { ConfigModule } from '@nestjs/config';
 
+import { debugMode } from '../main';
 import { CustomNamingStrategy } from './custom-naming.strategy';
 
 ConfigModule.forRoot();
 
 export default defineConfig({
   dbName: process.env.DB_DATABASE,
-  debug: true,
+  debug: debugMode,
   driver: PostgreSqlDriver,
   driverOptions: {
     connection: { ssl: Number(process.env.DB_SSL) === 1 },
