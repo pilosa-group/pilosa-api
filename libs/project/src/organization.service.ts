@@ -2,7 +2,6 @@ import { CreateOrganizationDto } from '@app/project/dto/create-organization.dto'
 import { Organization } from '@app/project/entities/organization.entity';
 import { OrganizationMember } from '@app/project/entities/organization-member.entity';
 import { OrganizationRole } from '@app/project/enum/organization-role.enum';
-import { ProjectRole } from '@app/project/enum/project-role.enum';
 import { UserDto } from '@app/user/dto/user.dto';
 import { UserService } from '@app/user/user.service';
 import { InjectRepository } from '@mikro-orm/nestjs';

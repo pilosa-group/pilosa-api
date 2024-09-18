@@ -1,7 +1,6 @@
 import { CreateProjectDto } from '@app/project/dto/create-project.dto';
 import { Project } from '@app/project/entities/project.entity';
 import { ProjectMember } from '@app/project/entities/project-member.entity';
-import { OrganizationRole } from '@app/project/enum/organization-role.enum';
 import { ProjectRole } from '@app/project/enum/project-role.enum';
 import { OrganizationService } from '@app/project/organization.service';
 import { UserDto } from '@app/user/dto/user.dto';
