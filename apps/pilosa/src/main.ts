@@ -15,6 +15,8 @@ import { initSentry } from './instrument';
 export const debugMode = process.env.NODE_ENV === ENV_DEVELOPMENT;
 
 async function bootstrap() {
+  console.log({ debugMode, env: process.env.NODE_ENV });
+
   process.env.SENTRY_DSN &&
     initSentry({
       dsn: process.env.SENTRY_DSN,
