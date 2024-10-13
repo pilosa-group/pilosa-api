@@ -1,3 +1,10 @@
+## [1.13.4](https://github.com/pilosa-group/pilosa-api/compare/v1.13.3...v1.13.4) (2024-10-13)
+
+
+### Bug Fixes
+
+* add rejectUnauthorized ([4ea59a7](https://github.com/pilosa-group/pilosa-api/commit/4ea59a73f9ca41e67c90a286995a63459ddaf446))
+
 ## [1.13.3](https://github.com/pilosa-group/pilosa-api/compare/v1.13.2...v1.13.3) (2024-07-08)
 
 
