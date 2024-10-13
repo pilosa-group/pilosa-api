@@ -54,7 +54,6 @@ const distSource = path.join(process.cwd(), 'dist');
           host,
           password,
           port,
-          ssl,
           username: user,
         } = configService.get<DatabaseConfig>('database');
 
@@ -66,7 +65,11 @@ const distSource = path.join(process.cwd(), 'dist');
           debug: env === ENV_DEVELOPMENT,
           driver: PostgreSqlDriver,
           driverOptions: {
-            connection: { ssl },
+            connection: {
+              ssl: {
+                rejectUnauthorized: false,
+              },
+            },
           },
           entitiesTs: [path.join(srcRoot, './**/*.entity.ts')],
           extensions: [Migrator],
