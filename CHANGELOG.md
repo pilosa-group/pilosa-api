@@ -1,3 +1,10 @@
+## [1.13.5](https://github.com/pilosa-group/pilosa-api/compare/v1.13.4...v1.13.5) (2024-12-21)
+
+
+### Bug Fixes
+
+* disable crons ([74abc83](https://github.com/pilosa-group/pilosa-api/commit/74abc8375642e51e8221433f31e28f4ec0c0c081))
+
 ## [1.13.4](https://github.com/pilosa-group/pilosa-api/compare/v1.13.3...v1.13.4) (2024-10-13)
 
 
