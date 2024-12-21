@@ -4,7 +4,7 @@ import { ServerMetricService } from '@app/cloud-metrics/server-metric.service';
 import { CreateRequestContext } from '@mikro-orm/core';
 import { MikroORM } from '@mikro-orm/core';
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+// import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { CloudProviderAccountService } from './cloud-provider-account.service';
 import { AwsCredentials } from './cloud-provider-instance-list.interface';
@@ -23,7 +23,7 @@ export class MonitoringService {
     private readonly serverMetricService: ServerMetricService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  // @Cron(CronExpression.EVERY_5_MINUTES)
   @CreateRequestContext()
   async run() {
     if (this.isRunning) {
